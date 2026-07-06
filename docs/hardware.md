@@ -1,0 +1,35 @@
+# Hardware Profile
+
+## Controller Node: brain
+
+- CPU: Intel Celeron N5095A
+- Cores: 4
+- Memory: 14 GB RAM
+- Storage: ~100 GB NVMe
+- OS target: Ubuntu 26.04 LTS
+
+## Role in the Homelab
+
+`brain` serves as the central control plane host for:
+
+- Infrastructure automation execution
+- CI/CD job orchestration endpoints
+- Local service composition and testing
+- Monitoring and operational visibility tooling
+
+## Capacity Notes
+
+Given the current hardware footprint:
+
+- Keep service density moderate
+- Use lightweight workloads first
+- Monitor memory and disk utilization before adding heavy services
+- Prioritize reliability and reproducibility over workload count
+
+## Upgrade Considerations
+
+Potential future upgrades to improve lab headroom:
+
+- Increase NVMe capacity for logs, images, and state files
+- Add RAM to support concurrent build and monitoring workloads
+- Offload selected workloads to additional nodes once introduced
