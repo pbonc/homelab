@@ -1,0 +1,4 @@
+
+# Homepage runtime-generated files
+docker/homepage/config/logs/
+docker/homepage/config/kubernetes.yaml
