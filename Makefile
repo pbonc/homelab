@@ -10,7 +10,7 @@ help: ## Show available targets
 >@awk 'BEGIN {FS = ":.*##"; printf "\nAvailable targets:\n"} /^[a-zA-Z0-9_.-]+:.*##/ {printf "  %-14s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 doctor: ## Validate local environment baseline
->@./scripts/doctor.sh
+>@python3 -m labctl doctor
 
 lint: ## Run lint checks (placeholder)
 >@echo "[lint] No linters configured yet."
