@@ -1,0 +1,19 @@
+---
+- Homelab:
+    - Repository:
+        - abbr: GH
+          href: https://github.com/pbonc/homelab
+    - Roadmap:
+        - abbr: DOC
+          href: https://github.com/pbonc/homelab/blob/main/docs/roadmap.md
+
+- Documentation:
+    - Architecture:
+        - abbr: ARC
+          href: https://github.com/pbonc/homelab/blob/main/docs/architecture.md
+    - Network:
+        - abbr: NET
+          href: https://github.com/pbonc/homelab/blob/main/docs/network.md
+    - Standards:
+        - abbr: STD
+          href: https://github.com/pbonc/homelab/blob/main/docs/standards.md

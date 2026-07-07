@@ -55,3 +55,32 @@ See the folders in the project root and detailed documentation in `docs/`.
 ## License
 
 This repository is currently intended as a personal engineering portfolio project.
+
+## Homepage Dashboard (First Deployed Service)
+
+The first deployed service in this homelab is [Homepage](https://github.com/gethomepage/homepage), running with Docker Compose under `docker/homepage/`.
+
+Why Homepage first:
+
+- Provides an interview-ready control surface immediately
+- Creates a single dashboard for current, planned, and future services
+- Establishes a repeatable Docker Compose deployment pattern for the rest of the stack
+
+Start Homepage:
+
+- `cd docker/homepage`
+- `docker compose up -d`
+
+Stop Homepage:
+
+- `cd docker/homepage`
+- `docker compose down`
+
+View logs:
+
+- `cd docker/homepage`
+- `docker compose logs -f`
+
+Open in browser:
+
+- `http://192.168.1.23:3000`

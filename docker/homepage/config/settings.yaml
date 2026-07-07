@@ -1,0 +1,28 @@
+---
+title: Homelab Dashboard
+language: en
+theme: dark
+color: slate
+headerStyle: clean
+statusStyle: dot
+hideVersion: true
+useEqualHeights: true
+layout:
+  Infrastructure:
+    style: row
+    columns: 3
+  Platform Services:
+    style: row
+    columns: 3
+  Applications:
+    style: row
+    columns: 3
+  Monitoring:
+    style: row
+    columns: 3
+  Security Lab:
+    style: row
+    columns: 3
+  AI / GPU:
+    style: row
+    columns: 3

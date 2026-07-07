@@ -1,0 +1,118 @@
+:root {
+  --dash-bg-0: #060b13;
+  --dash-bg-1: #0b1220;
+  --dash-bg-2: #111a2d;
+  --dash-card: #0f1727;
+  --dash-border: #20324b;
+  --dash-text: #d7e3f4;
+  --dash-muted: #94a9c6;
+  --dash-accent: #2bb7e8;
+  --dash-accent-soft: #4dd3ff;
+  --status-running: #22c55e;
+  --status-planned: #f59e0b;
+  --status-future: #60a5fa;
+}
+
+body {
+  background: radial-gradient(circle at 15% 10%, #102440 0%, var(--dash-bg-1) 35%, var(--dash-bg-0) 100%) fixed;
+  color: var(--dash-text);
+  font-family: "Segoe UI", "Noto Sans", "Helvetica Neue", sans-serif;
+  letter-spacing: 0.01em;
+}
+
+#app,
+main,
+.layout,
+.container {
+  color: var(--dash-text);
+}
+
+.card,
+.service,
+.widget,
+.bookmark,
+.group {
+  background: linear-gradient(180deg, rgba(15, 23, 39, 0.98) 0%, rgba(11, 18, 32, 0.96) 100%);
+  border: 1px solid var(--dash-border);
+  border-radius: 14px;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.24);
+}
+
+.card:hover,
+.service:hover,
+.widget:hover,
+.bookmark:hover,
+.group:hover {
+  border-color: var(--dash-accent);
+  box-shadow: 0 10px 28px rgba(43, 183, 232, 0.16);
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+a,
+a:visited {
+  color: var(--dash-text);
+}
+
+a:hover {
+  color: var(--dash-accent-soft);
+}
+
+p,
+span,
+small,
+.description {
+  color: var(--dash-muted);
+}
+
+.status {
+  display: inline-block;
+  margin-right: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+}
+
+.status-running {
+  color: #b7f7cb;
+  background: rgba(34, 197, 94, 0.18);
+  border-color: rgba(34, 197, 94, 0.45);
+}
+
+.status-planned {
+  color: #ffe2ac;
+  background: rgba(245, 158, 11, 0.16);
+  border-color: rgba(245, 158, 11, 0.42);
+}
+
+.status-future {
+  color: #c9e2ff;
+  background: rgba(96, 165, 250, 0.18);
+  border-color: rgba(96, 165, 250, 0.42);
+}
+
+h1,
+h2,
+h3,
+.group-title,
+.title {
+  color: #e8f1ff;
+  font-weight: 650;
+}
+
+@media (max-width: 768px) {
+  .card,
+  .service,
+  .widget,
+  .bookmark,
+  .group {
+    border-radius: 12px;
+  }
+
+  body {
+    background: linear-gradient(180deg, #101b2e 0%, #070d18 100%) fixed;
+  }
+}
