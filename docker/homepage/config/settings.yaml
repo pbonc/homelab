@@ -1,7 +1,7 @@
 ---
 title: Paul Boncher Engineering Lab
 subtitle: DevOps • Platform Engineering • Kubernetes • AI
-footer: Last Updated: Managed through Git + Docker Compose
+footer: "Last Updated: Managed through Git + Docker Compose"
 language: en
 theme: dark
 color: slate
