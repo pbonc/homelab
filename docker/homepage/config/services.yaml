@@ -24,7 +24,7 @@
         icon: mdi-github
         href: http://github-runner.local
         # Placeholder URL for planned self-hosted runner dashboard/endpoint.
-        description: "🟡 Planned | CI runner"
+        description: "🟢 Running | CI runner"
     - Jenkins:
         icon: mdi-jenkins
         href: http://jenkins.local
