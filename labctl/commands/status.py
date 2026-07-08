@@ -45,6 +45,48 @@ def _docker_service_status() -> None:
         print("[FAIL] Docker: inactive")
 
 
+def _homepage_container_status() -> None:
+    if shutil.which("docker") is None:
+        print("[INFO] Homepage: Docker CLI unavailable")
+        return
+
+    result = subprocess.run(
+        [
+            "docker",
+            "inspect",
+            "homepage",
+            "--format",
+            "{{.State.Status}} {{if .State.Health}}{{.State.Health.Status}}{{else}}no-healthcheck{{end}}",
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    if result.returncode != 0:
+        stderr = result.stderr.lower()
+        if "no such object" in stderr or "not found" in stderr:
+            print("[FAIL] Homepage: not found")
+        else:
+            print("[FAIL] Homepage: not found")
+        return
+
+    status_output = result.stdout.strip()
+    if not status_output:
+        print("[FAIL] Homepage: unknown")
+        return
+
+    status, _, health = status_output.partition(" ")
+    if status == "running" and health == "healthy":
+        print("[PASS] Homepage: running / healthy")
+    elif status == "running" and health == "no-healthcheck":
+        print("[WARN] Homepage: running / no healthcheck")
+    elif status == "running" and health == "unhealthy":
+        print("[FAIL] Homepage: running / unhealthy")
+    else:
+        print(f"[FAIL] Homepage: {status}")
+
+
 def run_status() -> int:
     repo_root = Path(__file__).resolve().parents[2]
 
@@ -74,6 +116,7 @@ def run_status() -> int:
     print()
     print("-- Services --")
     _docker_service_status()
+    _homepage_container_status()
 
     print()
     print("Status checks complete.")
