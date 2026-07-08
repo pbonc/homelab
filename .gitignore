@@ -2,6 +2,7 @@
 # Homepage runtime-generated files
 docker/homepage/config/logs/
 docker/homepage/config/kubernetes.yaml
+docker/homepage/config/status.json
 
 # Python
 __pycache__/

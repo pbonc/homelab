@@ -3,7 +3,7 @@
     - brain:
         icon: mdi-server
         href: http://192.168.1.23:3000
-        description: "🟢 Running | Controller Node"
+        description: "Homepage: Dashboard service on brain"
     - atlas:
         icon: mdi-chip
         href: http://atlas.local
@@ -19,7 +19,7 @@
     - Docker:
         icon: mdi-docker
         href: https://docs.docker.com/
-        description: "🟢 Running | Installed on brain"
+        description: "Docker: Container runtime on brain"
     - GitHub Actions Runner:
         icon: mdi-github
         href: http://github-runner.local
