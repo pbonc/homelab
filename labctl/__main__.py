@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 from typing import Sequence
 
+from .commands.status import run_status
 from .doctor import run_doctor
 
 
@@ -19,6 +20,13 @@ def build_parser() -> argparse.ArgumentParser:
         description="Run local homelab environment checks.",
     )
     doctor_parser.set_defaults(handler=lambda _args: run_doctor())
+
+    status_parser = subparsers.add_parser(
+        "status",
+        help="Show homelab repository status summary.",
+        description="Show homelab repository status summary.",
+    )
+    status_parser.set_defaults(handler=lambda _args: run_status())
 
     return parser
 
