@@ -26,7 +26,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="Show homelab repository status summary.",
         description="Show homelab repository status summary.",
     )
-    status_parser.set_defaults(handler=lambda _args: run_status())
+    status_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Emit status checks as machine-readable JSON.",
+    )
+    status_parser.set_defaults(handler=lambda args: run_status(json_output=args.json))
 
     return parser
 
