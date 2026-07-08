@@ -28,6 +28,23 @@ def _git_branch(repo_root: Path) -> str:
     return result.stdout.strip() or "unknown"
 
 
+def _docker_service_status() -> None:
+    if shutil.which("systemctl") is None:
+        print("[INFO] Docker service check unavailable on this platform.")
+        return
+
+    result = subprocess.run(
+        ["systemctl", "is-active", "docker"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.stdout.strip() == "active":
+        print("[PASS] Docker: active")
+    else:
+        print("[FAIL] Docker: inactive")
+
+
 def run_status() -> int:
     repo_root = Path(__file__).resolve().parents[2]
 
@@ -53,6 +70,10 @@ def run_status() -> int:
             _ok(str(rel), "present")
         else:
             _warn(str(rel), "missing")
+
+    print()
+    print("-- Services --")
+    _docker_service_status()
 
     print()
     print("Status checks complete.")
