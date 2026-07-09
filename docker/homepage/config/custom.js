@@ -7,7 +7,7 @@
 			key: "docker",
 			baseText: "Container runtime on brain",
 		},
-		Homepage: {
+		brain: {
 			key: "homepage",
 			baseText: "Dashboard service on brain",
 		},
@@ -24,7 +24,7 @@
 	}
 
 	function findCardByTitle(title) {
-		const cardSelectors = ["article", "li", ".service", ".card", ".item"];
+		const cardSelectors = ["article", "li", ".service", ".card", ".item", "div"];
 		const cards = document.querySelectorAll(cardSelectors.join(", "));
 
 		for (const card of cards) {
@@ -101,8 +101,14 @@
 		}
 	}
 
-	document.addEventListener("DOMContentLoaded", () => {
+	function start() {
 		refreshStatuses();
 		window.setInterval(refreshStatuses, REFRESH_MS);
-	});
+	}
+
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", start, { once: true });
+	} else {
+		start();
+	}
 })();
