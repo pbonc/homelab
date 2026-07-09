@@ -1,17 +1,21 @@
 (() => {
-	const STATUS_URL = "/api/config/status.json";
+	const STATUS_URLS = ["/api/config/status.json", "/status.json"];
 	const REFRESH_MS = 30000;
 
-	const SERVICES = {
-		Docker: {
+	const SERVICES = [
+		{
+			title: "Docker",
 			key: "docker",
 			baseText: "Container runtime on brain",
+			hrefContains: "docs.docker.com",
 		},
-		brain: {
+		{
+			title: "brain",
 			key: "homepage",
 			baseText: "Dashboard service on brain",
+			hrefContains: ":3000",
 		},
-	};
+	];
 
 	function statusLabel(status) {
 		if (status === "healthy") {
@@ -23,7 +27,37 @@
 		return "⚪ Unknown";
 	}
 
-	function findCardByTitle(title) {
+	function closestCard(element) {
+		if (!element) {
+			return null;
+		}
+
+		return (
+			element.closest("article") ||
+			element.closest("li") ||
+			element.closest(".service") ||
+			element.closest(".card") ||
+			element.closest(".item") ||
+			element.closest("[class*='service']") ||
+			element.closest("[class*='item']") ||
+			element.parentElement ||
+			null
+		);
+	}
+
+	function findCard(service) {
+		if (service.hrefContains) {
+			const links = document.querySelectorAll("a[href]");
+			for (const link of links) {
+				if ((link.getAttribute("href") || "").includes(service.hrefContains) || (link.href || "").includes(service.hrefContains)) {
+					const cardFromLink = closestCard(link);
+					if (cardFromLink) {
+						return cardFromLink;
+					}
+				}
+			}
+		}
+
 		const cardSelectors = ["article", "li", ".service", ".card", ".item", "div"];
 		const cards = document.querySelectorAll(cardSelectors.join(", "));
 
@@ -33,7 +67,7 @@
 				.map((line) => line.trim())
 				.filter(Boolean);
 
-			if (text.includes(title)) {
+			if (text.includes(service.title)) {
 				return card;
 			}
 		}
@@ -55,8 +89,8 @@
 		);
 	}
 
-	function setCardDescription(title, text) {
-		const card = findCardByTitle(title);
+	function setCardDescription(service, text) {
+		const card = findCard(service);
 		if (!card) {
 			return;
 		}
@@ -75,10 +109,10 @@
 	function applyStatuses(payload) {
 		const services = (payload && payload.services) || {};
 
-		for (const [title, config] of Object.entries(SERVICES)) {
-			const service = services[config.key] || {};
-			const label = statusLabel(service.status);
-			setCardDescription(title, `${label} | ${config.baseText}`);
+		for (const config of SERVICES) {
+			const serviceState = services[config.key] || {};
+			const label = statusLabel(serviceState.status);
+			setCardDescription(config, `${label} | ${config.baseText}`);
 		}
 	}
 
@@ -86,15 +120,31 @@
 		applyStatuses({ services: {} });
 	}
 
+	async function loadStatusPayload() {
+		for (const url of STATUS_URLS) {
+			try {
+				const response = await fetch(url, { cache: "no-store" });
+				if (!response.ok) {
+					continue;
+				}
+
+				const text = await response.text();
+				if (!text.trim()) {
+					continue;
+				}
+
+				return JSON.parse(text);
+			} catch (_error) {
+				// Try next URL.
+			}
+		}
+
+		throw new Error("status JSON unavailable");
+	}
+
 	async function refreshStatuses() {
 		try {
-			const response = await fetch(STATUS_URL, { cache: "no-store" });
-			if (!response.ok) {
-				applyUnknownStatuses();
-				return;
-			}
-
-			const payload = await response.json();
+			const payload = await loadStatusPayload();
 			applyStatuses(payload);
 		} catch (_error) {
 			applyUnknownStatuses();
