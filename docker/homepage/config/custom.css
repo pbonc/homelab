@@ -1,20 +1,25 @@
 :root {
-  --dash-bg-0: #060b13;
-  --dash-bg-1: #0b1220;
-  --dash-bg-2: #111a2d;
-  --dash-card: #0f1727;
-  --dash-border: #20324b;
-  --dash-text: #d7e3f4;
-  --dash-muted: #94a9c6;
-  --dash-accent: #35bff0;
-  --dash-accent-soft: #67dcff;
+  --dash-bg-0: #040711;
+  --dash-bg-1: #091426;
+  --dash-bg-2: #102542;
+  --dash-card: #111d31;
+  --dash-card-raised: #172944;
+  --dash-border: #2b4668;
+  --dash-text: #eef6ff;
+  --dash-muted: #a9bdd5;
+  --dash-accent: #22d3ee;
+  --dash-accent-soft: #7dd3fc;
   --status-running: #22c55e;
+  --status-unhealthy: #f43f5e;
   --status-planned: #f59e0b;
-  --status-future: #60a5fa;
+  --status-future: #818cf8;
 }
 
 body {
-  background: radial-gradient(circle at 15% 10%, #102440 0%, var(--dash-bg-1) 35%, var(--dash-bg-0) 100%) fixed;
+  background:
+    radial-gradient(circle at 12% 4%, rgba(8, 145, 178, 0.25) 0%, transparent 32%),
+    radial-gradient(circle at 90% 16%, rgba(99, 102, 241, 0.2) 0%, transparent 28%),
+    linear-gradient(145deg, var(--dash-bg-2) 0%, var(--dash-bg-1) 42%, var(--dash-bg-0) 100%) fixed;
   color: var(--dash-text);
   font-family: "Segoe UI", "Noto Sans", "Helvetica Neue", sans-serif;
   letter-spacing: 0.01em;
@@ -37,35 +42,71 @@ main,
 }
 
 .services-group,
-.service-group,
-.group {
+.service-group {
   margin-bottom: 18px;
 }
 
 .card,
-.service,
+.service-card,
 .widget,
-.bookmark,
-.group {
-  background: linear-gradient(180deg, rgba(15, 23, 39, 0.98) 0%, rgba(11, 18, 32, 0.96) 100%);
+.bookmark {
+  background: linear-gradient(145deg, rgba(23, 41, 68, 0.96) 0%, rgba(11, 24, 43, 0.98) 100%);
   border: 1px solid var(--dash-border);
   border-radius: 14px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.035);
   padding: 14px;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
 }
 
 .card:hover,
-.service:hover,
+.service-card:hover,
 .widget:hover,
-.bookmark:hover,
-.group:hover {
+.bookmark:hover {
   border-color: var(--dash-accent);
-  box-shadow: 0 10px 30px rgba(53, 191, 240, 0.2);
-  transition: border-color 180ms ease, box-shadow 180ms ease;
+  box-shadow: 0 12px 34px rgba(34, 211, 238, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transform: translateY(-2px);
 }
 
-.service {
+.service-card {
   margin-bottom: 10px;
+}
+
+.services-group {
+  padding: 10px 12px 14px;
+  border-radius: 16px;
+  background: rgba(5, 12, 24, 0.24);
+  border: 1px solid rgba(125, 211, 252, 0.08);
+}
+
+.services-group:nth-child(1) .service-group-name {
+  color: #86efac;
+}
+
+.services-group:nth-child(1) .service-card {
+  border-left: 3px solid rgba(34, 197, 94, 0.85);
+}
+
+.services-group:nth-child(2) .service-group-name {
+  color: #fcd34d;
+}
+
+.services-group:nth-child(2) .service-card {
+  border-left: 3px solid rgba(245, 158, 11, 0.72);
+}
+
+.services-group:nth-child(3) .service-group-name {
+  color: #a5b4fc;
+}
+
+.services-group:nth-child(3) .service-card {
+  border-left: 3px solid rgba(129, 140, 248, 0.72);
+}
+
+.service-group-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
 }
 
 .service-name,
@@ -85,7 +126,6 @@ a:hover {
 }
 
 p,
-span,
 small,
 .description {
   color: var(--dash-muted);
@@ -95,6 +135,24 @@ small,
 .description {
   margin-top: 6px;
   letter-spacing: 0.01em;
+}
+
+/* Preserve and strengthen Homepage's native health colors. */
+.service-tags [class*="bg-emerald"],
+.service-tags [class*="bg-green"] {
+  background-color: var(--status-running) !important;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.18), 0 0 14px rgba(34, 197, 94, 0.9);
+}
+
+.service-tags [class*="bg-rose"],
+.service-tags [class*="bg-red"],
+.service-tags [class*="bg-orange"] {
+  background-color: var(--status-unhealthy) !important;
+  box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.18), 0 0 14px rgba(244, 63, 94, 0.9);
+}
+
+.service-site-monitor .site-monitor-status {
+  opacity: 1;
 }
 
 h1,
@@ -134,10 +192,9 @@ footer,
   }
 
   .card,
-  .service,
+  .service-card,
   .widget,
-  .bookmark,
-  .group {
+  .bookmark {
     border-radius: 12px;
     padding: 11px;
   }
@@ -153,11 +210,13 @@ footer,
     font-size: 1.03rem;
   }
 
-  .service {
+  .service-card {
     margin-bottom: 8px;
   }
 
   body {
-    background: linear-gradient(180deg, #101b2e 0%, #070d18 100%) fixed;
+    background:
+      radial-gradient(circle at 20% 0%, rgba(8, 145, 178, 0.22), transparent 35%),
+      linear-gradient(180deg, #10233d 0%, #050914 100%) fixed;
   }
 }
