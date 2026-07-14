@@ -1,8 +1,15 @@
 (() => {
 	const THRESHOLDS = {
-		cpu: 85,
-		memory: 85,
-		disk: 85,
+		warning: {
+			cpu: 85,
+			memory: 85,
+			disk: 85,
+		},
+		critical: {
+			cpu: 95,
+			memory: 95,
+			disk: 95,
+		},
 	};
 	const STARTUP_GRACE_MS = 15000;
 
@@ -72,10 +79,19 @@
 			return;
 		}
 
+		const critical = [];
+		if (cpu >= THRESHOLDS.critical.cpu) critical.push(`CPU ${Math.round(cpu)}%`);
+		if (memory >= THRESHOLDS.critical.memory) critical.push(`RAM ${Math.round(memory)}%`);
+		if (disk >= THRESHOLDS.critical.disk) critical.push(`Disk ${Math.round(disk)}%`);
+		if (critical.length) {
+			setBadge(card, "critical", `Critical: ${critical.join(", ")}`);
+			return;
+		}
+
 		const warnings = [];
-		if (cpu >= THRESHOLDS.cpu) warnings.push(`CPU ${Math.round(cpu)}%`);
-		if (memory >= THRESHOLDS.memory) warnings.push(`RAM ${Math.round(memory)}%`);
-		if (disk >= THRESHOLDS.disk) warnings.push(`Disk ${Math.round(disk)}%`);
+		if (cpu >= THRESHOLDS.warning.cpu) warnings.push(`CPU ${Math.round(cpu)}%`);
+		if (memory >= THRESHOLDS.warning.memory) warnings.push(`RAM ${Math.round(memory)}%`);
+		if (disk >= THRESHOLDS.warning.disk) warnings.push(`Disk ${Math.round(disk)}%`);
 
 		if (warnings.length) {
 			setBadge(card, "warning", `Attention: ${warnings.join(", ")}`);

@@ -45,15 +45,6 @@
     - CardOS:
         icon: mdi-credit-card-outline
         description: "Planned | Portfolio application"
-    - MeanGeneBot:
-        icon: mdi-robot-outline
-        description: "Planned | Bot platform"
-    - Stream Overlay:
-        icon: mdi-monitor-dashboard
-        description: "Planned | Live graphics"
-    - Scanner Pipeline:
-        icon: mdi-scan-helper
-        description: "Planned | Document processing"
     - Grafana:
         icon: mdi-chart-line
         description: "Planned | Visualization"
@@ -86,6 +77,3 @@
     - Vulnerable VM Range:
         icon: mdi-lan-disconnect
         description: "Future | Isolated attack/defense lab"
-    - Stable Diffusion:
-        icon: mdi-image-filter-center-focus
-        description: "Future | GPU image generation"

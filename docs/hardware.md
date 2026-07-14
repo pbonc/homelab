@@ -34,7 +34,7 @@ The card is classified after a 15-second startup grace period:
 
 - Green: metrics are available and CPU, memory, and root filesystem usage are below 85%
 - Yellow: the node is active but one or more metrics are at or above 85%
-- Red: required metrics are unavailable
+- Red: one or more metrics are at or above 95%, or required metrics are unavailable
 
 ## Upgrade Considerations
 
