@@ -27,6 +27,7 @@ This repository is designed so GitHub Actions, GitLab CI, and Jenkins call the s
 
 - Docker and Docker Compose
 - Homepage at `http://192.168.1.23:3000`
+- Glances host metrics displayed on the `brain` card
 - A self-hosted GitHub Actions runner
 - Repository diagnostics through `labctl`
 
@@ -85,3 +86,5 @@ Open in browser:
 - `http://192.168.1.23:3000`
 
 Homepage configuration is mounted from `docker/homepage/config/`. Repository changes do not affect the running dashboard until this directory is deployed or synchronized to `brain`.
+
+The dashboard configuration version is stored in `docker/homepage/version.env` and displayed on the Homepage service card. Git tags and future deployment pipelines can override this value for versioned releases.

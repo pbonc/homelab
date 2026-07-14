@@ -1,9 +1,4 @@
 ---
-- resources:
-    cpu: true
-    memory: true
-    disk: /
-
 - datetime:
     text_size: md
     format:

@@ -29,11 +29,11 @@
 
 ## Current Topology
 
-- `brain`: active controller node running Docker, Homepage, and a GitHub Actions runner
+- `brain`: active controller node running Docker, Homepage, Glances, and a GitHub Actions runner
 - ADS-B Raspberry Pi: future edge receiver node
 - `atlas`: future GPU-capable node
 
-Homepage is the current control surface. Planned services remain informational until they have a verified endpoint and health signal.
+Homepage is the current control surface. Glances supplies host CPU, memory, and filesystem data to the `brain` infrastructure card over the private Compose network. Planned services remain informational until they have a verified endpoint and health signal.
 
 ## Current Phase
 

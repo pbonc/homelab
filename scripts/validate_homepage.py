@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CONFIG = ROOT / "docker" / "homepage" / "config"
 TEXT_FILES = [
     ROOT / "Makefile",
+    ROOT / "docker" / "homepage" / "version.env",
     *sorted(CONFIG.glob("*.yaml")),
     *sorted(CONFIG.glob("*.css")),
     *sorted(CONFIG.glob("*.js")),
@@ -84,7 +85,7 @@ def main() -> int:
         if path.suffix != ".yaml":
             continue
         for line_number, line in enumerate(text.splitlines(), start=1):
-            match = re.match(r"^\s*(?:href|siteMonitor):\s*[\"']?(.*?)[\"']?\s*$", line)
+            match = re.match(r"^\s*(?:href|siteMonitor|url):\s*[\"']?(.*?)[\"']?\s*$", line)
             if not match:
                 continue
             href = match.group(1)
@@ -103,6 +104,12 @@ def main() -> int:
     makefile = contents[ROOT / "Makefile"]
     if "homepage-status:" in makefile:
         errors.append("Makefile still exposes the unsupported Homepage JSON export")
+
+    version_env = contents[ROOT / "docker" / "homepage" / "version.env"]
+    if not re.search(r"^HOMEPAGE_VAR_DASHBOARD_VERSION=\d+\.\d+\.\d+$", version_env, re.MULTILINE):
+        errors.append("version.env must define a semantic dashboard version")
+    if "{{HOMEPAGE_VAR_DASHBOARD_VERSION}}" not in services:
+        errors.append("Homepage card does not display the dashboard version")
 
     if errors:
         for error in errors:

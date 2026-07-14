@@ -10,6 +10,9 @@ statusStyle: dot
 hideVersion: true
 useEqualHeights: true
 layout:
+  Infrastructure Nodes:
+    style: row
+    columns: 3
   Deployed Services:
     style: row
     columns: 3
@@ -18,4 +21,4 @@ layout:
     columns: 4
   Future Lab:
     style: row
-    columns: 4
+    columns: 2

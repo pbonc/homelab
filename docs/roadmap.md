@@ -13,6 +13,9 @@
 - [x] Remove placeholder click targets
 - [x] Retire unsupported status JSON and DOM mutation
 - [x] Add UTF-8 and Homepage configuration validation
+- [x] Separate physical nodes from deployed services
+- [x] Add host metrics to the `brain` card
+- [x] Display the semantic dashboard version
 - [ ] Deploy the current Homepage configuration to `brain`
 - [ ] Restore Docker integration through a supported, least-privilege connection
 - [ ] Add a real container healthcheck

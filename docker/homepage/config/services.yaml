@@ -1,17 +1,39 @@
 ---
-- Deployed Services:
+- Infrastructure Nodes:
     - brain:
         icon: mdi-server
+        description: "Active | Homelab controller"
+        widgets:
+          - type: glances
+            url: http://glances:61208
+            version: 4
+            metric: info
+            chart: false
+          - type: glances
+            url: http://glances:61208
+            version: 4
+            metric: fs:/host
+            chart: false
+    - atlas:
+        icon: mdi-chip
+        description: "Future | GPU server"
+    - adsb-pi:
+        icon: mdi-raspberry-pi
+        description: "Future | ADS-B receiver node"
+
+- Deployed Services:
+    - Homepage:
+        icon: mdi-view-dashboard
         href: http://192.168.1.23:3000
         siteMonitor: http://127.0.0.1:3000/api/healthcheck
-        description: "Running | Controller node and Homepage"
-    - Docker:
+        description: "Running on brain | Dashboard v{{HOMEPAGE_VAR_DASHBOARD_VERSION}}"
+    - Docker Engine:
         icon: mdi-docker
-        description: "Deployed | Container runtime on brain"
+        description: "Running on brain | Container runtime"
     - GitHub Actions Runner:
         icon: mdi-github
         href: https://github.com/pbonc/homelab/actions
-        description: "Configured | Self-hosted CI runner"
+        description: "Configured on brain | Self-hosted CI runner"
 
 - Planned Services:
     - Jenkins:
@@ -61,12 +83,6 @@
         description: "Planned | Model interface"
 
 - Future Lab:
-    - atlas:
-        icon: mdi-chip
-        description: "Future | GPU server"
-    - ADS-B Receiver:
-        icon: mdi-airplane-marker
-        description: "Future | Raspberry Pi receiver and feed health"
     - Vulnerable VM Range:
         icon: mdi-lan-disconnect
         description: "Future | Isolated attack/defense lab"

@@ -2,6 +2,8 @@ services:
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
+    depends_on:
+      - glances
     ports:
       - "3000:3000"
     volumes:
@@ -11,4 +13,18 @@ services:
       - PUID=1000
       - PGID=1000
       - HOMEPAGE_ALLOWED_HOSTS=*
+    env_file:
+      - version.env
+    restart: unless-stopped
+
+  glances:
+    image: nicolargo/glances:latest-full
+    container_name: glances
+    hostname: brain
+    pid: host
+    volumes:
+      - /:/host:ro
+      - ./glances.conf:/glances.conf:ro
+    environment:
+      - GLANCES_OPT=-w -C /glances.conf
     restart: unless-stopped

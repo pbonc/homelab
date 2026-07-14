@@ -79,26 +79,34 @@ main,
 }
 
 .services-group:nth-child(1) .service-group-name {
-  color: #86efac;
+  color: #67e8f9;
 }
 
 .services-group:nth-child(1) .service-card {
-  border-left: 3px solid rgba(34, 197, 94, 0.85);
+  border-left: 3px solid rgba(34, 211, 238, 0.82);
 }
 
 .services-group:nth-child(2) .service-group-name {
-  color: #fcd34d;
+  color: #86efac;
 }
 
 .services-group:nth-child(2) .service-card {
-  border-left: 3px solid rgba(245, 158, 11, 0.72);
+  border-left: 3px solid rgba(34, 197, 94, 0.85);
 }
 
 .services-group:nth-child(3) .service-group-name {
-  color: #a5b4fc;
+  color: #fcd34d;
 }
 
 .services-group:nth-child(3) .service-card {
+  border-left: 3px solid rgba(245, 158, 11, 0.72);
+}
+
+.services-group:nth-child(4) .service-group-name {
+  color: #a5b4fc;
+}
+
+.services-group:nth-child(4) .service-card {
   border-left: 3px solid rgba(129, 140, 248, 0.72);
 }
 

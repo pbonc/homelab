@@ -26,6 +26,10 @@ Given the current hardware footprint:
 - Monitor memory and disk utilization before adding heavy services
 - Prioritize reliability and reproducibility over workload count
 
+## Current Monitoring
+
+Glances runs alongside Homepage with host PID visibility and a read-only root filesystem mount. Homepage uses its internal API to display controller identity, CPU, memory, and root filesystem utilization on the `brain` card.
+
 ## Upgrade Considerations
 
 Potential future upgrades to improve lab headroom:
