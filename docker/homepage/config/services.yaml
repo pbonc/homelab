@@ -1,115 +1,74 @@
 ---
-- Infrastructure:
-    - brain:
-        icon: mdi-server
+- Deployed Services:
+    - Homepage:
+        icon: mdi-view-dashboard
         href: http://192.168.1.23:3000
-        description: "Homepage: Dashboard service on brain"
-    - atlas:
-        icon: mdi-chip
-        href: http://atlas.local
-        # Placeholder URL for future GPU server service endpoint.
-        description: "⚪ Future | GPU Server"
-    - edge:
-        icon: mdi-raspberry-pi
-        href: http://edge.local
-        # Placeholder URL for future Raspberry Pi service endpoint.
-        description: "⚪ Future | Raspberry Pi"
-
-- Platform Services:
+        description: "Deployed | Dashboard on brain"
     - Docker:
         icon: mdi-docker
-        href: https://docs.docker.com/
-        description: "Docker: Container runtime on brain"
+        description: "Deployed | Container runtime on brain"
     - GitHub Actions Runner:
         icon: mdi-github
-        href: http://github-runner.local
-        # Placeholder URL for planned self-hosted runner dashboard/endpoint.
-        description: "🟢 Running | CI runner"
+        href: https://github.com/pbonc/homelab/actions
+        description: "Configured | Self-hosted CI runner"
+
+- Planned Services:
     - Jenkins:
         icon: mdi-jenkins
-        href: http://jenkins.local
-        # Placeholder URL for planned Jenkins controller.
-        description: "🟡 Planned | CI/CD orchestration"
+        description: "Planned | CI/CD orchestration"
     - K3s:
         icon: mdi-kubernetes
-        href: http://k3s.local
-        # Placeholder URL for planned K3s API/service landing page.
-        description: "🟡 Planned | Lightweight Kubernetes"
-
-- Applications:
+        description: "Planned | Lightweight Kubernetes"
     - CardOS:
         icon: mdi-credit-card-outline
-        href: http://cardos.local
-        # Placeholder URL for planned CardOS application.
-        description: "🟡 Planned | Portfolio application"
+        description: "Planned | Portfolio application"
     - MeanGeneBot:
         icon: mdi-robot-outline
-        href: http://meangenebot.local
-        # Placeholder URL for planned MeanGeneBot application.
-        description: "🟡 Planned | Bot platform"
+        description: "Planned | Bot platform"
     - Stream Overlay:
         icon: mdi-monitor-dashboard
-        href: http://stream-overlay.local
-        # Placeholder URL for planned stream overlay application.
-        description: "🟡 Planned | Live graphics"
+        description: "Planned | Live graphics"
     - Scanner Pipeline:
         icon: mdi-scan-helper
-        href: http://scanner-pipeline.local
-        # Placeholder URL for planned scanner pipeline endpoint.
-        description: "🟡 Planned | Document processing"
-
-- Monitoring:
+        description: "Planned | Document processing"
     - Grafana:
         icon: mdi-chart-line
-        href: http://grafana.local
-        # Placeholder URL for planned Grafana dashboard.
-        description: "🟡 Planned | Visualization"
+        description: "Planned | Visualization"
     - Prometheus:
         icon: mdi-timeline-clock-outline
-        href: http://prometheus.local
-        # Placeholder URL for planned Prometheus endpoint.
-        description: "🟡 Planned | Metrics collection"
+        description: "Planned | Metrics collection"
     - Loki:
         icon: mdi-file-document-multiple-outline
-        href: http://loki.local
-        # Placeholder URL for planned Loki endpoint.
-        description: "🟡 Planned | Log aggregation"
+        description: "Planned | Log aggregation"
     - Uptime Kuma:
         icon: mdi-heart-pulse
-        href: http://uptime-kuma.local
-        # Placeholder URL for planned Uptime Kuma dashboard.
-        description: "🟡 Planned | Availability checks"
-
-- Security Lab:
+        description: "Planned | Availability checks"
+    - Weather:
+        icon: mdi-weather-partly-cloudy
+        description: "Planned | Local conditions and forecast"
     - OWASP Juice Shop:
         icon: mdi-shield-bug-outline
-        href: http://juice-shop.local
-        # Placeholder URL for planned OWASP Juice Shop instance.
-        description: "🟡 Planned | Web app security practice"
+        description: "Planned | Web security practice"
     - DVWA:
         icon: mdi-shield-alert-outline
-        href: http://dvwa.local
-        # Placeholder URL for planned DVWA instance.
-        description: "🟡 Planned | Vulnerable web app training"
-    - Vulnerable VM Range:
-        icon: mdi-lan-disconnect
-        href: http://vuln-range.local
-        # Placeholder URL for planned vulnerable VM range.
-        description: "⚪ Future | Isolated attack/defense lab"
-
-- AI / GPU:
+        description: "Planned | Vulnerable web app training"
     - Ollama:
         icon: mdi-brain
-        href: http://ollama.local
-        # Placeholder URL for planned Ollama endpoint.
-        description: "🟡 Planned | Local LLM runtime"
+        description: "Planned | Local LLM runtime"
     - Open WebUI:
         icon: mdi-web
-        href: http://open-webui.local
-        # Placeholder URL for planned Open WebUI instance.
-        description: "🟡 Planned | Model interface"
+        description: "Planned | Model interface"
+
+- Future Lab:
+    - atlas:
+        icon: mdi-chip
+        description: "Future | GPU server"
+    - ADS-B Receiver:
+        icon: mdi-airplane-marker
+        description: "Future | Raspberry Pi receiver and feed health"
+    - Vulnerable VM Range:
+        icon: mdi-lan-disconnect
+        description: "Future | Isolated attack/defense lab"
     - Stable Diffusion:
         icon: mdi-image-filter-center-focus
-        href: http://stable-diffusion.local
-        # Placeholder URL for planned image generation service.
-        description: "⚪ Future | GPU image generation"
+        description: "Future | GPU image generation"

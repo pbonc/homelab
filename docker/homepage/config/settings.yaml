@@ -10,21 +10,12 @@ statusStyle: dot
 hideVersion: true
 useEqualHeights: true
 layout:
-  Infrastructure:
+  Deployed Services:
     style: row
     columns: 3
-  Platform Services:
+  Planned Services:
     style: row
-    columns: 3
-  Applications:
+    columns: 4
+  Future Lab:
     style: row
-    columns: 3
-  Monitoring:
-    style: row
-    columns: 3
-  Security Lab:
-    style: row
-    columns: 3
-  AI / GPU:
-    style: row
-    columns: 3
+    columns: 4

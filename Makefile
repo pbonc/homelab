@@ -4,7 +4,7 @@ SHELL := /usr/bin/env bash
 # CI portability note:
 # GitHub Actions, GitLab CI, and Jenkins should call these same Make targets.
 
-.PHONY: help doctor status homepage-status lint test bootstrap docker-up docker-down
+.PHONY: help doctor status lint test bootstrap docker-up docker-down
 
 help: ## Show available targets
 >@awk 'BEGIN {FS = ":.*##"; printf "\nAvailable targets:\n"} /^[a-zA-Z0-9_.-]+:.*##/ {printf "  %-14s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -15,14 +15,11 @@ doctor: ## Validate local environment baseline
 status: ## Show homelab repository status summary
 >@python3 -m labctl status
 
-homepage-status: ## Export labctl status JSON for Homepage runtime
->@python3 -m labctl status --json > docker/homepage/config/status.json
+lint: ## Validate repository and Homepage configuration
+>@python3 scripts/validate_homepage.py
 
-lint: ## Run lint checks (placeholder)
->@echo "[lint] No linters configured yet."
-
-test: ## Run tests (placeholder)
->@echo "[test] No tests configured yet."
+test: ## Run repository validation checks
+>@python3 scripts/validate_homepage.py
 
 bootstrap: ## Bootstrap local prerequisites (placeholder, no installs)
 >@echo "[bootstrap] Define bootstrap steps in scripts/bootstrap.sh when ready."
