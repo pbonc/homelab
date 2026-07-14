@@ -86,6 +86,21 @@ main,
   border-left: 3px solid rgba(34, 211, 238, 0.82);
 }
 
+/* Glances graphless widgets need their own positioning context. */
+.services-group:nth-child(1) .service-card .service-container {
+  position: relative;
+  min-height: 3.25rem;
+  margin: 0.55rem 0.75rem 0.7rem;
+  border: 1px solid rgba(103, 232, 249, 0.13);
+  border-radius: 9px;
+  background: rgba(3, 12, 24, 0.38);
+  overflow: hidden;
+}
+
+.services-group:nth-child(1) .service-card .service-container + .service-container {
+  margin-top: 0.35rem;
+}
+
 .services-group:nth-child(2) .service-group-name {
   color: #86efac;
 }
