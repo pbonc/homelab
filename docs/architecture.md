@@ -27,6 +27,14 @@
 3. Infrastructure and configuration changes are applied through controlled modules.
 4. Monitoring validates runtime state and exposes system health.
 
+## Current Topology
+
+- `brain`: active controller node running Docker, Homepage, and a GitHub Actions runner
+- ADS-B Raspberry Pi: future edge receiver node
+- `atlas`: future GPU-capable node
+
+Homepage is the current control surface. Planned services remain informational until they have a verified endpoint and health signal.
+
 ## Current Phase
 
-This repository is in the initial scaffolding phase. It intentionally contains structure and contracts before implementation depth.
+Foundation work is complete. The lab is establishing a reliable local-operations and observability baseline before adding additional platforms or nodes.

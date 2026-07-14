@@ -21,25 +21,23 @@ Professional, portfolio-style homelab repository for building and operating a hy
 
 This repository is designed so GitHub Actions, GitLab CI, and Jenkins call the same local interfaces (`make` targets and scripts), rather than re-implementing logic per CI platform.
 
-## Current Scope
+## Current State
 
-Initial scaffold includes:
+`brain` is currently the only running homelab system. It hosts:
 
-- Documentation baseline under `docs/`
-- Common automation entry points in `Makefile`
-- Environment validation script in `scripts/doctor.sh`
-- Domain folders for Ansible, Terraform, Docker, Helm, Kubernetes, Jenkins, monitoring, and security
+- Docker and Docker Compose
+- Homepage at `http://192.168.1.23:3000`
+- A self-hosted GitHub Actions runner
+- Repository diagnostics through `labctl`
 
-No real secrets, production manifests, or installations are included at this stage.
+Weather data and an ADS-B receiver on a Raspberry Pi are planned. Other dashboard cards are intentionally non-clickable until their services are deployed.
 
 ## Quick Start
 
-1. Make the doctor script executable:
-	- `chmod +x scripts/doctor.sh`
-2. Run environment checks:
-	- `make doctor`
-3. Explore available commands:
-	- `make help`
+1. Run environment checks: `make doctor`
+2. Validate Homepage configuration: `make lint`
+3. Show repository and service status: `make status`
+4. Explore available commands: `make help`
 
 ## Repository Layout
 
@@ -47,10 +45,11 @@ See the folders in the project root and detailed documentation in `docs/`.
 
 ## Next Milestones
 
-- Add foundational Docker Compose services for local tooling
-- Add Ansible baseline playbooks for controller bootstrap
-- Add Terraform skeleton for future cloud/on-prem experiments
-- Add first CI pipeline wrappers that call the same `make` targets
+- Restore supported Docker integration and container health in Homepage
+- Expand `labctl` into a reliable runtime health collector
+- Add Prometheus, Grafana, and availability monitoring
+- Add weather integration
+- Add Raspberry Pi ADS-B receiver health and feed metrics
 
 ## License
 
@@ -84,3 +83,5 @@ View logs:
 Open in browser:
 
 - `http://192.168.1.23:3000`
+
+Homepage configuration is mounted from `docker/homepage/config/`. Repository changes do not affect the running dashboard until this directory is deployed or synchronized to `brain`.

@@ -84,7 +84,7 @@ def main() -> int:
         if path.suffix != ".yaml":
             continue
         for line_number, line in enumerate(text.splitlines(), start=1):
-            match = re.match(r"^\s*href:\s*[\"']?(.*?)[\"']?\s*$", line)
+            match = re.match(r"^\s*(?:href|siteMonitor):\s*[\"']?(.*?)[\"']?\s*$", line)
             if not match:
                 continue
             href = match.group(1)

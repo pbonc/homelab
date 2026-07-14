@@ -1,45 +1,54 @@
 # Roadmap
 
-## Phase 0: Foundation (Current)
+## Phase 0: Foundation — Complete
 
-- Create repository structure for core domains
-- Establish documentation baseline
-- Add local environment validation (`make doctor`)
-- Define CI portability strategy around shared Make targets
+- Repository structure and documentation baseline
+- Shared Make targets and `labctl` diagnostics
+- Docker Compose deployment for Homepage
+- Self-hosted GitHub Actions runner workflow
 
-## Phase 1: Local Operations Baseline
+## Phase 1: Truthful Dashboard — Current
 
-- Add Docker Compose for local utility services
-- Add bootstrap scripts for repeatable controller setup
-- Add style/lint/test placeholders for future expansion
+- [x] Separate deployed, planned, and future services
+- [x] Remove placeholder click targets
+- [x] Retire unsupported status JSON and DOM mutation
+- [x] Add UTF-8 and Homepage configuration validation
+- [ ] Deploy the current Homepage configuration to `brain`
+- [ ] Restore Docker integration through a supported, least-privilege connection
+- [ ] Add a real container healthcheck
 
-## Phase 2: Automation and IaC
+## Phase 2: Runtime Health Collection
 
-- Add initial Ansible role and inventory structure
-- Add Terraform module skeletons and remote state strategy
-- Introduce environment-specific configuration conventions
+- Expand `labctl status` beyond repository structure checks
+- Add HTTP reachability, timestamps, latency, and stale-data handling
+- Return nonzero exit codes for actionable failures
+- Define and test a versioned UTF-8 JSON schema
 
-## Phase 3: CI/CD Integration
+## Phase 3: Observability
 
-- Add GitHub Actions workflows that call shared Make targets
-- Add Jenkins pipeline wrappers calling same targets
-- Add GitLab CI wrappers for parity
+- Add Prometheus, Grafana, and availability monitoring
+- Define service checks and initial alerts
+- Add weather conditions and forecast integration
+- Add runbooks and incident-response notes
 
-## Phase 4: Observability and Reliability
+## Phase 4: ADS-B Edge Node
 
-- Add Prometheus, Grafana, and Loki base configuration
-- Define SLO-inspired service checks for key components
-- Add runbook templates and incident response notes
+- Provision the Raspberry Pi receiver with a role-oriented hostname
+- Monitor host health, SDR connectivity, receiver processes, and feed freshness
+- Collect aircraft count, message rate, and reception-range metrics
+- Add a Homepage summary and detailed Grafana dashboard
 
-## Phase 5: Kubernetes Platform Layer
+## Phase 5: Automation and Platform Expansion
 
-- Introduce K3s cluster bootstrap plan
-- Add Helm chart organization strategy
-- Add workload deployment lifecycle documentation
+- Add Ansible controller and node bootstrap roles
+- Add Terraform module and state conventions
+- Introduce K3s and Helm when controller capacity and operational needs justify them
+- Add further CI providers only where they demonstrate a distinct capability
 
 ## Success Criteria
 
-- Every automation path is reproducible from a clean checkout
-- CI providers execute the same command contracts
-- Documentation stays synchronized with implementation
+- Every clickable dashboard item resolves to a deployed destination
+- Health indicators come from supported and testable checks
+- Automation is reproducible from a clean checkout
+- Documentation matches deployed infrastructure
 - Changes are testable, observable, and reversible
