@@ -115,7 +115,7 @@ The initial InfluxDB measurement is `telemetry`. Tags identify `source`, `handle
 
 ## Container runtime
 
-`docker/telemetry/compose.yaml` defines InfluxDB 2.9.1, the collector, and Grafana OSS 12.4.0. Upstream images and the collector base image are digest-pinned. InfluxDB and Grafana use named volumes. InfluxDB setup creates the `homelab` organization and a `telemetry` bucket with a 30-day retention period.
+`docker/telemetry/compose.yaml` defines InfluxDB 2.9.1, the collector, and Grafana OSS 12.4.0. Upstream images and the collector base image are digest-pinned. InfluxDB and Grafana use named volumes. InfluxDB setup creates the `homelab` organization and a configurable `telemetry` bucket. The example environment starts with a 30-day retention period; production retention should be chosen per data lifecycle, with long-lived buckets used for data worth preserving.
 
 Run `make telemetry-secrets` once on the deployment host to create the ignored `.env` and Docker secret files. Existing configuration and secrets are never overwritten. The secrets directory is host-private (`0700`); individual files are readable by the non-root container users only when bind-mounted. Validate the resolved model with `make telemetry-config`.
 

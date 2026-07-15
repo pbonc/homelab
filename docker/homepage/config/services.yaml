@@ -54,7 +54,7 @@
         icon: si-influxdb
         href: http://192.168.1.23:8086
         siteMonitor: http://192.168.1.23:8086/health
-        description: "Running on brain | 30-day telemetry storage"
+        description: "Running on brain | Durable time-series storage"
     - Grafana:
         icon: si-grafana
         href: http://192.168.1.23:3001/d/homelab-weather/local-weather
