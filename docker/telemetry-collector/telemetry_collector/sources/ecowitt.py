@@ -87,8 +87,7 @@ class EcowittHandler:
             if source_field not in payload or payload[source_field] == "":
                 continue
             converted = round(converter(_number(payload[source_field], source_field)), 4)
-            value: int | float = int(converted) if converted.is_integer() else converted
-            measurements[name] = Measurement(value=value, unit=unit)
+            measurements[name] = Measurement(value=converted, unit=unit)
             consumed.add(source_field)
 
         for field, value in payload.items():

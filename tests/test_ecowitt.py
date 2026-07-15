@@ -62,6 +62,7 @@ class EcowittHandlerTests(unittest.TestCase):
         payload = {"dateutc": "now", "tempf": "75.0"}
         envelope = EcowittHandler().normalize(payload, received_at=RECEIVED_AT)
         self.assertEqual(envelope.observed_at, RECEIVED_AT)
+        self.assertIsInstance(envelope.measurements["outdoor_temperature"].value, float)
 
     def test_rejects_invalid_numeric_measurement(self) -> None:
         with self.assertRaisesRegex(EcowittPayloadError, "tempf must be numeric"):

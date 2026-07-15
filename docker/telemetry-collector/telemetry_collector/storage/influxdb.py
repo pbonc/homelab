@@ -48,7 +48,10 @@ class InfluxDBTelemetryStore:
             .time(envelope.observed_at, WritePrecision.NS)
         )
         for name, measurement in envelope.measurements.items():
-            point.field(_field_name(name), measurement.value)
+            # InfluxDB fixes a field's type at first write. Always serialize
+            # normalized measurements as floats so whole-number readings do
+            # not conflict with earlier fractional readings.
+            point.field(_field_name(name), float(measurement.value))
         for name, value in envelope.extra_fields.items():
             point.field(f"raw_{_field_name(name)}", value)
         try:
