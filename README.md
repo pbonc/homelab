@@ -46,11 +46,11 @@ See the folders in the project root and detailed documentation in `docs/`.
 
 ## Next Milestones
 
-- Restore supported Docker integration and container health in Homepage
-- Expand `labctl` into a reliable runtime health collector
-- Add Prometheus, Grafana, and availability monitoring
-- Add weather integration
-- Add Raspberry Pi ADS-B receiver health and feed metrics
+- Build shared validate, deploy, verify, and rollback targets for Homepage
+- Add a manually triggered, version-aware GitHub Actions deployment
+- Harden the runtime with pinned images, a Homepage healthcheck, and restricted allowed hosts
+- Deploy Jenkins after the shared deployment contract is proven
+- Expand `labctl` and add the observability stack
 
 ## License
 
