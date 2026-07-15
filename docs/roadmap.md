@@ -46,37 +46,51 @@ Build one deployment interface that works locally, from GitHub Actions, and late
 
 Build the first version of a generic ingestion, storage, API, and visualization platform. The Ecowitt weather station is the first data source, not a weather-specific architectural boundary.
 
-### Platform foundation
+### 1. Contracts and configuration
 
-- [ ] Add Docker Compose services for the FastAPI telemetry collector, InfluxDB, and Grafana
-- [ ] Add service healthchecks, automatic restarts, and persistent volumes where appropriate
-- [ ] Automatically configure the InfluxDB organization, bucket, and retention policy
-- [ ] Automatically provision the Grafana datasource and starter dashboards
-- [ ] Keep collector handlers, Grafana dashboards, and Homepage integrations extensible for future telemetry sources
+- [ ] Define the source-plugin interface, normalized telemetry envelope, measurement names, units, timestamps, and unknown-field preservation rules
+- [ ] Establish API conventions that support future routes such as `/api/current/adsb` and `/api/current/docker`
+- [ ] Define environment-based configuration and local secret handling for InfluxDB and Grafana without committing credentials
+- [ ] Create the initial `docs/telemetry.md` architecture, data-flow, configuration, and extension-point sections
 
-### Collector and Ecowitt integration
+### 2. Collector vertical slice
 
 - [ ] Create a modular `docker/telemetry-collector/` Python and FastAPI service
 - [ ] Implement source plugins or handlers with Ecowitt as the first source
 - [ ] Accept Ecowitt uploads at `POST /data/report/`
 - [ ] Normalize common weather, wind, rain, solar, UV, and battery measurements
 - [ ] Preserve unknown Ecowitt values rather than discarding them
-- [ ] Store normalized and source-specific telemetry in InfluxDB
+- [ ] Add automated tests and representative Ecowitt fixtures for parsing, normalization, unknown fields, and API errors
 
-### APIs and visualization
+### 3. Storage and container runtime
+
+- [ ] Add Docker Compose services for the FastAPI telemetry collector, InfluxDB, and Grafana
+- [ ] Automatically configure the InfluxDB organization, bucket, and retention policy
+- [ ] Store normalized and source-specific telemetry in InfluxDB
+- [ ] Add service healthchecks, dependency readiness, automatic restarts, and persistent volumes where appropriate
+- [ ] Verify a synthetic Ecowitt report reaches InfluxDB before connecting the physical station
+
+### 4. Query APIs
 
 - [ ] Add `GET /api/health`, `GET /api/current/weather`, and `GET /api/history/weather`
-- [ ] Establish API conventions that support future routes such as `/api/current/adsb` and `/api/current/docker`
-- [ ] Build a starter Grafana weather dashboard covering temperature, humidity, pressure, wind, rain, UV, solar, battery, and upload frequency
+- [ ] Define bounded history-query parameters and stable empty, stale, and error responses
+- [ ] Add automated API tests backed by known telemetry samples
 
-### Homelab integration
+### 5. Platform consumers
 
-- [ ] Move Weather from planned inventory to deployed services in Homepage
+- [ ] Automatically provision the Grafana datasource and a starter weather dashboard covering temperature, humidity, pressure, wind, rain, UV, solar, battery, and upload frequency
+- [ ] Add `python -m labctl telemetry` for platform health, latest weather, last upload, and source count
 - [ ] Add Homepage cards for Telemetry Collector, InfluxDB, and Grafana
 - [ ] Show the collector's last upload and active telemetry-source count in Homepage
-- [ ] Add `python -m labctl telemetry` for platform health, latest weather, last upload, and source count
-- [ ] Create `docs/telemetry.md` covering architecture, data flow, APIs, Ecowitt setup, extension points, dashboards, Homepage, and troubleshooting
-- [ ] Verify live Ecowitt ingestion, InfluxDB persistence, Grafana dashboards, Homepage cards, and `labctl telemetry`
+- [ ] Replace the Homepage search bar with local weather data from the Telemetry Collector API
+- [ ] Move Weather from planned inventory to deployed services in Homepage only after live data is verified
+
+### 6. Live rollout and acceptance
+
+- [ ] Configure the Ecowitt gateway to upload to `POST /data/report/`
+- [ ] Complete `docs/telemetry.md` with REST APIs, Ecowitt setup, dashboard extension, Homepage integration, operations, and troubleshooting
+- [ ] Verify live Ecowitt ingestion, restart persistence, API freshness, Grafana dashboards, Homepage cards, and `labctl telemetry`
+- [ ] Confirm collector handlers, Grafana dashboards, and Homepage integrations provide clear extension points for the next telemetry source
 
 ## Phase 4: CI/CD Orchestration
 
