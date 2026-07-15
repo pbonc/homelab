@@ -9,11 +9,13 @@
             version: 4
             metric: info
             chart: false
+            refreshInterval: 5000
           - type: glances
             url: http://glances:61208
             version: 4
             metric: fs:/host
             chart: false
+            refreshInterval: 5000
     - atlas:
         icon: mdi-chip
         description: "Future | GPU server"

@@ -11,9 +11,10 @@
 			disk: 95,
 		},
 	};
-	const STARTUP_GRACE_MS = 15000;
+	const UNAVAILABLE_AFTER_MS = 15000;
 
-	let graceExpired = false;
+	let missingSince = null;
+	let unavailableTimer = null;
 	let updateQueued = false;
 
 	function serviceCard(name) {
@@ -78,8 +79,31 @@
 		const disk = diskPercent(text);
 
 		if (cpu === null || memory === null || disk === null) {
-			setBadge(card, graceExpired ? "unavailable" : "checking", graceExpired ? "Unavailable" : "Checking");
+			if (missingSince === null) {
+				missingSince = Date.now();
+			}
+
+			const missingFor = Date.now() - missingSince;
+			if (missingFor >= UNAVAILABLE_AFTER_MS) {
+				setBadge(card, "unavailable", "Unavailable");
+			} else {
+				if (!card.dataset.health) {
+					setBadge(card, "checking", "Checking");
+				}
+				if (unavailableTimer === null) {
+					unavailableTimer = window.setTimeout(() => {
+						unavailableTimer = null;
+						scheduleUpdate();
+					}, UNAVAILABLE_AFTER_MS - missingFor);
+				}
+			}
 			return;
+		}
+
+		missingSince = null;
+		if (unavailableTimer !== null) {
+			window.clearTimeout(unavailableTimer);
+			unavailableTimer = null;
 		}
 
 		const critical = [];
@@ -124,10 +148,6 @@
 	function start() {
 		scheduleUpdate();
 		new MutationObserver(scheduleUpdate).observe(document.body, { childList: true, subtree: true, characterData: true });
-		window.setTimeout(() => {
-			graceExpired = true;
-			scheduleUpdate();
-		}, STARTUP_GRACE_MS);
 	}
 
 	if (document.readyState === "loading") {

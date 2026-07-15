@@ -30,7 +30,7 @@ Given the current hardware footprint:
 
 Glances runs alongside Homepage with host PID visibility and a read-only root filesystem mount. Homepage uses its internal API to display controller identity, CPU, memory, and root filesystem utilization on the `brain` card.
 
-The card is classified after a 15-second startup grace period:
+Glances refreshes the displayed metrics every five seconds. The card is classified after a 15-second continuous-data-loss grace period, so a single widget refresh does not cause a red status flash:
 
 - Green: metrics are available and CPU, memory, and root filesystem usage are below 85%
 - Yellow: the node is active but one or more metrics are at or above 85%

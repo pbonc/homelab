@@ -2,56 +2,84 @@
 
 ## Phase 0: Foundation — Complete
 
-- Repository structure and documentation baseline
-- Shared Make targets and `labctl` diagnostics
-- Docker Compose deployment for Homepage
-- Self-hosted GitHub Actions runner workflow
+- [x] Create the repository structure and documentation baseline
+- [x] Establish shared Make targets and `labctl` diagnostics
+- [x] Deploy Homepage with Docker Compose
+- [x] Register a self-hosted GitHub Actions runner on `brain`
 
-## Phase 1: Truthful Dashboard — Current
+## Phase 1: Truthful Dashboard — Complete
 
-- [x] Separate deployed, planned, and future services
-- [x] Remove placeholder click targets
-- [x] Retire unsupported status JSON and DOM mutation
-- [x] Add UTF-8 and Homepage configuration validation
-- [x] Separate physical nodes from deployed services
-- [x] Add host metrics to the `brain` card
-- [x] Display the semantic dashboard version
-- [ ] Deploy the current Homepage configuration to `brain`
-- [ ] Restore Docker integration through a supported, least-privilege connection
-- [ ] Add a real container healthcheck
+- [x] Separate infrastructure nodes, deployed services, planned services, and future work
+- [x] Remove placeholder click targets and unused project cards
+- [x] Separate `brain` from the Homepage service
+- [x] Add Glances-backed CPU, memory, and root filesystem metrics to `brain`
+- [x] Classify `brain` as active, warning, critical, or unavailable from live metrics
+- [x] Style planned and future cards as inactive inventory
+- [x] Display dashboard semantic version `0.1.0`
+- [x] Retire the unsupported status JSON polling path
+- [x] Add UTF-8, URL, lifecycle, and version validation
+- [x] Add Glances readiness, host-header validation, and restricted CORS configuration
+- [x] Deploy and visually verify the current dashboard on `brain`
 
-## Phase 2: Runtime Health Collection
+## Phase 2: Deployment Contract — Current
 
-- Expand `labctl status` beyond repository structure checks
-- Add HTTP reachability, timestamps, latency, and stale-data handling
-- Return nonzero exit codes for actionable failures
-- Define and test a versioned UTF-8 JSON schema
+Build one deployment interface that works locally, from GitHub Actions, and later from Jenkins.
 
-## Phase 3: Observability
+- [ ] Choose and document a permanent deployment directory on `brain`
+- [ ] Add `homepage-validate`, `homepage-deploy`, `homepage-verify`, and `homepage-rollback` Make targets
+- [ ] Record the deployed semantic version, Git commit, deployer, and timestamp
+- [ ] Preserve the last known-good release for rollback
+- [ ] Prevent overlapping deployments with a deployment lock
+- [ ] Add a manually triggered GitHub Actions deployment workflow
+- [ ] Exercise deploy, failed verification, and rollback paths
+- [ ] Enable automatic deployment from `main` only after the manual path is reliable
 
-- Add Prometheus, Grafana, and availability monitoring
-- Define service checks and initial alerts
-- Add weather conditions and forecast integration
-- Add runbooks and incident-response notes
+### Runtime hardening during Phase 2
 
-## Phase 4: ADS-B Edge Node
+- [ ] Pin Homepage and Glances image versions instead of using mutable `latest` tags
+- [ ] Add a real Homepage container healthcheck
+- [ ] Replace `HOMEPAGE_ALLOWED_HOSTS=*` with the trusted hostnames and addresses
+- [ ] Restore Homepage Docker integration through a least-privilege socket proxy or equivalent
+- [ ] Update `labctl status` to recognize the Glances container and deployed release
 
-- Provision the Raspberry Pi receiver with a role-oriented hostname
-- Monitor host health, SDR connectivity, receiver processes, and feed freshness
-- Collect aircraft count, message rate, and reception-range metrics
-- Add a Homepage summary and detailed Grafana dashboard
+## Phase 3: CI/CD Orchestration
 
-## Phase 5: Automation and Platform Expansion
+- [ ] Deploy Jenkins only after the shared deployment contract is stable
+- [ ] Have Jenkins call the same Make targets as GitHub Actions
+- [ ] Add a Jenkins release parameter for semantic version or Git tag
+- [ ] Assign only one system as the automatic production deployer
+- [ ] Use the other CI system for validation, manual releases, or pipeline-parity demonstrations
 
-- Add Ansible controller and node bootstrap roles
-- Add Terraform module and state conventions
-- Introduce K3s and Helm when controller capacity and operational needs justify them
-- Add further CI providers only where they demonstrate a distinct capability
+## Phase 4: Runtime Health and Observability
+
+- [ ] Expand `labctl status` beyond repository structure checks
+- [ ] Add HTTP reachability, timestamps, latency, and stale-data handling
+- [ ] Return nonzero exit codes for actionable failures
+- [ ] Define and test a versioned UTF-8 status schema
+- [ ] Add Prometheus, Grafana, Loki, and availability monitoring
+- [ ] Define initial service checks, thresholds, and alerts
+- [ ] Add weather conditions and forecast integration
+- [ ] Add runbooks and incident-response notes
+
+## Phase 5: ADS-B Edge Node
+
+- [ ] Provision the Raspberry Pi receiver with a role-oriented hostname
+- [ ] Monitor host health, SDR connectivity, receiver processes, and feed freshness
+- [ ] Collect aircraft count, message rate, and reception-range metrics
+- [ ] Add a Homepage summary and detailed Grafana dashboard
+
+## Phase 6: Automation and Platform Expansion
+
+- [ ] Add Ansible controller and node bootstrap roles
+- [ ] Add Terraform module and state conventions
+- [ ] Introduce K3s and Helm when controller capacity and operational needs justify them
+- [ ] Add further CI providers only where they demonstrate a distinct capability
 
 ## Success Criteria
 
 - Every clickable dashboard item resolves to a deployed destination
-- Health indicators come from supported and testable checks
+- Health indicators come from supported, testable, and documented checks
+- Deployments are versioned, mutually exclusive, verifiable, and reversible
+- CI providers call shared repository interfaces instead of embedding unique deployment logic
 - Automation is reproducible from a clean checkout
 - Documentation matches deployed infrastructure
-- Changes are testable, observable, and reversible
