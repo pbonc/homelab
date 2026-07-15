@@ -61,6 +61,29 @@ class HomepageReleaseTests(unittest.TestCase):
 
         homepage_release.verify(Path("/release"), "http://127.0.0.1:3000", 1, 0)
 
+    @patch("scripts.homepage_release.time.sleep")
+    @patch("scripts.homepage_release.urllib.request.urlopen")
+    @patch("scripts.homepage_release.run")
+    def test_verify_retries_a_connection_reset_during_startup(
+        self,
+        mock_run: MagicMock,
+        mock_urlopen: MagicMock,
+        _mock_sleep: MagicMock,
+    ) -> None:
+        mock_run.return_value = "\n".join(
+            [
+                json.dumps({"Service": "homepage", "State": "running", "Health": "healthy"}),
+                json.dumps({"Service": "glances", "State": "running", "Health": "healthy"}),
+            ]
+        )
+        response = MagicMock()
+        response.status = 200
+        successful_request = MagicMock()
+        successful_request.__enter__.return_value = response
+        mock_urlopen.side_effect = [ConnectionResetError(104, "Connection reset by peer"), successful_request]
+
+        homepage_release.verify(Path("/release"), "http://127.0.0.1:3000", 2, 0)
+
     @patch("scripts.homepage_release.run")
     def test_verify_rejects_a_missing_service(self, mock_run: MagicMock) -> None:
         mock_run.return_value = json.dumps(

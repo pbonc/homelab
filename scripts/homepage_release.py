@@ -173,7 +173,7 @@ def verify(release: Path, url: str, attempts: int, interval: float) -> None:
                     print(f"[PASS] Homepage verified at {url} (HTTP {response.status})")
                     return
                 last_error = f"HTTP {response.status}"
-        except (urllib.error.URLError, TimeoutError) as exc:
+        except (urllib.error.URLError, TimeoutError, OSError) as exc:
             last_error = str(exc)
         time.sleep(interval)
     raise ReleaseError(f"Homepage verification failed at {url}: {last_error}")

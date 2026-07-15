@@ -23,16 +23,16 @@ test: ## Run repository validation checks
 >@python3 -m unittest discover -s tests -v
 
 homepage-validate: ## Validate Homepage source and Compose configuration
->@python3 scripts/homepage_release.py validate
+>@python3 -u scripts/homepage_release.py validate
 
 homepage-deploy: ## Deploy and verify an immutable Homepage release
->@python3 scripts/homepage_release.py deploy
+>@python3 -u scripts/homepage_release.py deploy
 
 homepage-verify: ## Verify the active Homepage release
->@python3 scripts/homepage_release.py verify
+>@python3 -u scripts/homepage_release.py verify
 
 homepage-rollback: ## Restore and verify the last-known-good Homepage release
->@python3 scripts/homepage_release.py rollback
+>@python3 -u scripts/homepage_release.py rollback
 
 bootstrap: ## Bootstrap local prerequisites (placeholder, no installs)
 >@echo "[bootstrap] Define bootstrap steps in scripts/bootstrap.sh when ready."
