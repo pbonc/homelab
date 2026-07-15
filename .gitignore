@@ -8,5 +8,6 @@ docker/homepage/config/status.json
 __pycache__/
 *.py[cod]
 
-# Telemetry runtime secrets
-docker/telemetry-collector/.env
+# Telemetry runtime configuration and secrets
+docker/telemetry/.env
+docker/telemetry/secrets/

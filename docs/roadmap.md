@@ -72,9 +72,9 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 
 ### 4. Query APIs
 
-- [ ] Add `GET /api/health`, `GET /api/current/weather`, and `GET /api/history/weather`
-- [ ] Define bounded history-query parameters and stable empty, stale, and error responses
-- [ ] Add automated API tests backed by known telemetry samples
+- [x] Add `GET /api/health`, `GET /api/current/weather`, and `GET /api/history/weather`
+- [x] Define bounded history-query parameters and stable empty, stale, and error responses
+- [x] Add automated API tests backed by known telemetry samples
 
 ### 5. Platform consumers
 

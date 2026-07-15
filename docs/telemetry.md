@@ -83,8 +83,8 @@ Battery fields vary by sensor and remain source-specific initially. They are pre
 ## API conventions
 
 - Health is always `GET /api/health`.
-- Current values are `GET /api/current/{source}`.
-- History is `GET /api/history/{source}` with bounded `start`, `stop`, and `limit` parameters.
+- Current values are `GET /api/current/{source}` and include explicit `current`, `stale`, or `empty` state plus age in seconds.
+- History is `GET /api/history/{source}` with timezone-aware `start` and `stop`, a maximum 31-day range, and a `limit` from 1 through 1,000.
 - Source names are stable lowercase slugs such as `weather`, `adsb`, and `docker`.
 - Successful responses include `schema_version`, `source`, data, and freshness metadata.
 - Empty data is a successful response with an explicit empty/stale state; dependency failures use non-2xx responses with a stable error code.
@@ -103,6 +103,7 @@ Planned variables:
 | `INFLUXDB_ORG` | InfluxDB organization |
 | `INFLUXDB_BUCKET` | Telemetry bucket |
 | `INFLUXDB_TOKEN` | Collector write/query token; secret |
+| `INFLUXDB_TOKEN_FILE` | Preferred Docker secret-file path for the token |
 | `GRAFANA_ADMIN_USER` | Initial Grafana administrator; secret |
 | `GRAFANA_ADMIN_PASSWORD` | Initial Grafana password; secret |
 
@@ -110,7 +111,13 @@ Secrets must not appear in Compose YAML, fixtures, logs, API responses, dashboar
 
 ## Storage contract
 
-The initial InfluxDB measurement will be `telemetry`. Tags identify `source`, `handler`, and `device_id`; normalized values become fields. Source-specific extras use an explicit prefix or a separate raw measurement so they cannot collide with normalized fields. Device observation time is the point timestamp and receipt time is retained for delay/freshness calculations.
+The initial InfluxDB measurement is `telemetry`. Tags identify `source`, `handler`, and `device_id`; normalized values become numeric fields. Source-specific extras use a `raw_` prefix so they cannot collide with normalized fields. A redacted serialized envelope supports lossless API reconstruction. Device observation time is the point timestamp and receipt time is retained for delay/freshness calculations.
+
+## Container runtime
+
+`docker/telemetry/compose.yaml` defines InfluxDB 2.9.1, the collector, and Grafana OSS 12.4.0. Upstream images and the collector base image are digest-pinned. InfluxDB and Grafana use named volumes. InfluxDB setup creates the `homelab` organization and a `telemetry` bucket with a 30-day retention period.
+
+Run `make telemetry-secrets` once on the deployment host to create the ignored `.env` and Docker secret files. Existing configuration and secrets are never overwritten. Validate the resolved model with `make telemetry-config`.
 
 ## Extension points
 
