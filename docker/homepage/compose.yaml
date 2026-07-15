@@ -3,7 +3,8 @@ services:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
     depends_on:
-      - glances
+      glances:
+        condition: service_healthy
     ports:
       - "3000:3000"
     volumes:
@@ -27,4 +28,14 @@ services:
       - ./glances.conf:/glances.conf:ro
     environment:
       - GLANCES_OPT=-w -C /glances.conf
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:61208/api/4/status', timeout=2)"
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
     restart: unless-stopped
