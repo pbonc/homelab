@@ -19,7 +19,10 @@
 	function serviceCard(name) {
 		for (const card of document.querySelectorAll(".service-card")) {
 			const title = card.querySelector(".service-name");
-			if (title && title.textContent.trim() === name) {
+			const titleText = title
+				? Array.from(title.childNodes).find((node) => node.nodeType === Node.TEXT_NODE)?.textContent.trim()
+				: null;
+			if (titleText === name) {
 				return card;
 			}
 		}
