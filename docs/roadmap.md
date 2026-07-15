@@ -78,11 +78,11 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 
 ### 5. Platform consumers
 
-- [ ] Automatically provision the Grafana datasource and a starter weather dashboard covering temperature, humidity, pressure, wind, rain, UV, solar, battery, and upload frequency
-- [ ] Add `python -m labctl telemetry` for platform health, latest weather, last upload, and source count
-- [ ] Add Homepage cards for Telemetry Collector, InfluxDB, and Grafana
-- [ ] Show the collector's last upload and active telemetry-source count in Homepage
-- [ ] Replace the Homepage search bar with local weather data from the Telemetry Collector API
+- [x] Automatically provision the Grafana datasource and a starter weather dashboard covering temperature, humidity, pressure, wind, rain, UV, solar, battery, and upload frequency
+- [x] Add `python -m labctl telemetry` for platform health, latest weather, last upload, and source count
+- [x] Add Homepage cards for Telemetry Collector, InfluxDB, and Grafana
+- [x] Show the collector's last upload and active telemetry-source count in Homepage
+- [x] Replace the Homepage search bar with local weather data from the Telemetry Collector API
 - [ ] Move Weather from planned inventory to deployed services in Homepage only after live data is verified
 
 ### 6. Live rollout and acceptance
