@@ -48,19 +48,19 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 
 ### 1. Contracts and configuration
 
-- [ ] Define the source-plugin interface, normalized telemetry envelope, measurement names, units, timestamps, and unknown-field preservation rules
-- [ ] Establish API conventions that support future routes such as `/api/current/adsb` and `/api/current/docker`
-- [ ] Define environment-based configuration and local secret handling for InfluxDB and Grafana without committing credentials
-- [ ] Create the initial `docs/telemetry.md` architecture, data-flow, configuration, and extension-point sections
+- [x] Define the source-plugin interface, normalized telemetry envelope, measurement names, units, timestamps, and unknown-field preservation rules
+- [x] Establish API conventions that support future routes such as `/api/current/adsb` and `/api/current/docker`
+- [x] Define environment-based configuration and local secret handling for InfluxDB and Grafana without committing credentials
+- [x] Create the initial `docs/telemetry.md` architecture, data-flow, configuration, and extension-point sections
 
 ### 2. Collector vertical slice
 
-- [ ] Create a modular `docker/telemetry-collector/` Python and FastAPI service
-- [ ] Implement source plugins or handlers with Ecowitt as the first source
-- [ ] Accept Ecowitt uploads at `POST /data/report/`
-- [ ] Normalize common weather, wind, rain, solar, UV, and battery measurements
-- [ ] Preserve unknown Ecowitt values rather than discarding them
-- [ ] Add automated tests and representative Ecowitt fixtures for parsing, normalization, unknown fields, and API errors
+- [x] Create a modular `docker/telemetry-collector/` Python and FastAPI service
+- [x] Implement source plugins or handlers with Ecowitt as the first source
+- [x] Accept Ecowitt uploads at `POST /data/report/`
+- [x] Normalize common weather, wind, rain, solar, UV, and battery measurements
+- [x] Preserve unknown Ecowitt values rather than discarding them
+- [x] Add automated tests and representative Ecowitt fixtures for parsing, normalization, unknown fields, and API errors
 
 ### 3. Storage and container runtime
 

@@ -1,0 +1,135 @@
+# Telemetry Platform
+
+## Purpose
+
+The Telemetry Platform is the homelab's shared ingestion, storage, query, and visualization layer. Ecowitt weather data is its first source, but weather-specific behavior remains inside an Ecowitt handler so ADS-B, Docker, CI, radio, power, and application sources can use the same platform contracts.
+
+## Initial architecture
+
+```text
+Ecowitt gateway
+    │ HTTP form POST /data/report/
+    ▼
+Telemetry Collector
+    ├── source registry
+    ├── Ecowitt handler
+    ├── normalized telemetry envelope
+    ├── current/history REST API
+    └── InfluxDB writer
+             │
+             ├── Grafana dashboards
+             ├── Homepage summaries
+             └── labctl telemetry
+```
+
+The collector owns ingestion and normalization. InfluxDB owns durable time-series history. Consumers use the collector API or a provisioned InfluxDB datasource rather than coupling themselves to Ecowitt field names.
+
+## Source plugin contract
+
+A source handler:
+
+1. Declares a stable handler name and public source name.
+2. Determines a non-secret device identifier from the source payload or configuration.
+3. Parses the source timestamp or deliberately falls back to receipt time.
+4. Converts known values into the normalized measurement catalog.
+5. Preserves unknown, non-secret values under `extra_fields`.
+6. Never logs or stores credentials such as Ecowitt `PASSKEY`.
+7. Returns a versioned `TelemetryEnvelope` or a specific validation error.
+
+Adding a source means implementing this interface and registering its ingestion route. Core storage and consumer code must not branch on weather-specific field names.
+
+## Normalized envelope
+
+```json
+{
+  "schema_version": "1",
+  "source": "weather",
+  "handler": "ecowitt",
+  "device_id": "GW2000A",
+  "observed_at": "2026-07-15T18:30:00+00:00",
+  "received_at": "2026-07-15T18:30:02+00:00",
+  "measurements": {
+    "outdoor_temperature": {"value": 76.0, "unit": "degF"},
+    "outdoor_humidity": {"value": 61, "unit": "percent"}
+  },
+  "extra_fields": {
+    "runtime": "12345"
+  }
+}
+```
+
+Timestamps are UTC ISO 8601 values. `observed_at` is the device timestamp when valid; `received_at` is assigned by the collector. Measurement keys and units are stable API contracts.
+
+## Initial measurement catalog
+
+| Measurement | Unit | Typical Ecowitt field |
+| --- | --- | --- |
+| `outdoor_temperature` | `degF` | `tempf` |
+| `indoor_temperature` | `degF` | `tempinf` |
+| `outdoor_humidity` | `percent` | `humidity` |
+| `indoor_humidity` | `percent` | `humidityin` |
+| `relative_pressure` | `inHg` | `baromrelin` |
+| `absolute_pressure` | `inHg` | `baromabsin` |
+| `wind_speed` | `mph` | `windspeedmph` |
+| `wind_gust` | `mph` | `windgustmph` |
+| `wind_direction` | `degree` | `winddir` |
+| `rain_rate` | `in/h` | `rainratein` |
+| `rain_event`, `rain_hourly`, `rain_daily`, `rain_weekly`, `rain_monthly`, `rain_yearly` | `in` | corresponding `*rainin` field |
+| `uv_index` | `index` | `uv` |
+| `solar_radiation` | `W/m2` | `solarradiation` |
+
+Battery fields vary by sensor and remain source-specific initially. They are preserved with a `battery_` normalized key when numeric and retained in `extra_fields` when their semantics are unknown.
+
+## API conventions
+
+- Health is always `GET /api/health`.
+- Current values are `GET /api/current/{source}`.
+- History is `GET /api/history/{source}` with bounded `start`, `stop`, and `limit` parameters.
+- Source names are stable lowercase slugs such as `weather`, `adsb`, and `docker`.
+- Successful responses include `schema_version`, `source`, data, and freshness metadata.
+- Empty data is a successful response with an explicit empty/stale state; dependency failures use non-2xx responses with a stable error code.
+
+## Configuration and secrets
+
+Runtime configuration is supplied through environment variables. A committed `.env.example` documents required values; the real `.env` file is ignored by Git and stored only on `brain`.
+
+Planned variables:
+
+| Variable | Purpose |
+| --- | --- |
+| `TELEMETRY_LOG_LEVEL` | Collector logging level |
+| `TELEMETRY_STALE_AFTER_SECONDS` | Freshness threshold |
+| `INFLUXDB_URL` | Internal InfluxDB endpoint |
+| `INFLUXDB_ORG` | InfluxDB organization |
+| `INFLUXDB_BUCKET` | Telemetry bucket |
+| `INFLUXDB_TOKEN` | Collector write/query token; secret |
+| `GRAFANA_ADMIN_USER` | Initial Grafana administrator; secret |
+| `GRAFANA_ADMIN_PASSWORD` | Initial Grafana password; secret |
+
+Secrets must not appear in Compose YAML, fixtures, logs, API responses, dashboards, or release metadata.
+
+## Storage contract
+
+The initial InfluxDB measurement will be `telemetry`. Tags identify `source`, `handler`, and `device_id`; normalized values become fields. Source-specific extras use an explicit prefix or a separate raw measurement so they cannot collide with normalized fields. Device observation time is the point timestamp and receipt time is retained for delay/freshness calculations.
+
+## Extension points
+
+- Source handlers live under `telemetry_collector/sources/` and register through the source registry.
+- InfluxDB translation is isolated behind a storage interface.
+- API routes address generic source slugs.
+- Grafana provisioning uses one file per datasource or dashboard.
+- Homepage consumes stable collector APIs, not Ecowitt payloads.
+
+Deployment, operations, Ecowitt gateway configuration, dashboards, and troubleshooting will be completed as their implementation slices land.
+
+## Local development
+
+Install the pinned development dependencies in a virtual environment, run the tests, and start the API:
+
+```bash
+python -m pip install -r docker/telemetry-collector/requirements-dev.txt
+make telemetry-test
+make telemetry-run
+```
+
+The local collector listens on `http://127.0.0.1:8000`. In-memory current data is intentionally temporary in this first vertical slice; InfluxDB becomes the durable source of truth in the storage slice.

@@ -4,7 +4,7 @@ SHELL := /usr/bin/env bash
 # CI portability note:
 # GitHub Actions, GitLab CI, and Jenkins should call these same Make targets.
 
-.PHONY: help doctor status lint test bootstrap docker-up docker-down homepage-validate homepage-deploy homepage-verify homepage-rollback
+.PHONY: help doctor status lint test telemetry-test telemetry-run bootstrap docker-up docker-down homepage-validate homepage-deploy homepage-verify homepage-rollback
 
 help: ## Show available targets
 >@awk 'BEGIN {FS = ":.*##"; printf "\nAvailable targets:\n"} /^[a-zA-Z0-9_.-]+:.*##/ {printf "  %-14s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -21,6 +21,14 @@ lint: ## Validate repository and Homepage configuration
 test: ## Run repository validation checks
 >@python3 scripts/validate_homepage.py
 >@python3 -m unittest discover -s tests -v
+
+telemetry-test: ## Run telemetry collector tests (requires development dependencies)
+>@python3 -c "import fastapi, httpx2"
+>@python3 -m unittest discover -s tests -p "test_ecowitt.py" -v
+>@python3 -m unittest discover -s tests -p "test_telemetry_*.py" -v
+
+telemetry-run: ## Run the telemetry collector locally on port 8000
+>@cd docker/telemetry-collector && python3 -m uvicorn telemetry_collector.main:app --host 127.0.0.1 --port 8000
 
 homepage-validate: ## Validate Homepage source and Compose configuration
 >@python3 -u scripts/homepage_release.py validate
