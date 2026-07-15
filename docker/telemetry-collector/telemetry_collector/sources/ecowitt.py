@@ -34,6 +34,15 @@ FIELD_MAP: dict[str, tuple[str, str, Converter]] = {
     "weeklyrainin": ("rain_weekly", "in", _identity),
     "monthlyrainin": ("rain_monthly", "in", _identity),
     "yearlyrainin": ("rain_yearly", "in", _identity),
+    # WS90 piezo stations use these field names instead of the conventional
+    # Ecowitt rain fields above.
+    "rrain_piezo": ("rain_rate", "in/h", _identity),
+    "erain_piezo": ("rain_event", "in", _identity),
+    "hrain_piezo": ("rain_hourly", "in", _identity),
+    "drain_piezo": ("rain_daily", "in", _identity),
+    "wrain_piezo": ("rain_weekly", "in", _identity),
+    "mrain_piezo": ("rain_monthly", "in", _identity),
+    "yrain_piezo": ("rain_yearly", "in", _identity),
     "uv": ("uv_index", "index", _identity),
     "solarradiation": ("solar_radiation", "W/m2", _identity),
 }

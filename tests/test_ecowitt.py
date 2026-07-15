@@ -52,6 +52,19 @@ class EcowittHandlerTests(unittest.TestCase):
         self.assertEqual(battery.value, 1.4)
         self.assertEqual(battery.unit, "source")
 
+    def test_normalizes_ws90_piezo_rain_fields(self) -> None:
+        payload = {
+            "rrain_piezo": "0.125",
+            "drain_piezo": "0.750",
+            "yrain_piezo": "30.189",
+        }
+        envelope = EcowittHandler().normalize(payload, received_at=RECEIVED_AT)
+        self.assertEqual(envelope.measurements["rain_rate"].value, 0.125)
+        self.assertEqual(envelope.measurements["rain_rate"].unit, "in/h")
+        self.assertEqual(envelope.measurements["rain_daily"].value, 0.75)
+        self.assertEqual(envelope.measurements["rain_yearly"].value, 30.189)
+        self.assertNotIn("rrain_piezo", envelope.extra_fields)
+
     def test_preserves_unknown_fields_but_redacts_secrets(self) -> None:
         self.assertEqual(self.envelope.extra_fields["runtime"], "123456")
         self.assertNotIn("PASSKEY", self.envelope.extra_fields)
