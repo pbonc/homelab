@@ -144,8 +144,14 @@ def verify(release: Path, url: str, attempts: int, interval: float) -> None:
     if not ps:
         raise ReleaseError("Compose reports no Homepage services")
 
-    parsed = json.loads(ps)
-    services = parsed if isinstance(parsed, list) else [parsed]
+    try:
+        parsed = json.loads(ps)
+        services = parsed if isinstance(parsed, list) else [parsed]
+    except json.JSONDecodeError:
+        try:
+            services = [json.loads(line) for line in ps.splitlines() if line.strip()]
+        except json.JSONDecodeError as exc:
+            raise ReleaseError(f"Compose returned invalid service JSON: {exc}") from exc
     service_names = {service.get("Service") for service in services}
     missing = {"homepage", "glances"} - service_names
     if missing:
@@ -212,8 +218,11 @@ def deploy(deploy_root: Path, url: str, attempts: int, interval: float) -> None:
                 print(f"[WARN] Verification failed; restoring {previous.name}", file=sys.stderr)
                 activate(previous, deploy_root)
             else:
-                run(compose_command(release, "down"))
-                current_link.unlink(missing_ok=True)
+                print(
+                    "[WARN] Verification failed with no managed release to restore; "
+                    "leaving the candidate running for inspection",
+                    file=sys.stderr,
+                )
             raise
 
         write_metadata(deploy_root / "deployed.json", metadata)

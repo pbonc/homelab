@@ -53,7 +53,7 @@ HOMEPAGE_DEPLOY_ROOT=/tmp/homepage-release HOMEPAGE_VERIFY_URL=http://127.0.0.1:
 - A non-blocking file lock rejects overlapping deployments and rollbacks.
 - The stable Compose project name `homepage` prevents each release directory from creating a separate stack.
 - A release is successful only when Homepage and Glances are running, no service is unhealthy, and Homepage returns HTTP success.
-- Failed verification automatically reactivates the prior release. A failed first deployment is stopped and its `current` link is removed.
+- Failed verification automatically reactivates the prior managed release. If no prior managed release exists during the initial migration, the candidate is left running for inspection instead of tearing down the pre-existing Compose project.
 - Rollback swaps `current` and `previous`, allowing an operator to recover from an accidental rollback.
 - Generated Homepage logs and retired runtime files are excluded from release snapshots.
 
