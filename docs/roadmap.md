@@ -83,13 +83,13 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [x] Add Homepage cards for Telemetry Collector, InfluxDB, and Grafana
 - [x] Show the collector's last upload and active telemetry-source count in Homepage
 - [x] Replace the Homepage search bar with local weather data from the Telemetry Collector API
-- [ ] Move Weather from planned inventory to deployed services in Homepage only after live data is verified
+- [x] Move Weather from planned inventory to deployed services in Homepage only after live data is verified
 
 ### 6. Live rollout and acceptance
 
 - [x] Configure the Ecowitt gateway to upload to `POST /data/report/`
 - [ ] Complete `docs/telemetry.md` with REST APIs, Ecowitt setup, dashboard extension, Homepage integration, operations, and troubleshooting
-- [ ] Verify live Ecowitt ingestion, restart persistence, API freshness, Grafana dashboards, Homepage cards, and `labctl telemetry`
+- [x] Verify live Ecowitt ingestion, restart persistence, API freshness, Grafana dashboards, Homepage cards, and `labctl telemetry`
 - [ ] Confirm collector handlers, Grafana dashboards, and Homepage integrations provide clear extension points for the next telemetry source
 
 ## Phase 4: CI/CD Orchestration

@@ -4,58 +4,117 @@
   "graphTooltip": 1,
   "panels": [
     {
-      "title": "Current Conditions",
-      "type": "stat",
-      "id": 1,
-      "gridPos": {"h": 6, "w": 24, "x": 0, "y": 0},
+      "id": 1, "title": "Outdoor Temperature", "type": "stat",
+      "gridPos": {"h": 5, "w": 4, "x": 0, "y": 0},
       "datasource": {"type": "influxdb", "uid": "influxdb-telemetry"},
-      "targets": [{"refId": "A", "query": "from(bucket: \"telemetry\") |> range(start: -24h) |> filter(fn: (r) => r._measurement == \"telemetry\" and r.source == \"weather\" and contains(value: r._field, set: [\"outdoor_temperature\",\"outdoor_humidity\",\"relative_pressure\",\"wind_speed\",\"wind_gust\",\"rain_rate\",\"uv_index\",\"solar_radiation\"])) |> last()"}],
-      "options": {"colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "horizontal", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto", "wideLayout": true}
+      "targets": [{"refId": "A", "query": "from(bucket: \"telemetry\") |> range(start: -15m) |> filter(fn: (r) => r._measurement == \"telemetry\" and r.source == \"weather\" and r.device_id != \"synthetic-test\" and r._field == \"outdoor_temperature\") |> last() |> drop(columns: [\"device_id\", \"handler\", \"source\"])"}],
+      "fieldConfig": {"defaults": {"unit": "fahrenheit", "decimals": 1, "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "blue"}, {"color": "green", "value": 45}, {"color": "orange", "value": 85}, {"color": "red", "value": 100}]}}, "overrides": []},
+      "options": {"colorMode": "background", "graphMode": "area", "justifyMode": "center", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value_and_name", "wideLayout": true}
     },
     {
-      "title": "Temperature and Humidity",
-      "type": "timeseries",
-      "id": 2,
-      "gridPos": {"h": 9, "w": 12, "x": 0, "y": 6},
+      "id": 2, "title": "Outdoor Humidity", "type": "stat",
+      "gridPos": {"h": 5, "w": 4, "x": 4, "y": 0},
       "datasource": {"type": "influxdb", "uid": "influxdb-telemetry"},
-      "targets": [{"refId": "A", "query": "from(bucket: \"telemetry\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"telemetry\" and r.source == \"weather\" and contains(value: r._field, set: [\"outdoor_temperature\",\"indoor_temperature\",\"outdoor_humidity\",\"indoor_humidity\"])) |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)"}],
-      "fieldConfig": {"defaults": {}, "overrides": []}, "options": {"legend": {"displayMode": "list", "placement": "bottom"}, "tooltip": {"mode": "multi", "sort": "none"}}
+      "targets": [{"refId": "A", "query": "from(bucket: \"telemetry\") |> range(start: -15m) |> filter(fn: (r) => r._measurement == \"telemetry\" and r.source == \"weather\" and r.device_id != \"synthetic-test\" and r._field == \"outdoor_humidity\") |> last() |> drop(columns: [\"device_id\", \"handler\", \"source\"])"}],
+      "fieldConfig": {"defaults": {"unit": "percent", "decimals": 0, "min": 0, "max": 100, "color": {"mode": "continuous-BlYlRd"}}, "overrides": []},
+      "options": {"colorMode": "background", "graphMode": "area", "justifyMode": "center", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value_and_name", "wideLayout": true}
     },
     {
-      "title": "Wind, Rain, Pressure, UV and Solar",
-      "type": "timeseries",
-      "id": 3,
-      "gridPos": {"h": 9, "w": 12, "x": 12, "y": 6},
+      "id": 3, "title": "Wind", "type": "stat",
+      "gridPos": {"h": 5, "w": 4, "x": 8, "y": 0},
       "datasource": {"type": "influxdb", "uid": "influxdb-telemetry"},
-      "targets": [{"refId": "A", "query": "from(bucket: \"telemetry\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"telemetry\" and r.source == \"weather\" and contains(value: r._field, set: [\"relative_pressure\",\"wind_speed\",\"wind_gust\",\"rain_rate\",\"rain_daily\",\"uv_index\",\"solar_radiation\"])) |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)"}],
-      "fieldConfig": {"defaults": {}, "overrides": []}, "options": {"legend": {"displayMode": "list", "placement": "bottom"}, "tooltip": {"mode": "multi", "sort": "none"}}
+      "targets": [{"refId": "A", "query": "from(bucket: \"telemetry\") |> range(start: -15m) |> filter(fn: (r) => r._measurement == \"telemetry\" and r.source == \"weather\" and r.device_id != \"synthetic-test\" and contains(value: r._field, set: [\"wind_speed\", \"wind_gust\"])) |> last() |> drop(columns: [\"device_id\", \"handler\", \"source\"])"}],
+      "fieldConfig": {"defaults": {"unit": "velocitymph", "decimals": 1, "color": {"mode": "palette-classic"}}, "overrides": []},
+      "options": {"colorMode": "value", "graphMode": "area", "justifyMode": "center", "orientation": "horizontal", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value_and_name", "wideLayout": true}
     },
     {
-      "title": "Battery Levels",
-      "type": "timeseries",
-      "id": 4,
-      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 15},
+      "id": 4, "title": "Pressure", "type": "stat",
+      "gridPos": {"h": 5, "w": 4, "x": 12, "y": 0},
       "datasource": {"type": "influxdb", "uid": "influxdb-telemetry"},
-      "targets": [{"refId": "A", "query": "from(bucket: \"telemetry\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"telemetry\" and r.source == \"weather\" and r._field =~ /battery/) |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)"}],
-      "fieldConfig": {"defaults": {}, "overrides": []}, "options": {"legend": {"displayMode": "list", "placement": "bottom"}, "tooltip": {"mode": "multi", "sort": "none"}}
+      "targets": [{"refId": "A", "query": "from(bucket: \"telemetry\") |> range(start: -15m) |> filter(fn: (r) => r._measurement == \"telemetry\" and r.source == \"weather\" and r.device_id != \"synthetic-test\" and r._field == \"relative_pressure\") |> last() |> drop(columns: [\"device_id\", \"handler\", \"source\"])"}],
+      "fieldConfig": {"defaults": {"unit": "pressureinhg", "decimals": 2, "color": {"mode": "continuous-BlPu"}}, "overrides": []},
+      "options": {"colorMode": "background", "graphMode": "area", "justifyMode": "center", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value_and_name", "wideLayout": true}
     },
     {
-      "title": "Upload Frequency",
-      "type": "timeseries",
-      "id": 5,
-      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 15},
+      "id": 5, "title": "UV Index", "type": "stat",
+      "gridPos": {"h": 5, "w": 4, "x": 16, "y": 0},
       "datasource": {"type": "influxdb", "uid": "influxdb-telemetry"},
-      "targets": [{"refId": "A", "query": "from(bucket: \"telemetry\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"telemetry\" and r.source == \"weather\") |> keep(columns: [\"_time\"]) |> unique(column: \"_time\") |> aggregateWindow(every: v.windowPeriod, fn: count, createEmpty: false)"}],
-      "fieldConfig": {"defaults": {"unit": "short"}, "overrides": []}, "options": {"legend": {"displayMode": "list", "placement": "bottom"}, "tooltip": {"mode": "single", "sort": "none"}}
+      "targets": [{"refId": "A", "query": "from(bucket: \"telemetry\") |> range(start: -15m) |> filter(fn: (r) => r._measurement == \"telemetry\" and r.source == \"weather\" and r.device_id != \"synthetic-test\" and r._field == \"uv_index\") |> last() |> drop(columns: [\"device_id\", \"handler\", \"source\"])"}],
+      "fieldConfig": {"defaults": {"unit": "none", "decimals": 0, "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "green"}, {"color": "yellow", "value": 3}, {"color": "orange", "value": 6}, {"color": "red", "value": 8}, {"color": "purple", "value": 11}]}}, "overrides": []},
+      "options": {"colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value_and_name", "wideLayout": true}
+    },
+    {
+      "id": 6, "title": "Solar Radiation", "type": "stat",
+      "gridPos": {"h": 5, "w": 4, "x": 20, "y": 0},
+      "datasource": {"type": "influxdb", "uid": "influxdb-telemetry"},
+      "targets": [{"refId": "A", "query": "from(bucket: \"telemetry\") |> range(start: -15m) |> filter(fn: (r) => r._measurement == \"telemetry\" and r.source == \"weather\" and r.device_id != \"synthetic-test\" and r._field == \"solar_radiation\") |> last() |> drop(columns: [\"device_id\", \"handler\", \"source\"])"}],
+      "fieldConfig": {"defaults": {"unit": "wattm2", "decimals": 0, "color": {"mode": "continuous-YlRd"}}, "overrides": []},
+      "options": {"colorMode": "background", "graphMode": "area", "justifyMode": "center", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value_and_name", "wideLayout": true}
+    },
+    {
+      "id": 7, "title": "Temperature", "type": "timeseries",
+      "gridPos": {"h": 9, "w": 12, "x": 0, "y": 5},
+      "datasource": {"type": "influxdb", "uid": "influxdb-telemetry"},
+      "targets": [{"refId": "A", "query": "from(bucket: \"telemetry\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"telemetry\" and r.source == \"weather\" and r.device_id != \"synthetic-test\" and contains(value: r._field, set: [\"outdoor_temperature\", \"indoor_temperature\"])) |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false) |> drop(columns: [\"device_id\", \"handler\", \"source\"])"}],
+      "fieldConfig": {"defaults": {"unit": "fahrenheit", "decimals": 1, "custom": {"drawStyle": "line", "fillOpacity": 18, "lineInterpolation": "smooth", "lineWidth": 2, "showPoints": "never", "spanNulls": true}}, "overrides": []},
+      "options": {"legend": {"calcs": ["lastNotNull", "min", "max"], "displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "multi", "sort": "desc"}}
+    },
+    {
+      "id": 8, "title": "Humidity", "type": "timeseries",
+      "gridPos": {"h": 9, "w": 12, "x": 12, "y": 5},
+      "datasource": {"type": "influxdb", "uid": "influxdb-telemetry"},
+      "targets": [{"refId": "A", "query": "from(bucket: \"telemetry\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"telemetry\" and r.source == \"weather\" and r.device_id != \"synthetic-test\" and contains(value: r._field, set: [\"outdoor_humidity\", \"indoor_humidity\"])) |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false) |> drop(columns: [\"device_id\", \"handler\", \"source\"])"}],
+      "fieldConfig": {"defaults": {"unit": "percent", "decimals": 0, "min": 0, "max": 100, "custom": {"drawStyle": "line", "fillOpacity": 18, "lineInterpolation": "smooth", "lineWidth": 2, "showPoints": "never", "spanNulls": true}}, "overrides": []},
+      "options": {"legend": {"calcs": ["lastNotNull", "min", "max"], "displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "multi", "sort": "desc"}}
+    },
+    {
+      "id": 9, "title": "Wind Speed and Gust", "type": "timeseries",
+      "gridPos": {"h": 9, "w": 12, "x": 0, "y": 14},
+      "datasource": {"type": "influxdb", "uid": "influxdb-telemetry"},
+      "targets": [{"refId": "A", "query": "from(bucket: \"telemetry\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"telemetry\" and r.source == \"weather\" and r.device_id != \"synthetic-test\" and contains(value: r._field, set: [\"wind_speed\", \"wind_gust\"])) |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false) |> drop(columns: [\"device_id\", \"handler\", \"source\"])"}],
+      "fieldConfig": {"defaults": {"unit": "velocitymph", "decimals": 1, "min": 0, "custom": {"drawStyle": "line", "fillOpacity": 20, "lineInterpolation": "smooth", "lineWidth": 2, "showPoints": "never", "spanNulls": true}}, "overrides": []},
+      "options": {"legend": {"calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "multi", "sort": "desc"}}
+    },
+    {
+      "id": 10, "title": "Barometric Pressure", "type": "timeseries",
+      "gridPos": {"h": 9, "w": 12, "x": 12, "y": 14},
+      "datasource": {"type": "influxdb", "uid": "influxdb-telemetry"},
+      "targets": [{"refId": "A", "query": "from(bucket: \"telemetry\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"telemetry\" and r.source == \"weather\" and r.device_id != \"synthetic-test\" and r._field == \"relative_pressure\") |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false) |> drop(columns: [\"device_id\", \"handler\", \"source\"])"}],
+      "fieldConfig": {"defaults": {"unit": "pressureinhg", "decimals": 3, "custom": {"drawStyle": "line", "fillOpacity": 22, "lineInterpolation": "smooth", "lineWidth": 2, "showPoints": "never", "spanNulls": true}}, "overrides": []},
+      "options": {"legend": {"calcs": ["lastNotNull", "min", "max"], "displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "single", "sort": "none"}}
+    },
+    {
+      "id": 11, "title": "Station Battery", "type": "timeseries",
+      "gridPos": {"h": 7, "w": 8, "x": 0, "y": 23},
+      "datasource": {"type": "influxdb", "uid": "influxdb-telemetry"},
+      "targets": [{"refId": "A", "query": "from(bucket: \"telemetry\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"telemetry\" and r.source == \"weather\" and r.device_id != \"synthetic-test\" and r._field =~ /battery/) |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false) |> drop(columns: [\"device_id\", \"handler\", \"source\"])"}],
+      "fieldConfig": {"defaults": {"unit": "volt", "decimals": 2, "min": 0, "custom": {"drawStyle": "line", "fillOpacity": 20, "lineInterpolation": "smooth", "lineWidth": 2, "showPoints": "never", "spanNulls": true}}, "overrides": []},
+      "options": {"legend": {"calcs": ["lastNotNull"], "displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "single", "sort": "none"}}
+    },
+    {
+      "id": 12, "title": "UV and Solar", "type": "timeseries",
+      "gridPos": {"h": 7, "w": 8, "x": 8, "y": 23},
+      "datasource": {"type": "influxdb", "uid": "influxdb-telemetry"},
+      "targets": [{"refId": "A", "query": "from(bucket: \"telemetry\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"telemetry\" and r.source == \"weather\" and r.device_id != \"synthetic-test\" and contains(value: r._field, set: [\"uv_index\", \"solar_radiation\"])) |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false) |> drop(columns: [\"device_id\", \"handler\", \"source\"])"}],
+      "fieldConfig": {"defaults": {"decimals": 1, "custom": {"drawStyle": "line", "fillOpacity": 18, "lineInterpolation": "smooth", "lineWidth": 2, "showPoints": "never", "spanNulls": true}}, "overrides": [{"matcher": {"id": "byName", "options": "solar_radiation"}, "properties": [{"id": "unit", "value": "wattm2"}]}, {"matcher": {"id": "byName", "options": "uv_index"}, "properties": [{"id": "unit", "value": "none"}, {"id": "custom.axisPlacement", "value": "right"}]}]},
+      "options": {"legend": {"calcs": ["lastNotNull"], "displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "multi", "sort": "desc"}}
+    },
+    {
+      "id": 13, "title": "Reports per Interval", "type": "timeseries",
+      "gridPos": {"h": 7, "w": 8, "x": 16, "y": 23},
+      "datasource": {"type": "influxdb", "uid": "influxdb-telemetry"},
+      "targets": [{"refId": "A", "query": "from(bucket: \"telemetry\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"telemetry\" and r.source == \"weather\" and r.device_id != \"synthetic-test\" and r._field == \"outdoor_temperature\") |> aggregateWindow(every: v.windowPeriod, fn: count, createEmpty: false) |> map(fn: (r) => ({r with _field: \"station_reports\"})) |> drop(columns: [\"device_id\", \"handler\", \"source\"])"}],
+      "fieldConfig": {"defaults": {"unit": "short", "decimals": 0, "min": 0, "custom": {"drawStyle": "bars", "fillOpacity": 55, "lineWidth": 1, "showPoints": "never", "spanNulls": true}}, "overrides": []},
+      "options": {"legend": {"calcs": ["sum"], "displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "single", "sort": "none"}}
     }
   ],
   "refresh": "30s",
   "schemaVersion": 41,
   "tags": ["homelab", "telemetry", "weather"],
   "templating": {"list": []},
-  "time": {"from": "now-24h", "to": "now"},
+  "time": {"from": "now-6h", "to": "now"},
   "timezone": "browser",
   "title": "Local Weather",
   "uid": "homelab-weather",
-  "version": 1
+  "version": 2
 }
