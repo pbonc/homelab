@@ -30,7 +30,7 @@
 	}
 
 	function percent(text, label) {
-		const match = text.match(new RegExp(`${label}\\s+(\\d+(?:\\.\\d+)?)%`, "i"));
+		const match = text.match(new RegExp(`${label}\\s*(\\d+(?:\\.\\d+)?)\\s*%`, "i"));
 		return match ? Number(match[1]) : null;
 	}
 
@@ -40,8 +40,8 @@
 	}
 
 	function diskPercent(text) {
-		const used = text.match(/(\d+(?:\.\d+)?)\s*(B|KB|MB|GB|TB|PB)\s+Used/i);
-		const total = text.match(/(\d+(?:\.\d+)?)\s*(B|KB|MB|GB|TB|PB)\s+Total/i);
+		const used = text.match(/(\d+(?:\.\d+)?)\s*(B|KB|MB|GB|TB|PB)\s*Used/i);
+		const total = text.match(/(\d+(?:\.\d+)?)\s*(B|KB|MB|GB|TB|PB)\s*Total/i);
 		if (!used || !total) {
 			return null;
 		}
