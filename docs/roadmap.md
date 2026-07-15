@@ -87,7 +87,7 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 
 ### 6. Live rollout and acceptance
 
-- [ ] Configure the Ecowitt gateway to upload to `POST /data/report/`
+- [x] Configure the Ecowitt gateway to upload to `POST /data/report/`
 - [ ] Complete `docs/telemetry.md` with REST APIs, Ecowitt setup, dashboard extension, Homepage integration, operations, and troubleshooting
 - [ ] Verify live Ecowitt ingestion, restart persistence, API freshness, Grafana dashboards, Homepage cards, and `labctl telemetry`
 - [ ] Confirm collector handlers, Grafana dashboards, and Homepage integrations provide clear extension points for the next telemetry source

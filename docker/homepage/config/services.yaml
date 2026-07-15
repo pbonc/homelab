@@ -60,6 +60,11 @@
         href: http://192.168.1.23:3001/d/homelab-weather/local-weather
         siteMonitor: http://192.168.1.23:3001/api/health
         description: "Running on brain | Telemetry dashboards"
+    - Weather:
+        icon: mdi-weather-partly-cloudy
+        href: http://192.168.1.23:3001/d/homelab-weather/local-weather
+        siteMonitor: http://192.168.1.23:8000/api/health
+        description: "Live | Local conditions in imperial units"
 
 - Planned Services:
     - Jenkins:
@@ -80,9 +85,6 @@
     - Uptime Kuma:
         icon: mdi-heart-pulse
         description: "Planned | Availability checks"
-    - Weather:
-        icon: mdi-weather-partly-cloudy
-        description: "Planned | Awaiting verified live station data"
     - OWASP Juice Shop:
         icon: mdi-shield-bug-outline
         description: "Planned | Web security practice"
