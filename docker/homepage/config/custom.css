@@ -58,6 +58,26 @@ main,
   transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
 }
 
+.local-weather-header {
+  display: block;
+  margin: 0 0 14px;
+  padding: 13px 18px;
+  border: 1px solid rgba(34, 211, 238, 0.6);
+  border-radius: 14px;
+  background: linear-gradient(90deg, rgba(8, 145, 178, 0.32), rgba(30, 64, 175, 0.26));
+  color: var(--dash-text);
+  font-size: clamp(1.05rem, 2vw, 1.35rem);
+  font-weight: 650;
+  text-align: center;
+  text-decoration: none;
+}
+
+.local-weather-header[data-state="stale"],
+.local-weather-header[data-state="unavailable"] {
+  border-color: rgba(245, 158, 11, 0.7);
+  color: #fde68a;
+}
+
 .card:hover,
 .service-card:hover,
 .widget:hover,

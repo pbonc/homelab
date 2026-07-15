@@ -4,6 +4,7 @@ import argparse
 from typing import Sequence
 
 from .commands.status import run_status
+from .commands.telemetry import run_telemetry
 from .doctor import run_doctor
 
 
@@ -32,6 +33,25 @@ def build_parser() -> argparse.ArgumentParser:
         help="Emit status checks as machine-readable JSON.",
     )
     status_parser.set_defaults(handler=lambda args: run_status(json_output=args.json))
+
+    telemetry_parser = subparsers.add_parser(
+        "telemetry",
+        help="Show telemetry platform health and latest weather.",
+        description="Show telemetry platform health and latest weather.",
+    )
+    telemetry_parser.add_argument(
+        "--url",
+        default="http://127.0.0.1:8000",
+        help="Telemetry Collector base URL.",
+    )
+    telemetry_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Emit telemetry status as machine-readable JSON.",
+    )
+    telemetry_parser.set_defaults(
+        handler=lambda args: run_telemetry(base_url=args.url, json_output=args.json)
+    )
 
     return parser
 

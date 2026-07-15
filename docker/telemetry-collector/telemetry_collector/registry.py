@@ -23,6 +23,10 @@ class SourceRegistry:
     def names(self) -> tuple[str, ...]:
         return tuple(sorted(self._handlers))
 
+    @property
+    def source_names(self) -> tuple[str, ...]:
+        return tuple(sorted({handler.source_name for handler in self._handlers.values()}))
+
 
 registry = SourceRegistry()
 registry.register(EcowittHandler())

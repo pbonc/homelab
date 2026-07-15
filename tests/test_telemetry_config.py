@@ -22,6 +22,7 @@ class TelemetrySettingsTests(unittest.TestCase):
         self.assertEqual(settings.storage_backend, "memory")
         self.assertEqual(settings.influxdb_bucket, "telemetry")
         self.assertIsNone(settings.influxdb_token)
+        self.assertIn("http://192.168.1.23:3000", settings.allowed_origins)
 
     @patch.dict(os.environ, {"TELEMETRY_STALE_AFTER_SECONDS": "0"}, clear=True)
     def test_stale_threshold_must_be_positive(self) -> None:

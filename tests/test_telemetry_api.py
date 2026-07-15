@@ -38,6 +38,7 @@ class TelemetryApiTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["status"], "healthy")
         self.assertIn("ecowitt", response.json()["handlers"])
+        self.assertEqual(response.json()["active_source_count"], 0)
 
     def test_accepts_ecowitt_form_and_returns_current_weather(self) -> None:
         payload = json.loads(FIXTURE.read_text(encoding="utf-8"))
@@ -55,6 +56,11 @@ class TelemetryApiTests(unittest.TestCase):
             "degF",
         )
         self.assertNotIn("PASSKEY", json.dumps(body))
+
+        health = self.client.get("/api/health").json()
+        self.assertEqual(health["active_sources"], ["weather"])
+        self.assertEqual(health["active_source_count"], 1)
+        self.assertIsNotNone(health["last_received_at"])
 
         history = self.client.get("/api/history/weather?limit=10")
         self.assertEqual(history.status_code, 200)

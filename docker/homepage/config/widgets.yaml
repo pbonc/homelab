@@ -5,7 +5,3 @@
       dateStyle: medium
       timeStyle: short
       hourCycle: h23
-
-- search:
-    provider: duckduckgo
-    target: _blank

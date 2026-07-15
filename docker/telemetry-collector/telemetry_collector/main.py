@@ -6,6 +6,7 @@ from urllib.parse import parse_qsl
 
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 from telemetry_collector import __version__
 from telemetry_collector.config import Settings
@@ -46,18 +47,38 @@ def create_app(
     active_settings = settings or Settings.from_environment()
     active_store = store or _build_store(active_settings)
     application = FastAPI(title="Homelab Telemetry Collector", version=__version__)
+    application.add_middleware(
+        CORSMiddleware,
+        allow_origins=list(active_settings.allowed_origins),
+        allow_methods=["GET"],
+        allow_headers=["*"],
+    )
     application.state.store = active_store
     application.state.settings = active_settings
 
     @application.get("/api/health")
     def health() -> JSONResponse:
         storage_healthy = active_store.healthy()
+        latest_by_source: dict[str, str] = {}
+        if storage_healthy:
+            for source in registry.source_names:
+                try:
+                    latest = active_store.current(source)
+                except StorageUnavailable:
+                    storage_healthy = False
+                    break
+                if latest is not None:
+                    latest_by_source[source] = latest.received_at.isoformat()
         return JSONResponse(
             status_code=200 if storage_healthy else 503,
             content={
                 "status": "healthy" if storage_healthy else "degraded",
                 "version": __version__,
                 "handlers": registry.names,
+                "configured_sources": registry.source_names,
+                "active_sources": sorted(latest_by_source),
+                "active_source_count": len(latest_by_source),
+                "last_received_at": max(latest_by_source.values(), default=None),
                 "storage": {
                     "backend": active_settings.storage_backend,
                     "status": "healthy" if storage_healthy else "unavailable",

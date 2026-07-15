@@ -14,6 +14,7 @@ class Settings:
     influxdb_org: str
     influxdb_bucket: str
     influxdb_token: str | None
+    allowed_origins: tuple[str, ...]
 
     @classmethod
     def from_environment(cls) -> "Settings":
@@ -35,4 +36,12 @@ class Settings:
             influxdb_org=os.environ.get("INFLUXDB_ORG", "homelab"),
             influxdb_bucket=os.environ.get("INFLUXDB_BUCKET", "telemetry"),
             influxdb_token=token,
+            allowed_origins=tuple(
+                origin.strip()
+                for origin in os.environ.get(
+                    "TELEMETRY_ALLOWED_ORIGINS",
+                    "http://192.168.1.23:3000,http://brain:3000",
+                ).split(",")
+                if origin.strip()
+            ),
         )

@@ -37,6 +37,29 @@
         icon: mdi-github
         href: https://github.com/pbonc/homelab/actions
         description: "Configured on brain | Self-hosted CI runner"
+    - Telemetry Collector:
+        icon: mdi-access-point-network
+        href: http://192.168.1.23:8000/docs
+        siteMonitor: http://192.168.1.23:8000/api/health
+        description: "Running on brain | Generic ingestion API"
+        widget:
+          type: customapi
+          url: http://192.168.1.23:8000/api/health
+          mappings:
+            - field: active_source_count
+              label: Sources
+            - field: last_received_at
+              label: Last upload
+    - InfluxDB:
+        icon: si-influxdb
+        href: http://192.168.1.23:8086
+        siteMonitor: http://192.168.1.23:8086/health
+        description: "Running on brain | 30-day telemetry storage"
+    - Grafana:
+        icon: si-grafana
+        href: http://192.168.1.23:3001/d/homelab-weather/local-weather
+        siteMonitor: http://192.168.1.23:3001/api/health
+        description: "Running on brain | Telemetry dashboards"
 
 - Planned Services:
     - Jenkins:
@@ -48,9 +71,6 @@
     - CardOS:
         icon: mdi-credit-card-outline
         description: "Planned | Portfolio application"
-    - Grafana:
-        icon: mdi-chart-line
-        description: "Planned | Visualization"
     - Prometheus:
         icon: mdi-timeline-clock-outline
         description: "Planned | Metrics collection"
@@ -62,7 +82,7 @@
         description: "Planned | Availability checks"
     - Weather:
         icon: mdi-weather-partly-cloudy
-        description: "Planned | Local conditions and forecast"
+        description: "Planned | Awaiting verified live station data"
     - OWASP Juice Shop:
         icon: mdi-shield-bug-outline
         description: "Planned | Web security practice"

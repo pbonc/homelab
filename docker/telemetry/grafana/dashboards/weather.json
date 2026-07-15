@@ -1,0 +1,61 @@
+{
+  "annotations": {"list": []},
+  "editable": false,
+  "graphTooltip": 1,
+  "panels": [
+    {
+      "title": "Current Conditions",
+      "type": "stat",
+      "id": 1,
+      "gridPos": {"h": 6, "w": 24, "x": 0, "y": 0},
+      "datasource": {"type": "influxdb", "uid": "influxdb-telemetry"},
+      "targets": [{"refId": "A", "query": "from(bucket: \"telemetry\") |> range(start: -24h) |> filter(fn: (r) => r._measurement == \"telemetry\" and r.source == \"weather\" and contains(value: r._field, set: [\"outdoor_temperature\",\"outdoor_humidity\",\"relative_pressure\",\"wind_speed\",\"wind_gust\",\"rain_rate\",\"uv_index\",\"solar_radiation\"])) |> last()"}],
+      "options": {"colorMode": "value", "graphMode": "area", "justifyMode": "auto", "orientation": "horizontal", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "auto", "wideLayout": true}
+    },
+    {
+      "title": "Temperature and Humidity",
+      "type": "timeseries",
+      "id": 2,
+      "gridPos": {"h": 9, "w": 12, "x": 0, "y": 6},
+      "datasource": {"type": "influxdb", "uid": "influxdb-telemetry"},
+      "targets": [{"refId": "A", "query": "from(bucket: \"telemetry\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"telemetry\" and r.source == \"weather\" and contains(value: r._field, set: [\"outdoor_temperature\",\"indoor_temperature\",\"outdoor_humidity\",\"indoor_humidity\"])) |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)"}],
+      "fieldConfig": {"defaults": {}, "overrides": []}, "options": {"legend": {"displayMode": "list", "placement": "bottom"}, "tooltip": {"mode": "multi", "sort": "none"}}
+    },
+    {
+      "title": "Wind, Rain, Pressure, UV and Solar",
+      "type": "timeseries",
+      "id": 3,
+      "gridPos": {"h": 9, "w": 12, "x": 12, "y": 6},
+      "datasource": {"type": "influxdb", "uid": "influxdb-telemetry"},
+      "targets": [{"refId": "A", "query": "from(bucket: \"telemetry\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"telemetry\" and r.source == \"weather\" and contains(value: r._field, set: [\"relative_pressure\",\"wind_speed\",\"wind_gust\",\"rain_rate\",\"rain_daily\",\"uv_index\",\"solar_radiation\"])) |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)"}],
+      "fieldConfig": {"defaults": {}, "overrides": []}, "options": {"legend": {"displayMode": "list", "placement": "bottom"}, "tooltip": {"mode": "multi", "sort": "none"}}
+    },
+    {
+      "title": "Battery Levels",
+      "type": "timeseries",
+      "id": 4,
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 15},
+      "datasource": {"type": "influxdb", "uid": "influxdb-telemetry"},
+      "targets": [{"refId": "A", "query": "from(bucket: \"telemetry\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"telemetry\" and r.source == \"weather\" and r._field =~ /battery/) |> aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)"}],
+      "fieldConfig": {"defaults": {}, "overrides": []}, "options": {"legend": {"displayMode": "list", "placement": "bottom"}, "tooltip": {"mode": "multi", "sort": "none"}}
+    },
+    {
+      "title": "Upload Frequency",
+      "type": "timeseries",
+      "id": 5,
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 15},
+      "datasource": {"type": "influxdb", "uid": "influxdb-telemetry"},
+      "targets": [{"refId": "A", "query": "from(bucket: \"telemetry\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"telemetry\" and r.source == \"weather\") |> keep(columns: [\"_time\"]) |> unique(column: \"_time\") |> aggregateWindow(every: v.windowPeriod, fn: count, createEmpty: false)"}],
+      "fieldConfig": {"defaults": {"unit": "short"}, "overrides": []}, "options": {"legend": {"displayMode": "list", "placement": "bottom"}, "tooltip": {"mode": "single", "sort": "none"}}
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 41,
+  "tags": ["homelab", "telemetry", "weather"],
+  "templating": {"list": []},
+  "time": {"from": "now-24h", "to": "now"},
+  "timezone": "browser",
+  "title": "Local Weather",
+  "uid": "homelab-weather",
+  "version": 1
+}

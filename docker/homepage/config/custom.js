@@ -12,6 +12,8 @@
 		},
 	};
 	const UNAVAILABLE_AFTER_MS = 15000;
+	const WEATHER_URL = "http://192.168.1.23:8000/api/current/weather";
+	const WEATHER_REFRESH_MS = 30000;
 
 	let missingSince = null;
 	let unavailableTimer = null;
@@ -135,6 +137,41 @@
 		}
 	}
 
+	function weatherBanner() {
+		let banner = document.querySelector(".local-weather-header");
+		if (banner) return banner;
+		const main = document.querySelector("main");
+		if (!main) return null;
+		banner = document.createElement("a");
+		banner.className = "local-weather-header";
+		banner.href = "http://192.168.1.23:3001/d/homelab-weather/local-weather";
+		banner.textContent = "Local weather: waiting for telemetry";
+		main.prepend(banner);
+		return banner;
+	}
+
+	async function refreshWeather() {
+		const banner = weatherBanner();
+		if (banner) {
+			try {
+				const response = await fetch(WEATHER_URL, { cache: "no-store" });
+				if (!response.ok) throw new Error(`HTTP ${response.status}`);
+				const payload = await response.json();
+				const measurements = payload.data?.measurements || {};
+				const temperature = measurements.outdoor_temperature?.value;
+				const humidity = measurements.outdoor_humidity?.value;
+				const wind = measurements.wind_speed?.value;
+				if (temperature === undefined) throw new Error("no current weather");
+				banner.dataset.state = payload.stale ? "stale" : "current";
+				banner.textContent = `${temperature}°F  •  ${humidity ?? "—"}% humidity  •  Wind ${wind ?? "—"} mph`;
+			} catch (_error) {
+				banner.dataset.state = "unavailable";
+				banner.textContent = "Local weather unavailable";
+			}
+		}
+		window.setTimeout(refreshWeather, WEATHER_REFRESH_MS);
+	}
+
 	function scheduleUpdate() {
 		if (updateQueued) return;
 		updateQueued = true;
@@ -147,6 +184,7 @@
 
 	function start() {
 		scheduleUpdate();
+		refreshWeather();
 		new MutationObserver(scheduleUpdate).observe(document.body, { childList: true, subtree: true, characterData: true });
 	}
 
