@@ -64,11 +64,11 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 
 ### 3. Storage and container runtime
 
-- [ ] Add Docker Compose services for the FastAPI telemetry collector, InfluxDB, and Grafana
-- [ ] Automatically configure the InfluxDB organization, bucket, and retention policy
-- [ ] Store normalized and source-specific telemetry in InfluxDB
-- [ ] Add service healthchecks, dependency readiness, automatic restarts, and persistent volumes where appropriate
-- [ ] Verify a synthetic Ecowitt report reaches InfluxDB before connecting the physical station
+- [x] Add Docker Compose services for the FastAPI telemetry collector, InfluxDB, and Grafana
+- [x] Automatically configure the InfluxDB organization, bucket, and retention policy
+- [x] Store normalized and source-specific telemetry in InfluxDB
+- [x] Add service healthchecks, dependency readiness, automatic restarts, and persistent volumes where appropriate
+- [x] Verify a synthetic Ecowitt report reaches InfluxDB before connecting the physical station
 
 ### 4. Query APIs
 

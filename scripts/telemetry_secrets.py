@@ -34,7 +34,10 @@ def main() -> int:
             continue
         path.write_text(secrets.token_urlsafe(48) + "\n", encoding="utf-8")
         try:
-            path.chmod(0o600)
+            # Compose file-backed secrets retain host ownership. The 0700 parent
+            # directory protects host access while 0644 lets non-root containers
+            # read the individual bind-mounted secret.
+            path.chmod(0o644)
         except OSError:
             pass
         print(f"[PASS] Created secret: {filename}")
