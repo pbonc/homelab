@@ -1,0 +1,33 @@
+name: Deploy Homepage
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: homepage-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy Homepage to brain
+    runs-on:
+      - self-hosted
+      - Linux
+      - X64
+    environment: production
+    timeout-minutes: 15
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout requested revision
+        uses: actions/checkout@v4
+
+      - name: Validate deployment source
+        run: make homepage-validate
+
+      - name: Deploy and verify release
+        env:
+          HOMEPAGE_DEPLOY_ROOT: /srv/homelab/homepage
+          HOMEPAGE_VERIFY_URL: http://127.0.0.1:3000
+        run: make homepage-deploy

@@ -40,6 +40,8 @@ Weather data and an ADS-B receiver on a Raspberry Pi are planned. Other dashboar
 3. Show repository and service status: `make status`
 4. Explore available commands: `make help`
 
+Homepage releases use the shared deployment contract documented in [`docs/deployment.md`](docs/deployment.md). Validate with `make homepage-validate`; deploy, verify, and rollback through the corresponding `homepage-*` targets.
+
 ## Repository Layout
 
 See the folders in the project root and detailed documentation in `docs/`.

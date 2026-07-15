@@ -25,12 +25,12 @@
 
 Build one deployment interface that works locally, from GitHub Actions, and later from Jenkins.
 
-- [ ] Choose and document a permanent deployment directory on `brain`
-- [ ] Add `homepage-validate`, `homepage-deploy`, `homepage-verify`, and `homepage-rollback` Make targets
-- [ ] Record the deployed semantic version, Git commit, deployer, and timestamp
-- [ ] Preserve the last known-good release for rollback
-- [ ] Prevent overlapping deployments with a deployment lock
-- [ ] Add a manually triggered GitHub Actions deployment workflow
+- [x] Choose and document a permanent deployment directory on `brain`
+- [x] Add `homepage-validate`, `homepage-deploy`, `homepage-verify`, and `homepage-rollback` Make targets
+- [x] Record the deployed semantic version, Git commit, deployer, and timestamp
+- [x] Preserve the last known-good release for rollback
+- [x] Prevent overlapping deployments with a deployment lock
+- [x] Add a manually triggered GitHub Actions deployment workflow
 - [ ] Exercise deploy, failed verification, and rollback paths
 - [ ] Enable automatic deployment from `main` only after the manual path is reliable
 
