@@ -42,7 +42,43 @@ Build one deployment interface that works locally, from GitHub Actions, and late
 - [ ] Restore Homepage Docker integration through a least-privilege socket proxy or equivalent
 - [ ] Update `labctl status` to recognize the Glances container and deployed release
 
-## Phase 3: CI/CD Orchestration
+## Phase 3: Telemetry Platform
+
+Build the first version of a generic ingestion, storage, API, and visualization platform. The Ecowitt weather station is the first data source, not a weather-specific architectural boundary.
+
+### Platform foundation
+
+- [ ] Add Docker Compose services for the FastAPI telemetry collector, InfluxDB, and Grafana
+- [ ] Add service healthchecks, automatic restarts, and persistent volumes where appropriate
+- [ ] Automatically configure the InfluxDB organization, bucket, and retention policy
+- [ ] Automatically provision the Grafana datasource and starter dashboards
+- [ ] Keep collector handlers, Grafana dashboards, and Homepage integrations extensible for future telemetry sources
+
+### Collector and Ecowitt integration
+
+- [ ] Create a modular `docker/telemetry-collector/` Python and FastAPI service
+- [ ] Implement source plugins or handlers with Ecowitt as the first source
+- [ ] Accept Ecowitt uploads at `POST /data/report/`
+- [ ] Normalize common weather, wind, rain, solar, UV, and battery measurements
+- [ ] Preserve unknown Ecowitt values rather than discarding them
+- [ ] Store normalized and source-specific telemetry in InfluxDB
+
+### APIs and visualization
+
+- [ ] Add `GET /api/health`, `GET /api/current/weather`, and `GET /api/history/weather`
+- [ ] Establish API conventions that support future routes such as `/api/current/adsb` and `/api/current/docker`
+- [ ] Build a starter Grafana weather dashboard covering temperature, humidity, pressure, wind, rain, UV, solar, battery, and upload frequency
+
+### Homelab integration
+
+- [ ] Move Weather from planned inventory to deployed services in Homepage
+- [ ] Add Homepage cards for Telemetry Collector, InfluxDB, and Grafana
+- [ ] Show the collector's last upload and active telemetry-source count in Homepage
+- [ ] Add `python -m labctl telemetry` for platform health, latest weather, last upload, and source count
+- [ ] Create `docs/telemetry.md` covering architecture, data flow, APIs, Ecowitt setup, extension points, dashboards, Homepage, and troubleshooting
+- [ ] Verify live Ecowitt ingestion, InfluxDB persistence, Grafana dashboards, Homepage cards, and `labctl telemetry`
+
+## Phase 4: CI/CD Orchestration
 
 - [ ] Deploy Jenkins only after the shared deployment contract is stable
 - [ ] Have Jenkins call the same Make targets as GitHub Actions
@@ -50,25 +86,24 @@ Build one deployment interface that works locally, from GitHub Actions, and late
 - [ ] Assign only one system as the automatic production deployer
 - [ ] Use the other CI system for validation, manual releases, or pipeline-parity demonstrations
 
-## Phase 4: Runtime Health and Observability
+## Phase 5: Runtime Health and Observability
 
 - [ ] Expand `labctl status` beyond repository structure checks
 - [ ] Add HTTP reachability, timestamps, latency, and stale-data handling
 - [ ] Return nonzero exit codes for actionable failures
 - [ ] Define and test a versioned UTF-8 status schema
-- [ ] Add Prometheus, Grafana, Loki, and availability monitoring
+- [ ] Add Prometheus, Loki, and availability monitoring around the existing telemetry platform
 - [ ] Define initial service checks, thresholds, and alerts
-- [ ] Add weather conditions and forecast integration
 - [ ] Add runbooks and incident-response notes
 
-## Phase 5: ADS-B Edge Node
+## Phase 6: ADS-B Edge Node
 
 - [ ] Provision the Raspberry Pi receiver with a role-oriented hostname
 - [ ] Monitor host health, SDR connectivity, receiver processes, and feed freshness
 - [ ] Collect aircraft count, message rate, and reception-range metrics
-- [ ] Add a Homepage summary and detailed Grafana dashboard
+- [ ] Add an ADS-B collector plugin, Homepage summary, and detailed Grafana dashboard
 
-## Phase 6: Automation and Platform Expansion
+## Phase 7: Automation and Platform Expansion
 
 - [ ] Add Ansible controller and node bootstrap roles
 - [ ] Add Terraform module and state conventions
