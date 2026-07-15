@@ -21,7 +21,7 @@
 - [x] Add Glances readiness, host-header validation, and restricted CORS configuration
 - [x] Deploy and visually verify the current dashboard on `brain`
 
-## Phase 2: Deployment Contract — Current
+## Phase 2: Deployment Contract — Complete
 
 Build one deployment interface that works locally, from GitHub Actions, and later from Jenkins.
 
@@ -32,17 +32,17 @@ Build one deployment interface that works locally, from GitHub Actions, and late
 - [x] Prevent overlapping deployments with a deployment lock
 - [x] Add a manually triggered GitHub Actions deployment workflow
 - [x] Exercise deploy, failed verification, and rollback paths
-- [ ] Enable automatic deployment from `main` only after the manual path is reliable
+- [x] Keep production deployment manually triggered; do not deploy automatically from `main`
 
 ### Runtime hardening during Phase 2
 
-- [ ] Pin Homepage and Glances image versions instead of using mutable `latest` tags
-- [ ] Add a real Homepage container healthcheck
-- [ ] Replace `HOMEPAGE_ALLOWED_HOSTS=*` with the trusted hostnames and addresses
-- [ ] Restore Homepage Docker integration through a least-privilege socket proxy or equivalent
-- [ ] Update `labctl status` to recognize the Glances container and deployed release
+- [x] Pin Homepage and Glances image versions instead of using mutable `latest` tags
+- [x] Add a real Homepage container healthcheck
+- [x] Replace `HOMEPAGE_ALLOWED_HOSTS=*` with the trusted hostnames and addresses
+- [x] Restore Homepage Docker integration through a least-privilege socket proxy or equivalent
+- [x] Update `labctl status` to recognize the Glances container and deployed release
 
-## Phase 3: Telemetry Platform
+## Phase 3: Telemetry Platform — Current
 
 Build the first version of a generic ingestion, storage, API, and visualization platform. The Ecowitt weather station is the first data source, not a weather-specific architectural boundary.
 

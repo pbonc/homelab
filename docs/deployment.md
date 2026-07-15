@@ -64,7 +64,7 @@ HOMEPAGE_DEPLOY_ROOT=/tmp/homepage-release HOMEPAGE_VERIFY_URL=http://127.0.0.1:
 
 Run the **Deploy Homepage** workflow from the GitHub Actions interface and select the Git revision to release. The workflow uses the self-hosted runner on `brain`, participates in a workflow-level production concurrency group, and calls the same Make targets used locally.
 
-Automatic deployment from `main` remains disabled until manual deployment, forced verification failure, and explicit rollback have all been exercised successfully.
+Production deployment remains manually triggered by policy. Pushes to `main` validate the repository but do not deploy automatically.
 
 ## Failure-path exercise
 
