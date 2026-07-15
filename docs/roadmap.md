@@ -31,7 +31,7 @@ Build one deployment interface that works locally, from GitHub Actions, and late
 - [x] Preserve the last known-good release for rollback
 - [x] Prevent overlapping deployments with a deployment lock
 - [x] Add a manually triggered GitHub Actions deployment workflow
-- [ ] Exercise deploy, failed verification, and rollback paths
+- [x] Exercise deploy, failed verification, and rollback paths
 - [ ] Enable automatic deployment from `main` only after the manual path is reliable
 
 ### Runtime hardening during Phase 2

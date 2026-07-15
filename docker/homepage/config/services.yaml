@@ -28,6 +28,8 @@
         icon: mdi-view-dashboard
         href: http://192.168.1.23:3000
         description: "Running on brain | Dashboard v{{HOMEPAGE_VAR_DASHBOARD_VERSION}}"
+        server: brain-docker
+        container: homepage
     - Docker Engine:
         icon: mdi-docker
         description: "Running on brain | Container runtime"

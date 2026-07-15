@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import shutil
 import subprocess
 from pathlib import Path
@@ -44,7 +45,7 @@ def _docker_service_status() -> dict[str, str]:
     return {"level": "fail", "state": "inactive", "status": "unhealthy"}
 
 
-def _homepage_container_status() -> dict[str, str]:
+def _container_status(container: str) -> dict[str, str]:
     if shutil.which("docker") is None:
         return {
             "level": "info",
@@ -57,7 +58,7 @@ def _homepage_container_status() -> dict[str, str]:
         [
             "docker",
             "inspect",
-            "homepage",
+            container,
             "--format",
             "{{.State.Status}} {{if .State.Health}}{{.State.Health.Status}}{{else}}no-healthcheck{{end}}",
         ],
@@ -113,6 +114,21 @@ def _homepage_container_status() -> dict[str, str]:
     }
 
 
+def _deployed_release(deploy_root: Path) -> dict[str, str]:
+    metadata_path = deploy_root / "deployed.json"
+    if not metadata_path.exists():
+        return {"status": "unavailable"}
+    try:
+        payload = json.loads(metadata_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        return {"status": "invalid"}
+
+    required = ("version", "git_commit", "deployer", "deployed_at")
+    if not all(isinstance(payload.get(field), str) and payload[field] for field in required):
+        return {"status": "invalid"}
+    return {"status": "deployed", **{field: payload[field] for field in required}}
+
+
 def _print_docker_service_status(service: dict[str, str]) -> None:
     level = service["level"]
     if level == "info":
@@ -123,25 +139,38 @@ def _print_docker_service_status(service: dict[str, str]) -> None:
         print("[FAIL] Docker: inactive")
 
 
-def _print_homepage_container_status(service: dict[str, str]) -> None:
+def _print_container_status(name: str, service: dict[str, str]) -> None:
     level = service["level"]
     state = service["state"]
     health = service.get("health", "unknown")
 
     if level == "info":
-        print("[INFO] Homepage: Docker CLI unavailable")
+        print(f"[INFO] {name}: Docker CLI unavailable")
     elif level == "pass":
-        print("[PASS] Homepage: running / healthy")
+        print(f"[PASS] {name}: running / healthy")
     elif level == "warn" and state == "running" and health == "no-healthcheck":
-        print("[WARN] Homepage: running / no healthcheck")
+        print(f"[WARN] {name}: running / no healthcheck")
     elif state == "running" and health == "unhealthy":
-        print("[FAIL] Homepage: running / unhealthy")
+        print(f"[FAIL] {name}: running / unhealthy")
     elif state == "not-found":
-        print("[FAIL] Homepage: not found")
+        print(f"[FAIL] {name}: not found")
     elif state == "unknown":
-        print("[FAIL] Homepage: unknown")
+        print(f"[FAIL] {name}: unknown")
     else:
-        print(f"[FAIL] Homepage: {state}")
+        print(f"[FAIL] {name}: {state}")
+
+
+def _print_release(release: dict[str, str]) -> None:
+    if release["status"] == "deployed":
+        commit = release["git_commit"][:12]
+        print(
+            f"[PASS] Release: v{release['version']} / {commit} / "
+            f"{release['deployer']} / {release['deployed_at']}"
+        )
+    elif release["status"] == "invalid":
+        print("[FAIL] Release: deployed.json is invalid")
+    else:
+        print("[INFO] Release: no managed deployment metadata found")
 
 
 def run_status(json_output: bool = False) -> int:
@@ -164,7 +193,10 @@ def run_status(json_output: bool = False) -> int:
             path_statuses[str(rel)] = "missing"
 
     docker_status = _docker_service_status()
-    homepage_status = _homepage_container_status()
+    homepage_status = _container_status("homepage")
+    glances_status = _container_status("glances")
+    deploy_root = Path(os.environ.get("HOMEPAGE_DEPLOY_ROOT", "/srv/homelab/homepage"))
+    release = _deployed_release(deploy_root)
 
     if json_output:
         payload = {
@@ -183,7 +215,13 @@ def run_status(json_output: bool = False) -> int:
                     "health": homepage_status["health"],
                     "status": homepage_status["status"],
                 },
+                "glances": {
+                    "state": glances_status["state"],
+                    "health": glances_status["health"],
+                    "status": glances_status["status"],
+                },
             },
+            "deployment": release,
         }
         print(json.dumps(payload, indent=2))
         return 0
@@ -206,7 +244,9 @@ def run_status(json_output: bool = False) -> int:
     print()
     print("-- Services --")
     _print_docker_service_status(docker_status)
-    _print_homepage_container_status(homepage_status)
+    _print_container_status("Homepage", homepage_status)
+    _print_container_status("Glances", glances_status)
+    _print_release(release)
 
     print()
     print("Status checks complete.")

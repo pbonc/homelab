@@ -52,7 +52,10 @@ HOMEPAGE_DEPLOY_ROOT=/tmp/homepage-release HOMEPAGE_VERIFY_URL=http://127.0.0.1:
 
 - A non-blocking file lock rejects overlapping deployments and rollbacks.
 - The stable Compose project name `homepage` prevents each release directory from creating a separate stack.
-- A release is successful only when Homepage and Glances are running, no service is unhealthy, and Homepage returns HTTP success.
+- Runtime images are pinned by digest; version comments in Compose identify the corresponding upstream release.
+- Homepage accepts the LAN endpoint and `brain` hostname rather than wildcard host headers.
+- Homepage reaches the Docker API through an internal read-only socket proxy. The proxy permits container queries and rejects POST operations; Homepage never mounts the Docker socket directly.
+- A release is successful only when Homepage, Glances, and the Docker proxy are running, no service is unhealthy, and Homepage returns HTTP success.
 - Failed verification automatically reactivates the prior managed release. If no prior managed release exists during the initial migration, the candidate is left running for inspection instead of tearing down the pre-existing Compose project.
 - Rollback swaps `current` and `previous`, allowing an operator to recover from an accidental rollback.
 - Generated Homepage logs and retired runtime files are excluded from release snapshots.

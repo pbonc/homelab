@@ -1,25 +1,55 @@
 services:
   homepage:
-    image: ghcr.io/gethomepage/homepage:latest
+    # Homepage v1.13.2; digest pin makes deployments reproducible.
+    image: ghcr.io/gethomepage/homepage@sha256:a0b71c8e757298d02560186bab9fbe3fc2d375c523a62cc1019177b37e48aa28
     container_name: homepage
     depends_on:
       glances:
+        condition: service_healthy
+      docker-proxy:
         condition: service_healthy
     ports:
       - "3000:3000"
     volumes:
       - ./config:/app/config
-      - /var/run/docker.sock:/var/run/docker.sock:ro
     environment:
       - PUID=1000
       - PGID=1000
-      - HOMEPAGE_ALLOWED_HOSTS=*
+      - HOMEPAGE_ALLOWED_HOSTS=192.168.1.23:3000,brain:3000
     env_file:
       - version.env
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/api/healthcheck || exit 1
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+
+  docker-proxy:
+    # Tecnativa Docker Socket Proxy v0.4.2.
+    image: ghcr.io/tecnativa/docker-socket-proxy@sha256:1f3a6f303320723d199d2316a3e82b2e2685d86c275d5e3deeaf182573b47476
+    container_name: homepage-docker-proxy
+    environment:
+      - CONTAINERS=1
+      - POST=0
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - wget --quiet --tries=1 --spider http://127.0.0.1:2375/_ping || exit 1
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
     restart: unless-stopped
 
   glances:
-    image: nicolargo/glances:latest-full
+    # Glances v4.5.5; digest pin makes deployments reproducible.
+    image: nicolargo/glances@sha256:58651aabedf62db8bfc1d252f8d3889675dfcdb5d0ad1c177ae5879c21626f3a
     container_name: glances
     hostname: brain
     pid: host

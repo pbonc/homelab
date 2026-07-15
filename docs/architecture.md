@@ -35,6 +35,8 @@
 
 Homepage is the current control surface. Glances supplies host CPU, memory, and filesystem data to the `brain` infrastructure card over the private Compose network. Planned services remain informational until they have a verified endpoint and health signal.
 
+Homepage obtains container status through an internal Docker socket proxy limited to read-only container queries. The raw Docker socket is not mounted into Homepage or published on the host network.
+
 ## Current Phase
 
 Foundation work is complete. The lab is establishing a reliable local-operations and observability baseline before adding additional platforms or nodes.

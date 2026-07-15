@@ -28,6 +28,7 @@ SOURCE_DIR = REPO_ROOT / "docker" / "homepage"
 DEFAULT_DEPLOY_ROOT = Path("/srv/homelab/homepage")
 DEFAULT_URL = "http://127.0.0.1:3000"
 PROJECT_NAME = "homepage"
+REQUIRED_SERVICES = {"homepage", "glances", "docker-proxy"}
 
 
 class ReleaseError(RuntimeError):
@@ -153,7 +154,7 @@ def verify(release: Path, url: str, attempts: int, interval: float) -> None:
         except json.JSONDecodeError as exc:
             raise ReleaseError(f"Compose returned invalid service JSON: {exc}") from exc
     service_names = {service.get("Service") for service in services}
-    missing = {"homepage", "glances"} - service_names
+    missing = REQUIRED_SERVICES - service_names
     if missing:
         raise ReleaseError("Compose services are missing: " + ", ".join(sorted(missing)))
     failures = []

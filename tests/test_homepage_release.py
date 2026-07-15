@@ -32,6 +32,7 @@ class HomepageReleaseTests(unittest.TestCase):
             [
                 {"Service": "homepage", "State": "running", "Health": ""},
                 {"Service": "glances", "State": "running", "Health": "healthy"},
+                {"Service": "docker-proxy", "State": "running", "Health": "healthy"},
             ]
         )
         response = MagicMock()
@@ -53,6 +54,7 @@ class HomepageReleaseTests(unittest.TestCase):
             [
                 json.dumps({"Service": "homepage", "State": "running", "Health": "healthy"}),
                 json.dumps({"Service": "glances", "State": "running", "Health": "healthy"}),
+                json.dumps({"Service": "docker-proxy", "State": "running", "Health": "healthy"}),
             ]
         )
         response = MagicMock()
@@ -74,6 +76,7 @@ class HomepageReleaseTests(unittest.TestCase):
             [
                 json.dumps({"Service": "homepage", "State": "running", "Health": "healthy"}),
                 json.dumps({"Service": "glances", "State": "running", "Health": "healthy"}),
+                json.dumps({"Service": "docker-proxy", "State": "running", "Health": "healthy"}),
             ]
         )
         response = MagicMock()

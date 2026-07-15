@@ -31,6 +31,8 @@ This repository is designed so GitHub Actions, GitLab CI, and Jenkins call the s
 - A self-hosted GitHub Actions runner
 - Repository diagnostics through `labctl`
 
+Homepage and Glances use digest-pinned images. Homepage has an explicit healthcheck, restricted host-header allowlist, and read-only Docker integration through an internal socket proxy.
+
 Weather data and an ADS-B receiver on a Raspberry Pi are planned. Other dashboard cards are intentionally non-clickable until their services are deployed.
 
 ## Quick Start
