@@ -102,12 +102,14 @@ Planned variables:
 | `INFLUXDB_URL` | Internal InfluxDB endpoint |
 | `INFLUXDB_ORG` | InfluxDB organization |
 | `INFLUXDB_BUCKET` | Telemetry bucket |
-| `INFLUXDB_TOKEN` | Collector write/query token; secret |
+| `INFLUXDB_TOKEN` | Scoped collector read/write token; secret |
 | `INFLUXDB_TOKEN_FILE` | Preferred Docker secret-file path for the token |
 | `GRAFANA_ADMIN_USER` | Initial Grafana administrator; secret |
 | `GRAFANA_ADMIN_PASSWORD` | Initial Grafana password; secret |
 
 Secrets must not appear in Compose YAML, fixtures, logs, API responses, dashboards, or release metadata.
+
+InfluxDB credentials follow least privilege: the initialization administrator token is retained only for authorization management, the collector receives read/write access to the telemetry bucket, and Grafana receives read-only access. Grafana permits anonymous LAN access with the `Viewer` role while retaining the authenticated administrator account for configuration changes. Anonymous access must not be exposed through router port forwarding or an untrusted network.
 
 ## Storage contract
 
@@ -118,6 +120,8 @@ The initial InfluxDB measurement is `telemetry`. Tags identify `source`, `handle
 `docker/telemetry/compose.yaml` defines InfluxDB 2.9.1, the collector, and Grafana OSS 12.4.0. Upstream images and the collector base image are digest-pinned. InfluxDB and Grafana use named volumes. InfluxDB setup creates the `homelab` organization and a configurable `telemetry` bucket. The example environment starts with a 30-day retention period; production retention should be chosen per data lifecycle, with long-lived buckets used for data worth preserving.
 
 Run `make telemetry-secrets` once on the deployment host to create the ignored `.env` and Docker secret files. Existing configuration and secrets are never overwritten. The secrets directory is host-private (`0700`); individual files are readable by the non-root container users only when bind-mounted. Validate the resolved model with `make telemetry-config`.
+
+After InfluxDB initialization, create bucket-scoped authorizations and save them as `secrets/influxdb_collector_token.txt` (read/write) and `secrets/influxdb_grafana_token.txt` (read-only). These are InfluxDB-issued tokens, not randomly generated application secrets. Keep `secrets/influxdb_admin_token.txt` out of the collector and Grafana containers.
 
 ## Extension points
 
