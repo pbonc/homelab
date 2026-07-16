@@ -71,7 +71,7 @@
 		}
 	}
 
-	function setSecurityBadge(card, state, label) {
+	function setSecurityBadge(card, state, counts = null) {
 		card.dataset.security = state;
 		let badge = card.querySelector(".security-status-badge");
 		if (!badge) {
@@ -79,7 +79,30 @@
 			badge.className = "security-status-badge";
 			card.appendChild(badge);
 		}
-		badge.textContent = label;
+		badge.replaceChildren();
+		if (!counts) {
+			badge.classList.add("security-status-single");
+			badge.textContent = state === "stale" ? "Stale" : "Unavailable";
+			badge.setAttribute("aria-label", badge.textContent);
+			return;
+		}
+		badge.classList.remove("security-status-single");
+		const values = [
+			["C", counts.critical || 0],
+			["H", counts.high || 0],
+			["M", counts.medium || 0],
+			["L", counts.low || 0],
+		];
+		for (const [label, value] of values) {
+			const item = document.createElement("span");
+			item.textContent = label + ":" + value;
+			badge.appendChild(item);
+		}
+		badge.setAttribute(
+			"aria-label",
+			"Critical " + values[0][1] + ", high " + values[1][1] +
+			", medium " + values[2][1] + ", low " + values[3][1],
+		);
 	}
 
 	async function refreshSecurity() {
@@ -90,17 +113,10 @@
 				if (!response.ok) throw new Error("HTTP " + response.status);
 				const payload = await response.json();
 				const counts = payload.counts || {};
-				const labels = {
-					clear: "Clear",
-					low_medium: ((counts.medium || 0) + (counts.low || 0)) + " low/medium",
-					high: (counts.high || 0) + " high",
-					critical: (counts.critical || 0) + " critical",
-					stale: "Stale",
-					unavailable: "Unavailable",
-				};
-				setSecurityBadge(card, payload.status, labels[payload.status] || "Unknown");
+				const displayCounts = payload.status === "stale" || payload.status === "unavailable" ? null : counts;
+				setSecurityBadge(card, payload.status, displayCounts);
 			} catch (_error) {
-				setSecurityBadge(card, "unavailable", "Unavailable");
+				setSecurityBadge(card, "unavailable");
 			}
 		}
 		window.setTimeout(refreshSecurity, SECURITY_REFRESH_MS);

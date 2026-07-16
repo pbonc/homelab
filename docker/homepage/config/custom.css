@@ -177,16 +177,31 @@ main,
 
 .security-status-badge {
   position: absolute;
-  top: 0.8rem;
+  top: 0.55rem;
   right: 0.9rem;
-  padding: 0.28rem 0.6rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.12rem 0.5rem;
+  min-width: 4.6rem;
+  padding: 0.3rem 0.48rem;
   border: 1px solid currentColor;
-  border-radius: 999px;
-  font-size: 0.7rem;
+  border-radius: 0.5rem;
+  font-size: 0.64rem;
   font-weight: 750;
-  letter-spacing: 0.045em;
-  line-height: 1;
+  letter-spacing: 0.025em;
+  line-height: 1.05;
   text-transform: uppercase;
+}
+
+.security-status-badge span {
+  text-align: left;
+  white-space: nowrap;
+}
+
+.security-status-badge.security-status-single {
+  display: block;
+  min-width: 0;
+  border-radius: 999px;
 }
 
 .service-card[data-security="clear"] {
