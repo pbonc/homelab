@@ -1,0 +1,37 @@
+services:
+  security-status:
+    build:
+      context: .
+    image: homelab/security-status:0.1.0
+    container_name: security-status
+    ports:
+      - "8010:8010"
+    environment:
+      AIKIDO_REPOSITORY: ${AIKIDO_REPOSITORY}
+      AIKIDO_POLL_SECONDS: ${AIKIDO_POLL_SECONDS}
+      AIKIDO_STALE_AFTER_SECONDS: ${AIKIDO_STALE_AFTER_SECONDS}
+      AIKIDO_ALLOWED_ORIGINS: ${AIKIDO_ALLOWED_ORIGINS}
+      AIKIDO_DASHBOARD_URL: ${AIKIDO_DASHBOARD_URL}
+      AIKIDO_CLIENT_ID_FILE: /run/secrets/aikido_client_id
+      AIKIDO_CLIENT_SECRET_FILE: /run/secrets/aikido_client_secret
+    secrets:
+      - aikido_client_id
+      - aikido_client_secret
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8010/api/health', timeout=3)"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+
+secrets:
+  aikido_client_id:
+    file: ./secrets/aikido_client_id.txt
+  aikido_client_secret:
+    file: ./secrets/aikido_client_secret.txt
+

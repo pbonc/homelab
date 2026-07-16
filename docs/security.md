@@ -36,6 +36,34 @@ Polling is preferred over inbound webhooks because `brain` is not exposed to the
 public internet. The initial polling interval will be conservative and cached
 results will be served when Aikido is temporarily unavailable.
 
+## Adapter operations
+
+The adapter source and Compose stack live in `docker/security-status/`. It
+listens on LAN port `8010`, polls every 15 minutes, and considers cached data
+stale after one hour.
+
+On `brain`, create the ignored runtime files interactively and start the stack:
+
+```bash
+make security-secrets
+make security-config
+docker compose --env-file docker/security-status/.env --file docker/security-status/compose.yaml up --detach --build
+```
+
+`make security-secrets` does not echo credentials and does not overwrite
+existing values. Its secrets directory is host-private (`0700`); individual
+files are `0644` because Compose file-backed secrets retain host permissions
+and the container runs as a non-root user. Verify the sanitized endpoint without
+displaying credentials:
+
+```bash
+curl --fail --silent --show-error http://127.0.0.1:8010/api/status
+```
+
+The response may include repository name, aggregate counts, state, freshness,
+and the Aikido dashboard URL. It must not include API credentials, access
+tokens, finding names, file paths, or vulnerability details.
+
 ## Status semantics
 
 - `clear`: no actionable open findings

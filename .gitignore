@@ -11,3 +11,7 @@ __pycache__/
 # Telemetry runtime configuration and secrets
 docker/telemetry/.env
 docker/telemetry/secrets/
+
+# Security status runtime configuration and credentials
+docker/security-status/.env
+docker/security-status/secrets/

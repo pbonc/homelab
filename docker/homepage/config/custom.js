@@ -14,6 +14,8 @@
 	const UNAVAILABLE_AFTER_MS = 15000;
 	const WEATHER_URL = "http://192.168.1.23:8000/api/current/weather";
 	const WEATHER_REFRESH_MS = 300000;
+	const SECURITY_URL = "http://192.168.1.23:8010/api/status";
+	const SECURITY_REFRESH_MS = 900000;
 
 	let missingSince = null;
 	let unavailableTimer = null;
@@ -67,6 +69,41 @@
 		if (badge.textContent !== label) {
 			badge.textContent = label;
 		}
+	}
+
+	function setSecurityBadge(card, state, label) {
+		card.dataset.security = state;
+		let badge = card.querySelector(".security-status-badge");
+		if (!badge) {
+			badge = document.createElement("span");
+			badge.className = "security-status-badge";
+			card.appendChild(badge);
+		}
+		badge.textContent = label;
+	}
+
+	async function refreshSecurity() {
+		const card = serviceCard("Aikido Security");
+		if (card) {
+			try {
+				const response = await fetch(SECURITY_URL, { cache: "no-store" });
+				if (!response.ok) throw new Error("HTTP " + response.status);
+				const payload = await response.json();
+				const counts = payload.counts || {};
+				const labels = {
+					clear: "Clear",
+					low_medium: ((counts.medium || 0) + (counts.low || 0)) + " low/medium",
+					high: (counts.high || 0) + " high",
+					critical: (counts.critical || 0) + " critical",
+					stale: "Stale",
+					unavailable: "Unavailable",
+				};
+				setSecurityBadge(card, payload.status, labels[payload.status] || "Unknown");
+			} catch (_error) {
+				setSecurityBadge(card, "unavailable", "Unavailable");
+			}
+		}
+		window.setTimeout(refreshSecurity, SECURITY_REFRESH_MS);
 	}
 
 	function updateBrainHealth() {
@@ -210,6 +247,7 @@
 	function start() {
 		scheduleUpdate();
 		refreshWeather();
+		refreshSecurity();
 		new MutationObserver(scheduleUpdate).observe(document.body, { childList: true, subtree: true, characterData: true });
 	}
 

@@ -4,7 +4,7 @@ SHELL := /usr/bin/env bash
 # CI portability note:
 # GitHub Actions, GitLab CI, and Jenkins should call these same Make targets.
 
-.PHONY: help doctor status lint test telemetry-test telemetry-run telemetry-secrets telemetry-config bootstrap docker-up docker-down homepage-validate homepage-deploy homepage-verify homepage-rollback
+.PHONY: help doctor status lint test telemetry-test telemetry-run telemetry-secrets telemetry-config security-test security-secrets security-config bootstrap docker-up docker-down homepage-validate homepage-deploy homepage-verify homepage-rollback
 
 help: ## Show available targets
 >@awk 'BEGIN {FS = ":.*##"; printf "\nAvailable targets:\n"} /^[a-zA-Z0-9_.-]+:.*##/ {printf "  %-14s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -35,6 +35,15 @@ telemetry-secrets: ## Create ignored telemetry runtime configuration and secrets
 
 telemetry-config: ## Validate the resolved telemetry Compose configuration
 >@docker compose --env-file docker/telemetry/.env --file docker/telemetry/compose.yaml config --quiet
+
+security-test: ## Run security status adapter tests
+>@python3 -m unittest discover -s tests -p "test_security_status.py" -v
+
+security-secrets: ## Create ignored Aikido runtime configuration and credentials
+>@python3 scripts/security_secrets.py
+
+security-config: ## Validate the resolved security status Compose configuration
+>@docker compose --env-file docker/security-status/.env --file docker/security-status/compose.yaml config --quiet
 
 homepage-validate: ## Validate Homepage source and Compose configuration
 >@python3 -u scripts/homepage_release.py validate
