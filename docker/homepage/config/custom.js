@@ -15,7 +15,7 @@
 	const WEATHER_URL = "http://192.168.1.23:8000/api/current/weather";
 	const WEATHER_REFRESH_MS = 300000;
 	const SECURITY_URL = "http://192.168.1.23:8010/api/status";
-	const SECURITY_REFRESH_MS = 900000;
+	const SECURITY_REFRESH_MS = 60000;
 
 	let missingSince = null;
 	let unavailableTimer = null;
