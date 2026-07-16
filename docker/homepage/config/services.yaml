@@ -42,14 +42,6 @@
         href: http://192.168.1.23:8000/docs
         siteMonitor: http://192.168.1.23:8000/api/health
         description: "Running on brain | Generic ingestion API"
-        widget:
-          type: customapi
-          url: http://192.168.1.23:8000/api/health
-          mappings:
-            - field: active_source_count
-              label: Sources
-            - field: last_received_at
-              label: Last upload
     - InfluxDB:
         icon: si-influxdb
         href: http://192.168.1.23:8086

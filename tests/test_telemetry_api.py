@@ -62,7 +62,14 @@ class TelemetryApiTests(unittest.TestCase):
         self.assertEqual(health["active_source_count"], 1)
         self.assertIsNotNone(health["last_received_at"])
 
-        history = self.client.get("/api/history/weather?limit=10")
+        history = self.client.get(
+            "/api/history/weather",
+            params={
+                "start": "2026-07-15T00:00:00Z",
+                "stop": "2026-07-16T00:00:00Z",
+                "limit": 10,
+            },
+        )
         self.assertEqual(history.status_code, 200)
         self.assertEqual(history.json()["count"], 1)
         self.assertEqual(history.json()["data"][0]["source"], "weather")
