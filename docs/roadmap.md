@@ -92,32 +92,22 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [x] Verify live Ecowitt ingestion, restart persistence, API freshness, Grafana dashboards, Homepage cards, and `labctl telemetry`
 - [x] Confirm collector handlers, Grafana dashboards, and Homepage integrations provide clear extension points for the next telemetry source
 
-## Phase 4: CI/CD Orchestration and Security
+## Phase 4: Security Visibility — Complete
 
 ### 1. Aikido baseline and policy
 
 - [x] Connect only the `homelab` repository to Aikido through its read-only GitHub App permissions
 - [x] Establish an Aikido baseline for dependency, SAST, secret, license, IaC, and malware findings
-- [ ] Triage and document accepted baseline findings before enabling pull-request or release gating
-- [ ] Gate newly introduced critical and high-severity findings without granting automatic-fix write access
-- [ ] Add container-image and exposed-domain scanning as deployed services expand
+- [x] Keep Autofix, write permissions, and release gating disabled during baseline adoption
 
 ### 2. Homepage security status
 
-- [ ] Add a server-side Aikido status adapter on `brain` that stores its API token outside the repository and polls Aikido at a conservative interval
-- [ ] Limit the adapter to the `homelab` repository and expose only aggregate severity counts, scan freshness, and a dashboard link through a credential-free LAN endpoint
-- [ ] Add an equal-height Aikido card to Homepage without embedding a variable-height widget
-- [ ] Color the card green when clear, yellow for low or medium findings or stale results, orange for high findings, red for critical findings, and gray when status is unavailable
-- [ ] Base the card state on actionable open findings after baseline triage rather than historical or accepted findings
-- [ ] Verify the API token and detailed findings are never exposed to Homepage clients, logs, or committed configuration
-
-### 3. Jenkins pipeline parity
-
-- [ ] Deploy Jenkins only after the shared deployment contract is stable and the Aikido baseline is triaged
-- [ ] Have Jenkins call the same Make targets as GitHub Actions
-- [ ] Add a Jenkins release parameter for semantic version or Git tag
-- [ ] Keep production deployment manually triggered and assign only one CI system as its production deployer
-- [ ] Use the other CI system for validation, manual releases, or pipeline-parity demonstrations
+- [x] Add a server-side Aikido status adapter on `brain` that stores its API token outside the repository and polls Aikido at a conservative interval
+- [x] Limit the adapter to the `homelab` repository and expose only aggregate severity counts, scan freshness, and a dashboard link through a credential-free LAN endpoint
+- [x] Add an equal-height Aikido card to Homepage without embedding a variable-height widget
+- [x] Color the card green when clear, yellow for low or medium findings or stale results, orange for high findings, red for critical findings, and gray when status is unavailable
+- [x] Base the card state on open findings rather than closed, ignored, snoozed, or historical findings
+- [x] Verify the API token and detailed findings are never exposed to Homepage clients, logs, or committed configuration
 
 ## Phase 5: Runtime Health and Observability
 
@@ -129,6 +119,12 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [ ] Define initial service checks, thresholds, and alerts
 - [ ] Add runbooks and incident-response notes
 
+### Security follow-up
+
+- [ ] Triage and document accepted Aikido baseline findings
+- [ ] Gate newly introduced critical and high-severity findings without granting automatic-fix write access
+- [ ] Add container-image and exposed-domain scanning as deployed services expand
+
 ## Phase 6: ADS-B Edge Node
 
 - [ ] Provision the Raspberry Pi receiver with a role-oriented hostname
@@ -138,6 +134,11 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 
 ## Phase 7: Automation and Platform Expansion
 
+- [ ] Deploy Jenkins only when it demonstrates a capability beyond the current GitHub Actions workflow
+- [ ] Have Jenkins call the same Make targets as GitHub Actions
+- [ ] Add a Jenkins release parameter for semantic version or Git tag
+- [ ] Keep production deployment manually triggered and assign only one CI system as its production deployer
+- [ ] Use the other CI system for validation, manual releases, or pipeline-parity demonstrations
 - [ ] Add Ansible controller and node bootstrap roles
 - [ ] Add Terraform module and state conventions
 - [ ] Introduce K3s and Helm when controller capacity and operational needs justify them
