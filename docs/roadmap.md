@@ -42,7 +42,7 @@ Build one deployment interface that works locally, from GitHub Actions, and late
 - [x] Restore Homepage Docker integration through a least-privilege socket proxy or equivalent
 - [x] Update `labctl status` to recognize the Glances container and deployed release
 
-## Phase 3: Telemetry Platform — Current
+## Phase 3: Telemetry Platform — Complete
 
 Build the first version of a generic ingestion, storage, API, and visualization platform. The Ecowitt weather station is the first data source, not a weather-specific architectural boundary.
 
@@ -81,16 +81,16 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [x] Automatically provision the Grafana datasource and a starter weather dashboard covering temperature, humidity, pressure, wind, rain, UV, solar, battery, and upload frequency
 - [x] Add `python -m labctl telemetry` for platform health, latest weather, last upload, and source count
 - [x] Add Homepage cards for Telemetry Collector, InfluxDB, and Grafana
-- [x] Show the collector's last upload and active telemetry-source count in Homepage
+- [x] Expose the collector's last upload and active telemetry-source count through its API and `labctl telemetry`
 - [x] Replace the Homepage search bar with local weather data from the Telemetry Collector API
 - [x] Move Weather from planned inventory to deployed services in Homepage only after live data is verified
 
 ### 6. Live rollout and acceptance
 
 - [x] Configure the Ecowitt gateway to upload to `POST /data/report/`
-- [ ] Complete `docs/telemetry.md` with REST APIs, Ecowitt setup, dashboard extension, Homepage integration, operations, and troubleshooting
+- [x] Complete `docs/telemetry.md` with REST APIs, Ecowitt setup, dashboard extension, Homepage integration, operations, and troubleshooting
 - [x] Verify live Ecowitt ingestion, restart persistence, API freshness, Grafana dashboards, Homepage cards, and `labctl telemetry`
-- [ ] Confirm collector handlers, Grafana dashboards, and Homepage integrations provide clear extension points for the next telemetry source
+- [x] Confirm collector handlers, Grafana dashboards, and Homepage integrations provide clear extension points for the next telemetry source
 
 ## Phase 4: CI/CD Orchestration and Security
 

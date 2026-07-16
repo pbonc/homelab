@@ -23,7 +23,7 @@ test: ## Run repository validation checks
 >@python3 -m unittest discover -s tests -v
 
 telemetry-test: ## Run telemetry collector tests (requires development dependencies)
->@python3 -c "import fastapi, httpx2"
+>@python3 -c "import fastapi, httpx"
 >@python3 -m unittest discover -s tests -p "test_ecowitt.py" -v
 >@python3 -m unittest discover -s tests -p "test_telemetry_*.py" -v
 
