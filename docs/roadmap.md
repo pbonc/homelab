@@ -94,17 +94,30 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 
 ## Phase 4: CI/CD Orchestration and Security
 
-- [ ] Deploy Jenkins only after the shared deployment contract is stable
-- [ ] Have Jenkins call the same Make targets as GitHub Actions
-- [ ] Add a Jenkins release parameter for semantic version or Git tag
-- [ ] Assign only one system as the automatic production deployer
-- [ ] Use the other CI system for validation, manual releases, or pipeline-parity demonstrations
-- [ ] Connect only the `homelab` repository to Aikido through its read-only GitHub App permissions
-- [ ] Establish an Aikido baseline for dependency, SAST, secret, license, IaC, and malware findings
+### 1. Aikido baseline and policy
+
+- [x] Connect only the `homelab` repository to Aikido through its read-only GitHub App permissions
+- [x] Establish an Aikido baseline for dependency, SAST, secret, license, IaC, and malware findings
 - [ ] Triage and document accepted baseline findings before enabling pull-request or release gating
 - [ ] Gate newly introduced critical and high-severity findings without granting automatic-fix write access
 - [ ] Add container-image and exposed-domain scanning as deployed services expand
-- [ ] Add a compact Homepage security summary only if scan results can be exposed without credentials or card-height drift
+
+### 2. Homepage security status
+
+- [ ] Add a server-side Aikido status adapter on `brain` that stores its API token outside the repository and polls Aikido at a conservative interval
+- [ ] Limit the adapter to the `homelab` repository and expose only aggregate severity counts, scan freshness, and a dashboard link through a credential-free LAN endpoint
+- [ ] Add an equal-height Aikido card to Homepage without embedding a variable-height widget
+- [ ] Color the card green when clear, yellow for low or medium findings or stale results, orange for high findings, red for critical findings, and gray when status is unavailable
+- [ ] Base the card state on actionable open findings after baseline triage rather than historical or accepted findings
+- [ ] Verify the API token and detailed findings are never exposed to Homepage clients, logs, or committed configuration
+
+### 3. Jenkins pipeline parity
+
+- [ ] Deploy Jenkins only after the shared deployment contract is stable and the Aikido baseline is triaged
+- [ ] Have Jenkins call the same Make targets as GitHub Actions
+- [ ] Add a Jenkins release parameter for semantic version or Git tag
+- [ ] Keep production deployment manually triggered and assign only one CI system as its production deployer
+- [ ] Use the other CI system for validation, manual releases, or pipeline-parity demonstrations
 
 ## Phase 5: Runtime Health and Observability
 
