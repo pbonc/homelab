@@ -22,7 +22,7 @@ class StatusCache:
         self.refreshed_at: datetime | None = None
         self.last_error: str | None = None
         self.client = (
-            AikidoClient(settings.client_id, settings.client_secret, settings.repository)
+            AikidoClient(settings.client_id, settings.client_secret)
             if settings.client_id and settings.client_secret
             else None
         )
@@ -51,7 +51,7 @@ class StatusCache:
             state = state_for(self.counts)
         return {
             "status": state,
-            "repository": self.settings.repository,
+            "scope": "workspace",
             "counts": self.counts,
             "open_total": sum(self.counts.values()),
             "last_refresh_at": self.refreshed_at.isoformat() if self.refreshed_at else None,

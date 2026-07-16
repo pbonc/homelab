@@ -7,7 +7,6 @@ services:
     ports:
       - "8010:8010"
     environment:
-      AIKIDO_REPOSITORY: ${AIKIDO_REPOSITORY}
       AIKIDO_POLL_SECONDS: ${AIKIDO_POLL_SECONDS}
       AIKIDO_STALE_AFTER_SECONDS: ${AIKIDO_STALE_AFTER_SECONDS}
       AIKIDO_ALLOWED_ORIGINS: ${AIKIDO_ALLOWED_ORIGINS}
@@ -34,4 +33,3 @@ secrets:
     file: ./secrets/aikido_client_id.txt
   aikido_client_secret:
     file: ./secrets/aikido_client_secret.txt
-

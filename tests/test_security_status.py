@@ -52,7 +52,6 @@ class SettingsTests(unittest.TestCase):
     def test_safe_defaults_do_not_invent_credentials(self) -> None:
         with patch.dict(os.environ, {}, clear=True):
             settings = Settings.from_environment()
-        self.assertEqual(settings.repository, "homelab")
         self.assertIsNone(settings.client_id)
         self.assertIsNone(settings.client_secret)
 

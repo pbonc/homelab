@@ -3,8 +3,8 @@
 ## Aikido scope
 
 Aikido is connected to the `pbonc/homelab` repository through its read-only
-GitHub App integration. Other repositories are outside this project's scanning
-scope. Autofix and other write-capable integrations remain disabled.
+GitHub App integration. Additional repositories may be connected later. Autofix
+and other write-capable integrations remain disabled.
 
 ## Initial baseline
 
@@ -20,7 +20,7 @@ gating must remain disabled.
 
 Homepage must never receive Aikido client credentials, access tokens, or finding
 details. A server-side adapter on `brain` will obtain short-lived access tokens,
-query only the `homelab` repository, and publish a LAN-only summary containing:
+query the Aikido workspace, and publish a LAN-only summary containing:
 
 - Counts for open critical, high, medium, and low findings
 - The state derived from the highest actionable severity
@@ -73,7 +73,9 @@ tokens, finding names, file paths, or vulnerability details.
 - `stale`: the last successful result is older than the configured freshness limit
 - `unavailable`: no successful result is available
 
-The adapter counts individual open issues rather than grouped feed records.
-Accepted, ignored, snoozed, and closed findings do not determine the Homepage
-card color. Baseline findings remain actionable until they are individually
-triaged.
+The adapter counts individual open issues across the workspace rather than
+grouped feed records. This includes repository, surface-monitoring, SCM,
+container, and other findings, and automatically covers repositories connected
+later. Accepted, ignored, snoozed, and closed findings do not determine the
+Homepage card color. Baseline findings remain actionable until they are
+individually triaged.

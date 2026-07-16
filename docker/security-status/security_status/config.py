@@ -15,7 +15,6 @@ def _secret(name: str) -> str | None:
 
 @dataclass(frozen=True)
 class Settings:
-    repository: str
     client_id: str | None
     client_secret: str | None
     poll_seconds: int
@@ -31,11 +30,7 @@ class Settings:
             raise ValueError("AIKIDO_POLL_SECONDS must be at least 60")
         if stale_after_seconds <= poll_seconds:
             raise ValueError("AIKIDO_STALE_AFTER_SECONDS must exceed AIKIDO_POLL_SECONDS")
-        repository = os.environ.get("AIKIDO_REPOSITORY", "homelab").strip()
-        if not repository:
-            raise ValueError("AIKIDO_REPOSITORY must not be empty")
         return cls(
-            repository=repository,
             client_id=_secret("AIKIDO_CLIENT_ID"),
             client_secret=_secret("AIKIDO_CLIENT_SECRET"),
             poll_seconds=poll_seconds,
@@ -50,4 +45,3 @@ class Settings:
             ),
             dashboard_url=os.environ.get("AIKIDO_DASHBOARD_URL", "https://app.aikido.dev/"),
         )
-

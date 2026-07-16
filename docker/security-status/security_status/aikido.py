@@ -61,10 +61,9 @@ def state_for(counts: Mapping[str, int]) -> str:
 
 
 class AikidoClient:
-    def __init__(self, client_id: str, client_secret: str, repository: str, timeout: float = 15) -> None:
+    def __init__(self, client_id: str, client_secret: str, timeout: float = 15) -> None:
         self.client_id = client_id
         self.client_secret = client_secret
-        self.repository = repository
         self.timeout = timeout
 
     def _token(self) -> str:
@@ -92,7 +91,6 @@ class AikidoClient:
             {
                 "format": "json",
                 "per_page": 5000,
-                "filter_code_repo_name": self.repository,
                 "filter_status": "open",
             }
         )
