@@ -13,7 +13,7 @@
 	};
 	const UNAVAILABLE_AFTER_MS = 15000;
 	const WEATHER_URL = "http://192.168.1.23:8000/api/current/weather";
-	const WEATHER_REFRESH_MS = 30000;
+	const WEATHER_REFRESH_MS = 300000;
 
 	let missingSince = null;
 	let unavailableTimer = null;
@@ -140,14 +140,25 @@
 	function weatherBanner() {
 		let banner = document.querySelector(".local-weather-header");
 		if (banner) return banner;
-		const main = document.querySelector("main");
-		if (!main) return null;
+		const informationWidgets = document.querySelector("#information-widgets");
+		const container = document.querySelector("#inner_wrapper .container");
+		if (!informationWidgets && !container) return null;
 		banner = document.createElement("a");
 		banner.className = "local-weather-header";
 		banner.href = "http://192.168.1.23:3001/d/homelab-weather/local-weather";
+		banner.setAttribute("aria-label", "Open the Local Weather dashboard in Grafana");
 		banner.textContent = "Local weather: waiting for telemetry";
-		main.prepend(banner);
+		if (informationWidgets) {
+			informationWidgets.insertAdjacentElement("afterend", banner);
+		} else {
+			container.prepend(banner);
+		}
 		return banner;
+	}
+
+	function weatherValue(measurements, field, digits = 0) {
+		const value = measurements[field]?.value;
+		return Number.isFinite(value) ? Number(value).toFixed(digits) : "--";
 	}
 
 	async function refreshWeather() {
@@ -158,12 +169,25 @@
 				if (!response.ok) throw new Error(`HTTP ${response.status}`);
 				const payload = await response.json();
 				const measurements = payload.data?.measurements || {};
-				const temperature = measurements.outdoor_temperature?.value;
-				const humidity = measurements.outdoor_humidity?.value;
-				const wind = measurements.wind_speed?.value;
-				if (temperature === undefined) throw new Error("no current weather");
+				if (!Number.isFinite(measurements.outdoor_temperature?.value)) {
+					throw new Error("no current weather");
+				}
+				const observed = new Date(payload.data.observed_at);
+				const observedTime = Number.isNaN(observed.getTime())
+					? "unknown"
+					: observed.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+				const freshness = payload.stale ? "STALE" : "LATEST";
 				banner.dataset.state = payload.stale ? "stale" : "current";
-				banner.textContent = `${temperature}°F  •  ${humidity ?? "—"}% humidity  •  Wind ${wind ?? "—"} mph`;
+				banner.textContent = [
+					`LOCAL WEATHER ${freshness}`,
+					`${weatherValue(measurements, "outdoor_temperature", 1)}\u00b0F`,
+					`${weatherValue(measurements, "outdoor_humidity")}% humidity`,
+					`Wind ${weatherValue(measurements, "wind_speed", 1)} mph`,
+					`Rain ${weatherValue(measurements, "rain_rate", 2)} in/h`,
+					`${weatherValue(measurements, "relative_pressure", 2)} inHg`,
+					`UV ${weatherValue(measurements, "uv_index")}`,
+					`Observed ${observedTime}`,
+				].join("  |  ");
 			} catch (_error) {
 				banner.dataset.state = "unavailable";
 				banner.textContent = "Local weather unavailable";
@@ -177,6 +201,7 @@
 		updateQueued = true;
 		window.requestAnimationFrame(() => {
 			updateQueued = false;
+			weatherBanner();
 			markLifecycleCards();
 			updateBrainHealth();
 		});
