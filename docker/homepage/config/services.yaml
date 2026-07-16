@@ -27,11 +27,13 @@
     - Homepage:
         icon: mdi-view-dashboard
         href: http://192.168.1.23:3000
+        siteMonitor: http://homepage:3000/api/healthcheck
         description: "Running on brain | Dashboard v{{HOMEPAGE_VAR_DASHBOARD_VERSION}}"
         server: brain-docker
         container: homepage
     - Docker Engine:
         icon: mdi-docker
+        siteMonitor: http://docker-proxy:2375/_ping
         description: "Running on brain | Container runtime"
     - GitHub Actions Runner:
         icon: mdi-github
@@ -60,6 +62,7 @@
     - Aikido Security:
         icon: mdi-shield-check-outline
         href: https://app.aikido.dev/
+        siteMonitor: http://192.168.1.23:8010/api/health
         description: "Security | Open findings"
 
 - Planned Services:
