@@ -73,6 +73,7 @@ tokens, finding names, file paths, or vulnerability details.
 - `stale`: the last successful result is older than the configured freshness limit
 - `unavailable`: no successful result is available
 
+The adapter counts individual open issues rather than grouped feed records.
 Accepted, ignored, snoozed, and closed findings do not determine the Homepage
 card color. Baseline findings remain actionable until they are individually
 triaged.

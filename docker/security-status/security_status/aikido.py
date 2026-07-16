@@ -8,7 +8,7 @@ from urllib.request import Request, urlopen
 
 
 TOKEN_URL = "https://app.aikido.dev/api/oauth/token"
-ISSUES_URL = "https://app.aikido.dev/api/public/v1/open-issue-groups"
+ISSUES_URL = "https://app.aikido.dev/api/public/v1/issues/export"
 SEVERITIES = ("critical", "high", "medium", "low")
 
 
@@ -88,26 +88,18 @@ class AikidoClient:
 
     def open_issue_counts(self) -> dict[str, int]:
         token = self._token()
-        counts = {severity: 0 for severity in SEVERITIES}
-        page = 0
-        while True:
-            query = urlencode(
-                {
-                    "page": page,
-                    "per_page": 100,
-                    "filter_code_repo_name": self.repository,
-                    "filter_status": "open",
-                }
-            )
-            request = Request(
-                f"{ISSUES_URL}?{query}",
-                headers={"Authorization": f"Bearer {token}", "Accept": "application/json"},
-            )
-            with urlopen(request, timeout=self.timeout) as response:
-                payload = json.load(response)
-                has_next = response.headers.get("X-Has-Next-Page", "false").lower() == "true"
-            for severity, count in severity_counts(issue_items(payload)).items():
-                counts[severity] += count
-            if not has_next:
-                return counts
-            page += 1
+        query = urlencode(
+            {
+                "format": "json",
+                "per_page": 5000,
+                "filter_code_repo_name": self.repository,
+                "filter_status": "open",
+            }
+        )
+        request = Request(
+            f"{ISSUES_URL}?{query}",
+            headers={"Authorization": f"Bearer {token}", "Accept": "application/json"},
+        )
+        with urlopen(request, timeout=self.timeout) as response:
+            payload = json.load(response)
+        return severity_counts(issue_items(payload))

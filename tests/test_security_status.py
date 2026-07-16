@@ -30,6 +30,13 @@ class AikidoPayloadTests(unittest.TestCase):
             {"critical": 1, "high": 1, "medium": 1, "low": 1},
         )
 
+    def test_counts_each_issue_in_a_grouped_export_payload(self) -> None:
+        payload = {"items": [{"severity": "low"}, {"severity": "low"}, {"severity": "medium"}]}
+        self.assertEqual(
+            severity_counts(issue_items(payload)),
+            {"critical": 0, "high": 0, "medium": 1, "low": 2},
+        )
+
     def test_rejects_unknown_list_shape(self) -> None:
         with self.assertRaises(AikidoError):
             issue_items({"unexpected": []})
