@@ -12,9 +12,12 @@ The first Aikido scan completed with three open findings. This count records the
 starting point; it is not an acceptance of the findings or a permanent expected
 count. Finding details are intentionally not duplicated in the repository.
 
-Baseline triage is deferred. Until each finding is reviewed, no finding should
-be marked accepted solely because it existed in the initial scan, and security
-gating must remain disabled.
+Baseline remediation was explicitly deferred for later security work. No
+finding is accepted solely because it existed in the initial scan: deferred
+findings remain actionable in Aikido until individually reviewed. Any future
+risk acceptance must record the reason, owner, review date, and expiration or
+reconsideration trigger. Critical and high-severity gating will be enabled only
+after that baseline triage, without granting automatic-fix write access.
 
 ## Homepage status boundary
 

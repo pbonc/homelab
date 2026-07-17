@@ -109,7 +109,7 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [x] Base the card state on open findings rather than closed, ignored, snoozed, or historical findings
 - [x] Verify the API token and detailed findings are never exposed to Homepage clients, logs, or committed configuration
 
-## Phase 5: Runtime Health Contract
+## Phase 5: Runtime Health Contract — Complete
 
 ### 1. Runtime status contract
 
@@ -126,12 +126,6 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 
 - [x] Add runbooks and incident-response notes
 - [x] Exercise service-down, stale-data, runner-offline, and unsupported-platform scenarios
-
-### Security follow-up
-
-- [ ] Triage and document accepted Aikido baseline findings
-- [ ] Gate newly introduced critical and high-severity findings without granting automatic-fix write access
-- [ ] Add container-image and exposed-domain scanning as deployed services expand
 
 ## Phase 6: Metrics and Observability
 
@@ -156,6 +150,12 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [ ] Add Loki and a constrained log collector after metrics and availability checks are stable
 - [ ] Add observability runbooks and retention or capacity notes
 - [ ] Exercise disk-pressure, failed-deployment, log-backend-outage, and metrics-backend-outage scenarios
+
+### 4. Continuous security
+
+- [ ] Triage each Aikido baseline finding; document only explicit risk acceptances and leave deferred findings actionable
+- [ ] Gate newly introduced critical and high-severity findings without granting automatic-fix write access
+- [ ] Add container-image and exposed-domain scanning as deployed services expand
 
 ## Phase 7: Reproducible Node Automation
 
