@@ -124,7 +124,7 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 
 ### 2. Operational acceptance
 
-- [ ] Add runbooks and incident-response notes
+- [x] Add runbooks and incident-response notes
 - [ ] Exercise service-down, stale-data, runner-offline, and unsupported-platform scenarios
 
 ### Security follow-up
