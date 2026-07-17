@@ -50,6 +50,44 @@ class StatusTests(unittest.TestCase):
         self.assertEqual(service["status"], "healthy")
         self.assertIn("glances", mock_run.call_args.args[0])
 
+    @patch("labctl.commands.status.shutil.which", return_value="systemctl")
+    @patch("labctl.commands.status.subprocess.run")
+    def test_runner_status_discovers_the_active_systemd_unit(
+        self,
+        mock_run: MagicMock,
+        _mock_which: MagicMock,
+    ) -> None:
+        mock_run.return_value = MagicMock(
+            stdout=(
+                "actions.runner.pbonc-homelab.brain.service loaded active running "
+                "GitHub Actions Runner\n"
+            )
+        )
+        result = status._runner_status()
+        self.assertEqual(result["status"], "healthy")
+        self.assertEqual(result["unit"], "actions.runner.pbonc-homelab.brain.service")
+
+    @patch("labctl.commands.status.time.perf_counter", side_effect=[1.0, 1.01])
+    @patch("labctl.commands.status.urlopen")
+    def test_http_probe_marks_old_telemetry_as_stale(
+        self,
+        mock_urlopen: MagicMock,
+        _mock_clock: MagicMock,
+    ) -> None:
+        response = MagicMock()
+        response.status = 200
+        response.read.return_value = (
+            b'{"status":"healthy","last_received_at":"2026-07-17T12:00:00+00:00"}'
+        )
+        mock_urlopen.return_value.__enter__.return_value = response
+        result = status._http_probe(
+            "http://127.0.0.1:8000/api/health",
+            "telemetry",
+            now=datetime(2026, 7, 17, 12, 4, tzinfo=UTC),
+        )
+        self.assertEqual(result["status"], "stale")
+        self.assertEqual(result["latency_ms"], 10.0)
+
     def test_overall_status_uses_criticality_and_explicit_unavailable(self) -> None:
         unavailable = status._check(
             "docker.service", "runtime", "critical", "unavailable", "unsupported", "now"
@@ -74,6 +112,8 @@ class StatusTests(unittest.TestCase):
         )
         self.assertEqual(status._overall_status([failed, healthy]), "failed")
 
+    @patch("labctl.commands.status._http_probe")
+    @patch("labctl.commands.status._runner_status")
     @patch("labctl.commands.status._deployed_release")
     @patch("labctl.commands.status._container_status")
     @patch("labctl.commands.status._docker_service_status")
@@ -84,6 +124,8 @@ class StatusTests(unittest.TestCase):
         mock_docker: MagicMock,
         mock_container: MagicMock,
         mock_release: MagicMock,
+        mock_runner: MagicMock,
+        mock_http: MagicMock,
     ) -> None:
         mock_docker.return_value = {
             "level": "pass",
@@ -103,6 +145,17 @@ class StatusTests(unittest.TestCase):
             "deployer": "tester",
             "deployed_at": "2026-07-17T12:00:00+00:00",
         }
+        mock_runner.return_value = {
+            "state": "running",
+            "status": "healthy",
+            "unit": "actions.runner.test.service",
+        }
+        mock_http.return_value = {
+            "status": "healthy",
+            "summary": "HTTP 200 in 10.0 ms",
+            "http_status": 200,
+            "latency_ms": 10.0,
+        }
         with tempfile.TemporaryDirectory() as directory:
             payload = status._status_payload(
                 Path(directory),
@@ -112,7 +165,7 @@ class StatusTests(unittest.TestCase):
         self.assertEqual(payload["schema_version"], "1.0.0")
         self.assertEqual(payload["generated_at"], "2026-07-17T12:30:00+00:00")
         self.assertEqual(payload["overall_status"], "healthy")
-        self.assertEqual(len(payload["checks"]), 4)
+        self.assertEqual(len(payload["checks"]), 15)
         self.assertTrue(all(check["observed_at"] == payload["generated_at"] for check in payload["checks"]))
 
     def test_exit_codes_only_fail_on_confirmed_actionable_states(self) -> None:

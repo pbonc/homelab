@@ -66,14 +66,26 @@ automation without confirmed runtime evidence.
 | Check ID | Criticality | Owner | Evidence now | Planned evidence |
 | --- | --- | --- | --- | --- |
 | `docker.service` | Critical | Homelab operator | `systemctl is-active docker` | None |
-| `homepage.container` | Critical | Homelab operator | Docker container health | HTTP latency and reachability |
+| `homepage.container` | Critical | Homelab operator | Docker container health and HTTP reachability | None |
+| `homepage.proxy` | Important | Homelab operator | Docker container health | None |
 | `glances.container` | Informational | Homelab operator | Docker container health | API freshness |
 | `homepage.release` | Important | Homelab operator | Managed release metadata | Deployment-event correlation |
-| `github.runner` | Important | Homelab operator | Not implemented | Host service state and last activity |
-| `telemetry.collector` | Important | Homelab operator | Not implemented | Health endpoint and data freshness |
-| `telemetry.influxdb` | Important | Homelab operator | Not implemented | Health endpoint and write readiness |
-| `telemetry.grafana` | Important | Homelab operator | Not implemented | Health endpoint and response latency |
-| `security.aikido` | Important | Homelab operator | Not implemented | Adapter health, cache freshness, and upstream state |
+| `github.runner` | Important | Homelab operator | Host systemd service state | Last job or listener activity |
+| `telemetry.collector` | Important | Homelab operator | Container health, HTTP health, and weather freshness | None |
+| `telemetry.influxdb` | Important | Homelab operator | Container and HTTP health | Write-readiness probe |
+| `telemetry.grafana` | Important | Homelab operator | Container health, database health, and HTTP latency | None |
+| `security.aikido` | Important | Homelab operator | Container health, adapter HTTP health, and cache freshness | None |
 
-Thresholds for HTTP latency and stale data will be recorded only after the
-initial probes are measured on `brain`.
+## Initial thresholds
+
+Measurements on `brain` showed local endpoint response times between roughly
+2 ms and 22 ms. The initial thresholds deliberately allow substantial headroom:
+
+- HTTP timeout: 3 seconds
+- HTTP degraded threshold: greater than 500 ms
+- Weather data stale threshold: greater than 180 seconds
+
+An HTTP failure is distinct from stale application data. A collector can answer
+quickly while its most recent weather report is stale; that check reports
+`stale`, not `healthy`. Aikido severity does not determine adapter health,
+but an unavailable or stale adapter cache does.
