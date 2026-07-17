@@ -113,12 +113,13 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 
 ### 1. Runtime status contract
 
-- [ ] Define and test a versioned UTF-8 status schema
-- [ ] Define the service inventory, criticality, ownership, and stale or failure thresholds before adding checks
+- [x] Define and test a versioned UTF-8 status schema
+- [x] Define the service inventory, criticality, and ownership before adding checks
+- [ ] Measure initial probes and document service-specific latency, stale-data, and failure thresholds
 - [ ] Expand `labctl status` to check Docker, deployed containers, the GitHub Actions runner, and managed release metadata
 - [ ] Add HTTP reachability, response latency, timestamps, and stale-data handling for Homepage, telemetry, Grafana, InfluxDB, and Aikido status
-- [ ] Return nonzero exit codes only for documented actionable failures and preserve an explicit unavailable state for unsupported checks
-- [ ] Add deterministic tests for healthy, degraded, stale, unavailable, and failed states
+- [x] Return nonzero exit codes only for documented actionable failures and preserve an explicit unavailable state for unsupported checks
+- [x] Add deterministic contract tests for healthy, degraded, stale, unavailable, and failed states
 - [ ] Refresh architecture and network documentation from the verified runtime inventory
 
 ### 2. Operational acceptance

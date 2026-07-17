@@ -4,7 +4,13 @@ import json
 import os
 import shutil
 import subprocess
+from datetime import UTC, datetime
 from pathlib import Path
+
+
+SCHEMA_VERSION = "1.0.0"
+VALID_STATUSES = {"healthy", "degraded", "stale", "unavailable", "failed"}
+EXIT_CODES = {"healthy": 0, "unavailable": 0, "degraded": 1, "stale": 1, "failed": 2}
 
 
 def _ok(label: str, value: str) -> None:
@@ -97,7 +103,7 @@ def _container_status(container: str) -> dict[str, str]:
             "level": "warn",
             "state": "running",
             "health": "no-healthcheck",
-            "status": "warning",
+            "status": "degraded",
         }
     if status == "running" and health == "unhealthy":
         return {
@@ -173,10 +179,51 @@ def _print_release(release: dict[str, str]) -> None:
         print("[INFO] Release: no managed deployment metadata found")
 
 
-def run_status(json_output: bool = False) -> int:
-    repo_root = Path(__file__).resolve().parents[2]
-    branch = _git_branch(repo_root)
+def _check(
+    check_id: str,
+    category: str,
+    criticality: str,
+    status: str,
+    summary: str,
+    observed_at: str,
+    **details: str,
+) -> dict[str, object]:
+    if status not in VALID_STATUSES:
+        raise ValueError(f"unsupported status: {status}")
+    return {
+        "id": check_id,
+        "category": category,
+        "criticality": criticality,
+        "status": status,
+        "summary": summary,
+        "observed_at": observed_at,
+        "details": details,
+    }
 
+
+def _overall_status(checks: list[dict[str, object]]) -> str:
+    statuses = [str(check["status"]) for check in checks]
+    if any(
+        check["criticality"] == "critical" and check["status"] == "failed"
+        for check in checks
+    ):
+        return "failed"
+    if statuses and all(status == "unavailable" for status in statuses):
+        return "unavailable"
+    if any(status in {"failed", "degraded", "stale"} for status in statuses):
+        return "degraded"
+    if any(
+        check["criticality"] == "critical" and check["status"] == "unavailable"
+        for check in checks
+    ):
+        return "degraded"
+    return "healthy"
+
+
+def _status_payload(repo_root: Path, observed_at: datetime | None = None) -> dict[str, object]:
+    now = observed_at or datetime.now(UTC)
+    timestamp = now.astimezone(UTC).isoformat()
+    branch = _git_branch(repo_root)
     expected_paths = [
         repo_root / "ansible",
         repo_root / "docker",
@@ -184,70 +231,104 @@ def run_status(json_output: bool = False) -> int:
         repo_root / "terraform",
         repo_root / "docker" / "homepage" / "compose.yaml",
     ]
-    path_statuses: dict[str, str] = {}
-    for path in expected_paths:
-        rel = path.relative_to(repo_root)
-        if path.exists():
-            path_statuses[str(rel)] = "present"
-        else:
-            path_statuses[str(rel)] = "missing"
+    paths = {
+        str(path.relative_to(repo_root)): "present" if path.exists() else "missing"
+        for path in expected_paths
+    }
 
-    docker_status = _docker_service_status()
-    homepage_status = _container_status("homepage")
-    glances_status = _container_status("glances")
+    docker = _docker_service_status()
+    if docker["status"] == "unavailable":
+        homepage = {
+            "level": "info",
+            "state": "unavailable",
+            "health": "unavailable",
+            "status": "unavailable",
+        }
+        glances = dict(homepage)
+    else:
+        homepage = _container_status("homepage")
+        glances = _container_status("glances")
     deploy_root = Path(os.environ.get("HOMEPAGE_DEPLOY_ROOT", "/srv/homelab/homepage"))
     release = _deployed_release(deploy_root)
 
+    release_status = {
+        "deployed": "healthy",
+        "invalid": "failed",
+        "unavailable": "unavailable",
+    }[release["status"]]
+    checks = [
+        _check(
+            "docker.service",
+            "runtime",
+            "critical",
+            docker["status"],
+            f"Docker service is {docker['state']}",
+            timestamp,
+            state=docker["state"],
+        ),
+        _check(
+            "homepage.container",
+            "runtime",
+            "critical",
+            homepage["status"],
+            f"Homepage container is {homepage['state']} / {homepage['health']}",
+            timestamp,
+            state=homepage["state"],
+            health=homepage["health"],
+        ),
+        _check(
+            "glances.container",
+            "runtime",
+            "informational",
+            glances["status"],
+            f"Glances container is {glances['state']} / {glances['health']}",
+            timestamp,
+            state=glances["state"],
+            health=glances["health"],
+        ),
+        _check(
+            "homepage.release",
+            "deployment",
+            "important",
+            release_status,
+            f"Homepage release metadata is {release['status']}",
+            timestamp,
+            **{key: value for key, value in release.items() if key != "status"},
+        ),
+    ]
+    overall = _overall_status(checks)
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "generated_at": timestamp,
+        "overall_status": overall,
+        "context": {
+            "repository_root": str(repo_root),
+            "branch": branch,
+            "paths": paths,
+        },
+        "checks": checks,
+    }
+
+
+def run_status(json_output: bool = False) -> int:
+    repo_root = Path(__file__).resolve().parents[2]
+    payload = _status_payload(repo_root)
+    exit_code = EXIT_CODES[str(payload["overall_status"])]
+
     if json_output:
-        payload = {
-            "repository": {
-                "root": str(repo_root),
-                "branch": branch,
-            },
-            "paths": path_statuses,
-            "services": {
-                "docker": {
-                    "state": docker_status["state"],
-                    "status": docker_status["status"],
-                },
-                "homepage": {
-                    "state": homepage_status["state"],
-                    "health": homepage_status["health"],
-                    "status": homepage_status["status"],
-                },
-                "glances": {
-                    "state": glances_status["state"],
-                    "health": glances_status["health"],
-                    "status": glances_status["status"],
-                },
-            },
-            "deployment": release,
-        }
         print(json.dumps(payload, indent=2))
-        return 0
+        return exit_code
 
     print("== Homelab Status ==")
     print()
-
-    print("-- Repository --")
-    _ok("Root", str(repo_root))
-    _ok("Branch", branch)
-
+    print(f"Overall: {str(payload['overall_status']).upper()}")
+    print(f"Schema: {payload['schema_version']}")
     print()
-    print("-- Expected Paths --")
-    for rel, state in path_statuses.items():
-        if state == "present":
-            _ok(rel, state)
-        else:
-            _warn(rel, state)
-
-    print()
-    print("-- Services --")
-    _print_docker_service_status(docker_status)
-    _print_container_status("Homepage", homepage_status)
-    _print_container_status("Glances", glances_status)
-    _print_release(release)
+    for check in payload["checks"]:
+        label = str(check["id"])
+        status = str(check["status"]).upper()
+        print(f"[{status}] {label}: {check['summary']}")
 
     print()
     print("Status checks complete.")
-    return 0
+    return exit_code

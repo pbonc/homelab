@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://homelab.local/schemas/status-v1.schema.json",
+  "title": "Homelab Runtime Status",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "generated_at", "overall_status", "context", "checks"],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "overall_status": {
+      "$ref": "#/$defs/status"
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repository_root", "branch", "paths"],
+      "properties": {
+        "repository_root": {"type": "string"},
+        "branch": {"type": "string"},
+        "paths": {
+          "type": "object",
+          "additionalProperties": {
+            "enum": ["present", "missing"]
+          }
+        }
+      }
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/check"
+      }
+    }
+  },
+  "$defs": {
+    "status": {
+      "enum": ["healthy", "degraded", "stale", "unavailable", "failed"]
+    },
+    "criticality": {
+      "enum": ["critical", "important", "informational"]
+    },
+    "check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "category", "criticality", "status", "summary", "observed_at", "details"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9]+(?:[._-][a-z0-9]+)*$"},
+        "category": {"type": "string"},
+        "criticality": {"$ref": "#/$defs/criticality"},
+        "status": {"$ref": "#/$defs/status"},
+        "summary": {"type": "string"},
+        "observed_at": {"type": "string", "format": "date-time"},
+        "details": {
+          "type": "object",
+          "additionalProperties": {
+            "type": ["string", "number", "boolean", "null"]
+          }
+        }
+      }
+    }
+  }
+}
