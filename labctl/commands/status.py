@@ -72,7 +72,7 @@ def _docker_service_status() -> dict[str, str]:
     )
     if result.stdout.strip() == "active":
         return {"level": "pass", "state": "active", "status": "healthy"}
-    return {"level": "fail", "state": "inactive", "status": "unhealthy"}
+    return {"level": "fail", "state": "inactive", "status": "failed"}
 
 
 def _container_status(container: str) -> dict[str, str]:
@@ -102,7 +102,7 @@ def _container_status(container: str) -> dict[str, str]:
             "level": "fail",
             "state": "not-found",
             "health": "unknown",
-            "status": "unhealthy",
+            "status": "failed",
         }
 
     status_output = result.stdout.strip()
@@ -111,7 +111,7 @@ def _container_status(container: str) -> dict[str, str]:
             "level": "fail",
             "state": "unknown",
             "health": "unknown",
-            "status": "unhealthy",
+            "status": "failed",
         }
 
     status, _, health = status_output.partition(" ")
@@ -134,13 +134,13 @@ def _container_status(container: str) -> dict[str, str]:
             "level": "fail",
             "state": "running",
             "health": "unhealthy",
-            "status": "unhealthy",
+            "status": "failed",
         }
     return {
         "level": "fail",
         "state": status or "unknown",
         "health": health or "unknown",
-        "status": "unhealthy",
+        "status": "failed",
     }
 
 

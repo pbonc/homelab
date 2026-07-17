@@ -50,6 +50,18 @@ class StatusTests(unittest.TestCase):
         self.assertEqual(service["status"], "healthy")
         self.assertIn("glances", mock_run.call_args.args[0])
 
+    @patch("labctl.commands.status.shutil.which", return_value="docker")
+    @patch("labctl.commands.status.subprocess.run")
+    def test_container_status_maps_stopped_to_contract_failure(
+        self,
+        mock_run: MagicMock,
+        _mock_which: MagicMock,
+    ) -> None:
+        mock_run.return_value = MagicMock(returncode=0, stdout="exited unhealthy\n")
+        service = status._container_status("security-status")
+        self.assertEqual(service["status"], "failed")
+        self.assertEqual(service["state"], "exited")
+
     @patch("labctl.commands.status.shutil.which", return_value="systemctl")
     @patch("labctl.commands.status.subprocess.run")
     def test_runner_status_discovers_the_active_systemd_unit(
