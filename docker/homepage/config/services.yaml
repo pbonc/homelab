@@ -27,7 +27,6 @@
     - Homepage:
         icon: mdi-view-dashboard
         href: http://192.168.1.23:3000
-        siteMonitor: http://homepage:3000/api/healthcheck
         description: "Running on brain | Dashboard v{{HOMEPAGE_VAR_DASHBOARD_VERSION}}"
         server: brain-docker
         container: homepage
