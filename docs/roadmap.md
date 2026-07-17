@@ -109,15 +109,22 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [x] Base the card state on open findings rather than closed, ignored, snoozed, or historical findings
 - [x] Verify the API token and detailed findings are never exposed to Homepage clients, logs, or committed configuration
 
-## Phase 5: Runtime Health and Observability
+## Phase 5: Runtime Health Contract
 
-- [ ] Expand `labctl status` beyond repository structure checks
-- [ ] Add HTTP reachability, timestamps, latency, and stale-data handling
-- [ ] Return nonzero exit codes for actionable failures
+### 1. Runtime status contract
+
 - [ ] Define and test a versioned UTF-8 status schema
-- [ ] Add Prometheus, Loki, and availability monitoring around the existing telemetry platform
-- [ ] Define initial service checks, thresholds, and alerts
+- [ ] Define the service inventory, criticality, ownership, and stale or failure thresholds before adding checks
+- [ ] Expand `labctl status` to check Docker, deployed containers, the GitHub Actions runner, and managed release metadata
+- [ ] Add HTTP reachability, response latency, timestamps, and stale-data handling for Homepage, telemetry, Grafana, InfluxDB, and Aikido status
+- [ ] Return nonzero exit codes only for documented actionable failures and preserve an explicit unavailable state for unsupported checks
+- [ ] Add deterministic tests for healthy, degraded, stale, unavailable, and failed states
+- [ ] Refresh architecture and network documentation from the verified runtime inventory
+
+### 2. Operational acceptance
+
 - [ ] Add runbooks and incident-response notes
+- [ ] Exercise service-down, stale-data, runner-offline, and unsupported-platform scenarios
 
 ### Security follow-up
 
@@ -125,23 +132,55 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [ ] Gate newly introduced critical and high-severity findings without granting automatic-fix write access
 - [ ] Add container-image and exposed-domain scanning as deployed services expand
 
-## Phase 6: ADS-B Edge Node
+## Phase 6: Metrics and Observability
 
-- [ ] Provision the Raspberry Pi receiver with a role-oriented hostname
+### 1. Metrics, hardware, and availability
+
+- [ ] Deploy Prometheus and Node Exporter with constrained access, persistent storage, and documented retention
+- [ ] Collect host hardware telemetry for `brain`, including CPU, memory, disks, network interfaces, and available temperature or sensor readings
+- [ ] Provision a Grafana hardware dashboard with current health, utilization trends, storage capacity, and sensor history
+- [ ] Add availability probes for the Phase 5 critical service inventory and distinguish service failure from stale application data
+- [ ] Define recording rules, thresholds, and alerts only after observing a representative baseline
+
+### 2. Deployment events
+
+- [ ] Define a versioned deployment-event contract and durable event sink independent of Grafana
+- [ ] Record successful, failed, and rolled-back deployments using version, Git commit, deployer, target, result, and timestamp
+- [ ] Make event publication best-effort so an unavailable observability backend cannot alter deployment or rollback outcomes
+- [ ] Display deployment events as Grafana annotations on weather, hardware, and future service dashboards
+- [ ] Test annotation correlation across successful deployment, failed verification, and rollback paths
+
+### 3. Logs and acceptance
+
+- [ ] Add Loki and a constrained log collector after metrics and availability checks are stable
+- [ ] Add observability runbooks and retention or capacity notes
+- [ ] Exercise disk-pressure, failed-deployment, log-backend-outage, and metrics-backend-outage scenarios
+
+## Phase 7: Reproducible Node Automation
+
+- [ ] Define an Ansible inventory and connection model for `brain` and future edge nodes
+- [ ] Add a minimal bootstrap role for users, SSH access, time synchronization, base packages, and Docker where required
+- [ ] Separate non-secret defaults from encrypted or runtime-only secrets
+- [ ] Add check-mode and idempotence validation before using automation on a new node
+- [ ] Document recovery and manual break-glass steps when automation cannot reach a node
+
+## Phase 8: ADS-B Edge Node
+
+- [ ] Record receiver hardware, SDR model, network identity, and power or storage constraints
+- [ ] Provision the Raspberry Pi receiver through the Phase 7 automation baseline with a role-oriented hostname
+- [ ] Verify local aircraft decoding and feed freshness before adding remote telemetry
 - [ ] Monitor host health, SDR connectivity, receiver processes, and feed freshness
 - [ ] Collect aircraft count, message rate, and reception-range metrics
 - [ ] Add an ADS-B collector plugin, Homepage summary, and detailed Grafana dashboard
+- [ ] Document offline buffering, restart behavior, retention, and troubleshooting
+- [ ] Complete an outage and recovery exercise without affecting the controller node
 
-## Phase 7: Automation and Platform Expansion
+## Phase 9: Optional Platform Expansion
 
-- [ ] Deploy Jenkins only when it demonstrates a capability beyond the current GitHub Actions workflow
-- [ ] Have Jenkins call the same Make targets as GitHub Actions
-- [ ] Add a Jenkins release parameter for semantic version or Git tag
-- [ ] Keep production deployment manually triggered and assign only one CI system as its production deployer
-- [ ] Use the other CI system for validation, manual releases, or pipeline-parity demonstrations
-- [ ] Add Ansible controller and node bootstrap roles
-- [ ] Add Terraform module and state conventions
-- [ ] Introduce K3s and Helm when controller capacity and operational needs justify them
+- [ ] Add Terraform module and state conventions only when a concrete managed provider or reproducible resource exists
+- [ ] Introduce K3s and Helm only after capacity measurements and a multi-service operational need justify their overhead
+- [ ] Deploy Jenkins only when it demonstrates a capability not already provided by GitHub Actions
+- [ ] Require Jenkins to call the same Make targets, preserve manual production releases, and leave only one production deployer
 - [ ] Add further CI providers only where they demonstrate a distinct capability
 
 ## Success Criteria
@@ -149,6 +188,9 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - Every clickable dashboard item resolves to a deployed destination
 - Health indicators come from supported, testable, and documented checks
 - Deployments are versioned, mutually exclusive, verifiable, and reversible
+- Security status is least-privilege, actionable, and free of credentials or finding details
+- Runtime checks distinguish healthy, degraded, stale, unavailable, and failed states
+- Telemetry and deployment events remain useful across restarts and observability outages
 - CI providers call shared repository interfaces instead of embedding unique deployment logic
 - Automation is reproducible from a clean checkout
 - Documentation matches deployed infrastructure
