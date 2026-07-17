@@ -53,3 +53,9 @@ Stop the containers without deleting stored metrics:
 ```bash
 make observability-down
 ```
+
+## Deployment record
+
+The initial deployment on `brain` passed on 2026-07-17. Prometheus reported
+ready, and both the `prometheus` and `node` scrape targets reported `up` with no
+scrape errors.
