@@ -4,7 +4,7 @@ SHELL := /usr/bin/env bash
 # CI portability note:
 # GitHub Actions, GitLab CI, and Jenkins should call these same Make targets.
 
-.PHONY: help doctor status lint test telemetry-test telemetry-run telemetry-secrets telemetry-config security-test security-secrets security-config bootstrap docker-up docker-down homepage-validate homepage-deploy homepage-verify homepage-rollback
+.PHONY: help doctor status lint test telemetry-test telemetry-run telemetry-secrets telemetry-config security-test security-secrets security-config observability-config observability-up observability-down bootstrap docker-up docker-down homepage-validate homepage-deploy homepage-verify homepage-rollback
 
 help: ## Show available targets
 >@awk 'BEGIN {FS = ":.*##"; printf "\nAvailable targets:\n"} /^[a-zA-Z0-9_.-]+:.*##/ {printf "  %-14s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -44,6 +44,15 @@ security-secrets: ## Create ignored Aikido runtime configuration and credentials
 
 security-config: ## Validate the resolved security status Compose configuration
 >@docker compose --env-file docker/security-status/.env --file docker/security-status/compose.yaml config --quiet
+
+observability-config: ## Validate the Prometheus and Node Exporter Compose configuration
+>@docker compose --file docker/observability/compose.yaml config --quiet
+
+observability-up: ## Start Prometheus and Node Exporter
+>@docker compose --file docker/observability/compose.yaml up --detach
+
+observability-down: ## Stop Prometheus and Node Exporter without deleting metrics
+>@docker compose --file docker/observability/compose.yaml down
 
 homepage-validate: ## Validate Homepage source and Compose configuration
 >@python3 -u scripts/homepage_release.py validate

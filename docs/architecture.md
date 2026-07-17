@@ -27,6 +27,7 @@ special cases.
 | Homepage | Homepage, Glances, read-only Docker socket proxy | LAN control surface and host summary |
 | Telemetry | Telemetry Collector, InfluxDB, Grafana | Ingestion, durable time-series storage, APIs, and dashboards |
 | Security status | Aikido status adapter | Server-side OAuth, cached workspace severity summary, and LAN-safe status API |
+| Observability | Prometheus, Node Exporter | Persistent host metrics and time-series queries |
 | Host service | GitHub Actions runner | Manually triggered validation and production deployment jobs |
 
 The Homepage stack is deployed through immutable releases under
