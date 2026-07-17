@@ -120,7 +120,7 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [x] Add HTTP reachability, response latency, timestamps, and stale-data handling for Homepage, telemetry, Grafana, InfluxDB, and Aikido status
 - [x] Return nonzero exit codes only for documented actionable failures and preserve an explicit unavailable state for unsupported checks
 - [x] Add deterministic contract tests for healthy, degraded, stale, unavailable, and failed states
-- [ ] Refresh architecture and network documentation from the verified runtime inventory
+- [x] Refresh architecture and network documentation from the verified runtime inventory
 
 ### 2. Operational acceptance
 

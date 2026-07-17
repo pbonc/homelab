@@ -33,7 +33,12 @@ This repository is designed so GitHub Actions, GitLab CI, and Jenkins call the s
 
 Homepage and Glances use digest-pinned images. Homepage has an explicit healthcheck, restricted host-header allowlist, and read-only Docker integration through an internal socket proxy.
 
-Weather data and an ADS-B receiver on a Raspberry Pi are planned. Other dashboard cards are intentionally non-clickable until their services are deployed.
+The telemetry platform ingests live Ecowitt weather data into InfluxDB and
+provides Grafana dashboards plus a current-weather Homepage summary. A
+server-side Aikido adapter exposes aggregate workspace security status without
+exposing credentials or finding details. An ADS-B receiver on a Raspberry Pi
+remains planned. Other dashboard cards are intentionally non-clickable until
+their services are deployed.
 
 ## Quick Start
 
@@ -50,11 +55,10 @@ See the folders in the project root and detailed documentation in `docs/`.
 
 ## Next Milestones
 
-- Build shared validate, deploy, verify, and rollback targets for Homepage
-- Add a manually triggered, version-aware GitHub Actions deployment
-- Harden the runtime with pinned images, a Homepage healthcheck, and restricted allowed hosts
-- Deploy Jenkins after the shared deployment contract is proven
-- Expand `labctl` and add the observability stack
+- Complete the Phase 5 runtime health contract and operational exercises
+- Add Prometheus-backed hardware telemetry and Grafana dashboards
+- Record deployment events as durable Grafana annotations
+- Establish reproducible Ansible node provisioning before adding the ADS-B edge node
 
 ## License
 

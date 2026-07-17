@@ -2,38 +2,90 @@
 
 ## Scope
 
-This document defines initial network assumptions for the controller node and future homelab expansion.
+This document records the verified network exposure of the controller and the
+assumptions that future nodes and services must preserve.
 
-## Current Assumptions
+## Trusted network
 
-- `brain` is reachable at `192.168.1.23` on the local trusted network
-- SSH will be the primary remote administration path
-- Internal services are initially private to the homelab network
+- Controller hostname: `brain`
+- Controller address: `192.168.1.23`
+- Current client network: trusted home LAN
+- Primary administration path: SSH
+- Public inbound exposure: none intended
 
-## Current Endpoints
+Services currently bind plain HTTP to the LAN. The trusted-network boundary is
+therefore part of their security model; ports must not be forwarded from the
+internet without a deliberate authenticated reverse-proxy and TLS design.
 
-| System | Service | Address | Exposure |
-| --- | --- | --- | --- |
-| `brain` | Homepage | `http://192.168.1.23:3000` | Trusted LAN only |
+## LAN endpoints
 
-Dashboard entries without an address are plans, not active endpoints. Placeholder `.local` links are not used.
+| Port | Service | Address | Access and purpose |
+| ---: | --- | --- | --- |
+| 22 | SSH | `dar@192.168.1.23` | Administrative access using public-key authentication |
+| 3000 | Homepage | `http://192.168.1.23:3000` | Primary control surface |
+| 8000 | Telemetry Collector | `http://192.168.1.23:8000` | Ecowitt ingestion and telemetry APIs |
+| 8086 | InfluxDB | `http://192.168.1.23:8086` | Time-series API and administration |
+| 3001 | Grafana | `http://192.168.1.23:3001` | Anonymous Viewer dashboards; authenticated administration |
+| 8010 | Security status | `http://192.168.1.23:8010/api/status` | Credential-free aggregate Aikido status |
 
-## Naming and Access
+All entries are trusted-LAN only. Homepage links should use these verified
+addresses; planned services must not receive click targets.
 
-- Hostname standard starts with stable, human-readable names
-- Controller node hostname: `brain`
-- The ADS-B Raspberry Pi will receive a role-oriented hostname when provisioned
-- Future nodes should follow consistent role-oriented naming
+## Private container endpoints
 
-## Port and Exposure Strategy
+| Service | Private endpoint | Consumer |
+| --- | --- | --- |
+| Glances | `http://glances:61208` | Homepage |
+| Docker socket proxy | `http://docker-proxy:2375` | Homepage |
+| InfluxDB | `http://influxdb:8086` | Telemetry Collector and Grafana |
 
-- Do not expose management services directly to the public internet
-- Prefer reverse proxy and authentication boundaries for UI tools
-- Document every externally reachable service and reason
+The Docker proxy is not published on the host. Glances also remains private to
+the Homepage Compose network even though Homepage exposes its derived host
+metrics.
 
-## Future Topics
+## Expected traffic
 
-- VLAN segmentation strategy
+### Inbound on the LAN
+
+- Browser clients access Homepage, Grafana, InfluxDB, telemetry APIs, and the
+  sanitized security-status endpoint.
+- The Ecowitt gateway sends weather reports to port 8000.
+- Operators administer `brain` over SSH.
+
+### Outbound from `brain`
+
+- The GitHub Actions runner maintains its GitHub service connection.
+- The security-status adapter obtains OAuth tokens and reads Aikido's public
+  API.
+- Docker pulls explicitly configured images from their registries.
+
+No inbound connection from Aikido is required because the adapter uses outbound
+polling rather than webhooks.
+
+## Naming and future nodes
+
+- Hostnames are stable, lowercase, and role-oriented.
+- `brain` remains the controller identity.
+- The ADS-B Raspberry Pi receives its final hostname and address during its
+  automated provisioning phase.
+- `atlas` remains an inventory placeholder until hardware and networking are
+  verified.
+
+## Change requirements
+
+Before exposing a new port or address:
+
+1. Identify the owning service and operator.
+2. Define whether it is private-container, trusted-LAN, or public.
+3. Add a supported health check and document authentication.
+4. Update this endpoint inventory and Homepage only after verification.
+5. For any public exposure, add TLS, authentication, rate limiting, and a
+   documented reason.
+
+## Future network work
+
 - Internal DNS conventions
 - Certificate and TLS management
-- Network policy for container and Kubernetes workloads
+- VLAN segmentation for trusted clients, servers, IoT devices, and lab targets
+- Firewall policy for controller, edge nodes, and container workloads
+- Network policy if Kubernetes is eventually justified
