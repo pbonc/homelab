@@ -183,4 +183,4 @@ Expected: runtime checks are explicitly `unavailable`, overall state is
 | Stale telemetry classification | Deterministic stale state | Passed in automated tests |
 | Unsupported workstation | Unavailable / exit 0 | Passed on Windows development workstation |
 | Noncritical service down | Degraded / exit 1 / recovery | Passed with `security-status` on `brain`, 2026-07-17 |
-| Runner offline | Degraded / exit 1 / recovery | Pending controlled exercise |
+| Runner offline | Degraded / exit 1 / recovery | Passed on `brain`, 2026-07-17 |
