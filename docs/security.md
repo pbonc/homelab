@@ -42,6 +42,10 @@ The adapter source and Compose stack live in `docker/security-status/`. It
 listens on LAN port `8010`, polls every 15 minutes, and considers cached data
 stale after one hour.
 
+The HTTP surface is a minimal ASGI application served by Uvicorn. It deliberately
+does not depend on FastAPI or Starlette; two JSON endpoints do not justify the
+additional framework dependency or vulnerability surface.
+
 On `brain`, create the ignored runtime files interactively and start the stack:
 
 ```bash

@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import sys
 import unittest
+import asyncio
 from pathlib import Path
 from unittest.mock import patch
 
@@ -12,6 +13,7 @@ sys.path.insert(0, str(ROOT / "docker" / "security-status"))
 
 from security_status.aikido import AikidoError, issue_items, severity_counts, state_for  # noqa: E402
 from security_status.config import Settings  # noqa: E402
+from security_status.main import app  # noqa: E402
 
 
 class AikidoPayloadTests(unittest.TestCase):
@@ -59,6 +61,46 @@ class SettingsTests(unittest.TestCase):
         with patch.dict(os.environ, {"AIKIDO_POLL_SECONDS": "30"}, clear=True):
             with self.assertRaises(ValueError):
                 Settings.from_environment()
+
+
+class HttpEndpointTests(unittest.IsolatedAsyncioTestCase):
+    async def request(self, path: str, method: str = "GET", origin: str | None = None):
+        sent = []
+        received = asyncio.Queue()
+        await received.put({"type": "http.request", "body": b"", "more_body": False})
+        headers = [(b"origin", origin.encode())] if origin else []
+        scope = {
+            "type": "http",
+            "method": method,
+            "path": path,
+            "headers": headers,
+        }
+
+        async def receive():
+            return await received.get()
+
+        async def send(message):
+            sent.append(message)
+
+        await app(scope, receive, send)
+        return sent
+
+    async def test_health_supports_get_and_head(self) -> None:
+        get_response = await self.request("/api/health")
+        head_response = await self.request("/api/health", "HEAD")
+        self.assertEqual(get_response[0]["status"], 200)
+        self.assertEqual(get_response[1]["body"], b'{"status":"ok"}')
+        self.assertEqual(head_response[0]["status"], 200)
+        self.assertEqual(head_response[1]["body"], b"")
+
+    async def test_status_allows_configured_homepage_origin(self) -> None:
+        response = await self.request("/api/status", origin="http://192.168.1.23:3000")
+        headers = dict(response[0]["headers"])
+        self.assertEqual(headers[b"access-control-allow-origin"], b"http://192.168.1.23:3000")
+
+    async def test_unknown_route_is_not_found(self) -> None:
+        response = await self.request("/unknown")
+        self.assertEqual(response[0]["status"], 404)
 
 
 if __name__ == "__main__":

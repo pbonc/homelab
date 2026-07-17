@@ -1,12 +1,10 @@
 from __future__ import annotations
 
 import asyncio
+import json
 import logging
-from contextlib import asynccontextmanager
 from datetime import UTC, datetime
-
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from typing import Any
 
 from .aikido import AikidoClient, state_for
 from .config import Settings
@@ -70,30 +68,76 @@ async def poll() -> None:
         await asyncio.sleep(settings.poll_seconds)
 
 
-@asynccontextmanager
-async def lifespan(_app: FastAPI):
-    task = asyncio.create_task(poll())
-    try:
-        yield
-    finally:
-        task.cancel()
-        await asyncio.gather(task, return_exceptions=True)
+def response_headers(scope: dict[str, Any], body: bytes) -> list[tuple[bytes, bytes]]:
+    headers = [
+        (b"content-type", b"application/json"),
+        (b"content-length", str(len(body)).encode("ascii")),
+        (b"cache-control", b"no-store"),
+    ]
+    request_headers = {key.lower(): value for key, value in scope.get("headers", [])}
+    origin = request_headers.get(b"origin", b"").decode("latin-1")
+    if origin in settings.allowed_origins:
+        headers.extend(
+            [
+                (b"access-control-allow-origin", origin.encode("latin-1")),
+                (b"access-control-allow-methods", b"GET, HEAD, OPTIONS"),
+                (b"access-control-allow-headers", b"Accept"),
+                (b"vary", b"Origin"),
+            ]
+        )
+    return headers
 
 
-app = FastAPI(title="Homelab Security Status", version="0.1.0", lifespan=lifespan)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=list(settings.allowed_origins),
-    allow_methods=["GET"],
-    allow_headers=["Accept"],
-)
+async def send_json(
+    send: Any,
+    scope: dict[str, Any],
+    status: int,
+    payload: dict[str, object],
+) -> None:
+    body = json.dumps(payload, separators=(",", ":")).encode("utf-8")
+    await send(
+        {
+            "type": "http.response.start",
+            "status": status,
+            "headers": response_headers(scope, body),
+        }
+    )
+    await send(
+        {
+            "type": "http.response.body",
+            "body": b"" if scope.get("method") == "HEAD" else body,
+        }
+    )
 
 
-@app.get("/api/health")
-def health() -> dict[str, str]:
-    return {"status": "ok"}
+async def app(scope: dict[str, Any], receive: Any, send: Any) -> None:
+    if scope["type"] == "lifespan":
+        task: asyncio.Task[None] | None = None
+        while True:
+            message = await receive()
+            if message["type"] == "lifespan.startup":
+                task = asyncio.create_task(poll())
+                await send({"type": "lifespan.startup.complete"})
+            elif message["type"] == "lifespan.shutdown":
+                if task:
+                    task.cancel()
+                    await asyncio.gather(task, return_exceptions=True)
+                await send({"type": "lifespan.shutdown.complete"})
+                return
+        return
 
+    if scope["type"] != "http":
+        return
 
-@app.get("/api/status")
-def status() -> dict[str, object]:
-    return cache.payload()
+    method = scope.get("method", "GET")
+    path = scope.get("path", "")
+    if method == "OPTIONS":
+        await send_json(send, scope, 200, {"status": "ok"})
+    elif method not in {"GET", "HEAD"}:
+        await send_json(send, scope, 405, {"error": "method_not_allowed"})
+    elif path == "/api/health":
+        await send_json(send, scope, 200, {"status": "ok"})
+    elif path == "/api/status":
+        await send_json(send, scope, 200, cache.payload())
+    else:
+        await send_json(send, scope, 404, {"error": "not_found"})
