@@ -5,7 +5,7 @@
 - CPU: Intel Celeron N5095A
 - Cores: 4
 - Memory: 14 GB RAM
-- Storage: ~100 GB NVMe
+- Storage: Lexar NM620 1 TB NVMe; Ubuntu root logical volume is ~98 GB
 - OS target: Ubuntu 26.04 LTS
 
 ## Role in the Homelab
@@ -35,6 +35,21 @@ Glances refreshes the displayed metrics every five seconds. The card is classifi
 - Green: metrics are available and CPU, memory, and root filesystem usage are below 85%
 - Yellow: the node is active but one or more metrics are at or above 85%
 - Red: one or more metrics are at or above 95%, or required metrics are unavailable
+
+Prometheus also scrapes Node Exporter every 15 seconds for durable host history.
+Verified metric coverage includes:
+
+- Four CPU cores, utilization counters, frequency, and throttling
+- 15.996 GB physical memory and swap, cache, and pressure-related counters
+- Root, boot, and EFI filesystem capacity plus NVMe disk I/O
+- The active `enp3s0` Ethernet interface and its traffic and error counters
+- CPU package and per-core temperatures from `platform_coretemp_0`
+- NVMe composite and sensor temperatures from `nvme_nvme0`
+- ACPI, Wi-Fi, and Ethernet-controller thermal readings
+
+The physical NVMe device is approximately 1 TB, but the root logical volume is
+approximately 98 GB. Capacity dashboards and alerts must use the mounted root
+filesystem rather than assume the full physical device is allocated.
 
 ## Upgrade Considerations
 

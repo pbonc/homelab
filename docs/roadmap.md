@@ -132,7 +132,7 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 ### 1. Metrics, hardware, and availability
 
 - [x] Deploy Prometheus and Node Exporter with constrained access, persistent storage, and documented retention
-- [ ] Collect host hardware telemetry for `brain`, including CPU, memory, disks, network interfaces, and available temperature or sensor readings
+- [x] Collect host hardware telemetry for `brain`, including CPU, memory, disks, network interfaces, and available temperature or sensor readings
 - [ ] Provision a Grafana hardware dashboard with current health, utilization trends, storage capacity, and sensor history
 - [ ] Add availability probes for the Phase 5 critical service inventory and distinguish service failure from stale application data
 - [ ] Define recording rules, thresholds, and alerts only after observing a representative baseline

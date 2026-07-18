@@ -1,0 +1,125 @@
+{
+  "annotations": {"list": []},
+  "editable": false,
+  "graphTooltip": 1,
+  "panels": [
+    {
+      "id": 1, "title": "CPU Usage", "type": "stat",
+      "gridPos": {"h": 5, "w": 4, "x": 0, "y": 0},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [{"refId": "A", "expr": "100 * (1 - avg(rate(node_cpu_seconds_total{instance=\"brain\",mode=\"idle\"}[$__rate_interval])))", "legendFormat": "CPU", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "percent", "decimals": 1, "min": 0, "max": 100, "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "green"}, {"color": "yellow", "value": 70}, {"color": "red", "value": 90}]}}, "overrides": []},
+      "options": {"colorMode": "background", "graphMode": "area", "justifyMode": "center", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value"}
+    },
+    {
+      "id": 2, "title": "Memory Usage", "type": "stat",
+      "gridPos": {"h": 5, "w": 4, "x": 4, "y": 0},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [{"refId": "A", "expr": "100 * (1 - node_memory_MemAvailable_bytes{instance=\"brain\"} / node_memory_MemTotal_bytes{instance=\"brain\"})", "legendFormat": "Memory", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "percent", "decimals": 1, "min": 0, "max": 100, "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "green"}, {"color": "yellow", "value": 75}, {"color": "red", "value": 90}]}}, "overrides": []},
+      "options": {"colorMode": "background", "graphMode": "area", "justifyMode": "center", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value"}
+    },
+    {
+      "id": 3, "title": "Root Filesystem", "type": "stat",
+      "gridPos": {"h": 5, "w": 4, "x": 8, "y": 0},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [{"refId": "A", "expr": "100 * (1 - node_filesystem_avail_bytes{instance=\"brain\",mountpoint=\"/\"} / node_filesystem_size_bytes{instance=\"brain\",mountpoint=\"/\"})", "legendFormat": "Root", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "percent", "decimals": 1, "min": 0, "max": 100, "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "green"}, {"color": "yellow", "value": 75}, {"color": "red", "value": 90}]}}, "overrides": []},
+      "options": {"colorMode": "background", "graphMode": "area", "justifyMode": "center", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value"}
+    },
+    {
+      "id": 4, "title": "CPU Package", "type": "stat",
+      "gridPos": {"h": 5, "w": 4, "x": 12, "y": 0},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [{"refId": "A", "expr": "node_thermal_zone_temp{instance=\"brain\",type=\"x86_pkg_temp\"}", "legendFormat": "CPU", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "celsius", "decimals": 1, "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "blue"}, {"color": "green", "value": 30}, {"color": "yellow", "value": 70}, {"color": "red", "value": 85}]}}, "overrides": []},
+      "options": {"colorMode": "background", "graphMode": "area", "justifyMode": "center", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value"}
+    },
+    {
+      "id": 5, "title": "NVMe Temperature", "type": "stat",
+      "gridPos": {"h": 5, "w": 4, "x": 16, "y": 0},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [{"refId": "A", "expr": "node_hwmon_temp_celsius{instance=\"brain\",chip=\"nvme_nvme0\",sensor=\"temp1\"}", "legendFormat": "NVMe", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "celsius", "decimals": 1, "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "blue"}, {"color": "green", "value": 25}, {"color": "yellow", "value": 60}, {"color": "red", "value": 75}]}}, "overrides": []},
+      "options": {"colorMode": "background", "graphMode": "area", "justifyMode": "center", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value"}
+    },
+    {
+      "id": 6, "title": "Uptime", "type": "stat",
+      "gridPos": {"h": 5, "w": 4, "x": 20, "y": 0},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [{"refId": "A", "expr": "time() - node_boot_time_seconds{instance=\"brain\"}", "legendFormat": "Uptime", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "s", "decimals": 0, "color": {"mode": "continuous-GrYlRd"}}, "overrides": []},
+      "options": {"colorMode": "value", "graphMode": "area", "justifyMode": "center", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value"}
+    },
+    {
+      "id": 7, "title": "CPU Utilization", "type": "timeseries",
+      "gridPos": {"h": 9, "w": 12, "x": 0, "y": 5},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [{"refId": "A", "expr": "100 * (1 - avg by (instance) (rate(node_cpu_seconds_total{instance=\"brain\",mode=\"idle\"}[$__rate_interval])))", "legendFormat": "CPU", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "percent", "decimals": 1, "min": 0, "max": 100, "custom": {"drawStyle": "line", "fillOpacity": 20, "lineInterpolation": "smooth", "lineWidth": 2, "showPoints": "never", "spanNulls": true}}, "overrides": []},
+      "options": {"legend": {"calcs": ["lastNotNull", "min", "max"], "displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "multi", "sort": "desc"}}
+    },
+    {
+      "id": 8, "title": "Memory", "type": "timeseries",
+      "gridPos": {"h": 9, "w": 12, "x": 12, "y": 5},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [
+        {"refId": "A", "expr": "node_memory_MemTotal_bytes{instance=\"brain\"} - node_memory_MemAvailable_bytes{instance=\"brain\"}", "legendFormat": "Used", "range": true},
+        {"refId": "B", "expr": "node_memory_MemAvailable_bytes{instance=\"brain\"}", "legendFormat": "Available", "range": true}
+      ],
+      "fieldConfig": {"defaults": {"unit": "bytes", "decimals": 1, "min": 0, "custom": {"drawStyle": "line", "fillOpacity": 20, "lineInterpolation": "smooth", "lineWidth": 2, "showPoints": "never", "spanNulls": true}}, "overrides": []},
+      "options": {"legend": {"calcs": ["lastNotNull", "min", "max"], "displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "multi", "sort": "desc"}}
+    },
+    {
+      "id": 9, "title": "Filesystem Capacity", "type": "timeseries",
+      "gridPos": {"h": 9, "w": 12, "x": 0, "y": 14},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [{"refId": "A", "expr": "100 * (1 - node_filesystem_avail_bytes{instance=\"brain\",mountpoint=\"/\"} / node_filesystem_size_bytes{instance=\"brain\",mountpoint=\"/\"})", "legendFormat": "Root used", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "percent", "decimals": 1, "min": 0, "max": 100, "custom": {"drawStyle": "line", "fillOpacity": 25, "lineInterpolation": "smooth", "lineWidth": 2, "showPoints": "never", "spanNulls": true}}, "overrides": []},
+      "options": {"legend": {"calcs": ["lastNotNull", "min", "max"], "displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "single", "sort": "none"}}
+    },
+    {
+      "id": 10, "title": "NVMe Throughput", "type": "timeseries",
+      "gridPos": {"h": 9, "w": 12, "x": 12, "y": 14},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [
+        {"refId": "A", "expr": "rate(node_disk_read_bytes_total{instance=\"brain\",device=\"nvme0n1\"}[$__rate_interval])", "legendFormat": "Read", "range": true},
+        {"refId": "B", "expr": "rate(node_disk_written_bytes_total{instance=\"brain\",device=\"nvme0n1\"}[$__rate_interval])", "legendFormat": "Write", "range": true}
+      ],
+      "fieldConfig": {"defaults": {"unit": "Bps", "decimals": 1, "min": 0, "custom": {"drawStyle": "line", "fillOpacity": 20, "lineInterpolation": "smooth", "lineWidth": 2, "showPoints": "never", "spanNulls": true}}, "overrides": []},
+      "options": {"legend": {"calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "multi", "sort": "desc"}}
+    },
+    {
+      "id": 11, "title": "LAN Traffic", "type": "timeseries",
+      "gridPos": {"h": 9, "w": 12, "x": 0, "y": 23},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [
+        {"refId": "A", "expr": "rate(node_network_receive_bytes_total{instance=\"brain\",device=\"enp3s0\"}[$__rate_interval])", "legendFormat": "Receive", "range": true},
+        {"refId": "B", "expr": "rate(node_network_transmit_bytes_total{instance=\"brain\",device=\"enp3s0\"}[$__rate_interval])", "legendFormat": "Transmit", "range": true}
+      ],
+      "fieldConfig": {"defaults": {"unit": "Bps", "decimals": 1, "min": 0, "custom": {"drawStyle": "line", "fillOpacity": 20, "lineInterpolation": "smooth", "lineWidth": 2, "showPoints": "never", "spanNulls": true}}, "overrides": []},
+      "options": {"legend": {"calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "multi", "sort": "desc"}}
+    },
+    {
+      "id": 12, "title": "Hardware Temperatures", "type": "timeseries",
+      "gridPos": {"h": 9, "w": 12, "x": 12, "y": 23},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [
+        {"refId": "A", "expr": "node_thermal_zone_temp{instance=\"brain\",type=\"x86_pkg_temp\"}", "legendFormat": "CPU package", "range": true},
+        {"refId": "B", "expr": "node_hwmon_temp_celsius{instance=\"brain\",chip=\"nvme_nvme0\",sensor=\"temp1\"}", "legendFormat": "NVMe composite", "range": true},
+        {"refId": "C", "expr": "node_hwmon_temp_celsius{instance=\"brain\",chip=\"nvme_nvme0\",sensor=\"temp3\"}", "legendFormat": "NVMe sensor", "range": true}
+      ],
+      "fieldConfig": {"defaults": {"unit": "celsius", "decimals": 1, "custom": {"drawStyle": "line", "fillOpacity": 16, "lineInterpolation": "smooth", "lineWidth": 2, "showPoints": "never", "spanNulls": true}}, "overrides": []},
+      "options": {"legend": {"calcs": ["lastNotNull", "min", "max"], "displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "multi", "sort": "desc"}}
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 41,
+  "tags": ["homelab", "hardware", "prometheus"],
+  "templating": {"list": []},
+  "time": {"from": "now-6h", "to": "now"},
+  "timezone": "browser",
+  "title": "Brain Hardware",
+  "uid": "homelab-hardware",
+  "version": 1
+}

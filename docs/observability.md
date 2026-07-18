@@ -59,3 +59,18 @@ make observability-down
 The initial deployment on `brain` passed on 2026-07-17. Prometheus reported
 ready, and both the `prometheus` and `node` scrape targets reported `up` with no
 scrape errors.
+
+## Verified `brain` selectors
+
+Use `instance="brain"` for host panels. The primary hardware selectors are:
+
+- CPU: `node_cpu_seconds_total` and `node_cpu_scaling_frequency_hertz`
+- Memory: `node_memory_MemTotal_bytes` and `node_memory_MemAvailable_bytes`
+- Root capacity: `node_filesystem_*{mountpoint="/"}`
+- NVMe I/O: `node_disk_*{device="nvme0n1"}`
+- LAN traffic: `node_network_*{device="enp3s0"}`
+- CPU package temperature: `node_thermal_zone_temp{type="x86_pkg_temp"}`
+- NVMe temperatures: `node_hwmon_temp_celsius{chip="nvme_nvme0"}`
+
+Docker bridge and `veth` interfaces should be excluded from host-level network
+panels unless container-network behavior is the subject of the panel.
