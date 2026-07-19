@@ -157,12 +157,13 @@ so root-disk alerts remain the independent capacity guardrail.
 
 Grafana Alloy 1.16.1 discovers and tails Docker containers through
 `observability-docker-proxy`. Alloy never mounts the Docker socket. The proxy
-mounts it read-only, permits container GET operations, refuses POST operations,
-and is reachable only inside the Compose network. Collection is limited to
-Docker stdout and stderr; it does not scrape the host journal, application data
-directories, secret files, or arbitrary host paths. Alloy persists read offsets
-in the `alloy-data` volume so restarts resume without deliberately replaying the
-entire available history.
+mounts it read-only, permits container and network-metadata GET operations,
+refuses POST operations, and is reachable only inside the Compose network.
+Network metadata is required by Docker discovery but is not retained as a log
+label. Collection is limited to Docker stdout and stderr; it does not scrape the
+host journal, application data directories, secret files, or arbitrary host
+paths. Alloy persists read offsets in the `alloy-data` volume so restarts resume
+without deliberately replaying the entire available history.
 
 The one-shot `alloy-storage-init` service grants only `CAP_CHOWN` and
 `CAP_DAC_OVERRIDE`, assigns the mode-770 positions volume to Alloy's non-root
