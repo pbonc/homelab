@@ -69,16 +69,17 @@
         description: "Learn | Homelab interview practice"
     - Prometheus:
         icon: si-prometheus
-        href: http://192.168.1.23:9090
+        href: http://192.168.1.23:3001/d/homelab-platform-health/platform-health
         siteMonitor: http://192.168.1.23:9090/-/ready
-        description: "Observe | Metrics and alert evaluation"
+        description: "Observe | Platform metrics and alerts"
     - Loki:
         icon: si-grafana
-        href: http://192.168.1.23:3001/explore
+        href: http://192.168.1.23:3001/d/homelab-container-logs/container-logs
         siteMonitor: http://192.168.1.23:3100/ready
-        description: "Observe | Search Docker logs in Grafana"
+        description: "Observe | Container logs and errors"
     - Alloy:
         icon: mdi-pipe
+        href: http://192.168.1.23:3001/d/homelab-container-logs/container-logs?var-service=alloy
         description: "Observe | Constrained Docker log collector"
         server: brain-docker
         container: alloy

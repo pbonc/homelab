@@ -171,7 +171,9 @@ UID 473, and exits before Alloy starts. The long-running Alloy service remains
 non-root with all capabilities dropped.
 
 Grafana provisions the `Homelab Loki` datasource with UID `loki-homelab`.
-Use **Explore**, select that datasource, and begin with:
+The `Homelab / Container Logs` dashboard provides a service selector, error
+count, recent errors, per-service log rate, and a searchable log stream. Use
+**Explore** for ad hoc queries, select that datasource, and begin with:
 
 ```logql
 {host="brain", platform="docker"}

@@ -1,0 +1,82 @@
+{
+  "annotations": {"list": []},
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [
+    {"asDropdown": false, "icon": "external link", "includeVars": true, "keepTime": true, "tags": [], "targetBlank": false, "title": "Explore logs", "tooltip": "Open the current time range in Grafana Explore", "type": "link", "url": "/explore"}
+  ],
+  "panels": [
+    {
+      "datasource": {"type": "loki", "uid": "loki-homelab"},
+      "fieldConfig": {"defaults": {"color": {"mode": "thresholds"}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}, {"color": "orange", "value": 1}, {"color": "red", "value": 10}]}, "unit": "short"}, "overrides": []},
+      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
+      "id": 1,
+      "options": {"colorMode": "background", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "showPercentChange": false, "textMode": "auto", "wideLayout": true},
+      "targets": [{"datasource": {"type": "loki", "uid": "loki-homelab"}, "editorMode": "code", "expr": "sum(count_over_time({host=\"brain\", service=~\"$service\"} |~ \"(?i)(error|exception|fatal|panic)\" [$__range]))", "queryType": "instant", "refId": "A"}],
+      "title": "Errors in Selected Range",
+      "type": "stat"
+    },
+    {
+      "datasource": {"type": "loki", "uid": "loki-homelab"},
+      "fieldConfig": {"defaults": {"color": {"mode": "palette-classic"}, "custom": {"axisBorderShow": false, "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "lines/s", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 18, "gradientMode": "opacity", "hideFrom": {"legend": false, "tooltip": false, "viz": false}, "lineInterpolation": "smooth", "lineWidth": 2, "pointSize": 5, "scaleDistribution": {"type": "linear"}, "showPoints": "never", "spanNulls": false, "stacking": {"group": "A", "mode": "normal"}, "thresholdsStyle": {"mode": "off"}}, "mappings": [], "thresholds": {"mode": "absolute", "steps": [{"color": "green", "value": null}]}, "unit": "ops"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 18, "x": 6, "y": 0},
+      "id": 2,
+      "options": {"legend": {"calcs": ["mean", "max"], "displayMode": "table", "placement": "right", "showLegend": true}, "tooltip": {"hideZeros": false, "mode": "multi", "sort": "desc"}},
+      "targets": [{"datasource": {"type": "loki", "uid": "loki-homelab"}, "editorMode": "code", "expr": "sum by (service) (rate({host=\"brain\", service=~\"$service\"}[$__interval]))", "legendFormat": "{{service}}", "queryType": "range", "refId": "A"}],
+      "title": "Log Rate by Service",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "loki", "uid": "loki-homelab"},
+      "fieldConfig": {"defaults": {}, "overrides": []},
+      "gridPos": {"h": 4, "w": 6, "x": 0, "y": 4},
+      "id": 3,
+      "options": {"dedupStrategy": "none", "enableInfiniteScrolling": false, "enableLogDetails": true, "prettifyLogMessage": false, "showCommonLabels": false, "showLabels": false, "showTime": true, "sortOrder": "Descending", "wrapLogMessage": true},
+      "targets": [{"datasource": {"type": "loki", "uid": "loki-homelab"}, "editorMode": "code", "expr": "{host=\"brain\", service=~\"$service\"} |~ \"(?i)(error|exception|fatal|panic)\"", "queryType": "range", "refId": "A"}],
+      "title": "Recent Errors",
+      "type": "logs"
+    },
+    {
+      "datasource": {"type": "loki", "uid": "loki-homelab"},
+      "fieldConfig": {"defaults": {}, "overrides": []},
+      "gridPos": {"h": 13, "w": 24, "x": 0, "y": 8},
+      "id": 4,
+      "options": {"dedupStrategy": "none", "enableInfiniteScrolling": true, "enableLogDetails": true, "prettifyLogMessage": false, "showCommonLabels": false, "showLabels": false, "showTime": true, "sortOrder": "Descending", "wrapLogMessage": true},
+      "targets": [{"datasource": {"type": "loki", "uid": "loki-homelab"}, "editorMode": "code", "expr": "{host=\"brain\", service=~\"$service\"}", "queryType": "range", "refId": "A"}],
+      "title": "Container Logs",
+      "type": "logs"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 41,
+  "tags": ["homelab", "logs", "loki"],
+  "templating": {
+    "list": [
+      {
+        "allValue": ".*",
+        "current": {"text": "All", "value": "$__all"},
+        "datasource": {"type": "loki", "uid": "loki-homelab"},
+        "definition": "label_values({host=\"brain\"}, service)",
+        "includeAll": true,
+        "label": "Service",
+        "multi": true,
+        "name": "service",
+        "options": [],
+        "query": "label_values({host=\"brain\"}, service)",
+        "refresh": 2,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {"from": "now-1h", "to": "now"},
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Container Logs",
+  "uid": "homelab-container-logs",
+  "version": 1,
+  "weekStart": ""
+}
