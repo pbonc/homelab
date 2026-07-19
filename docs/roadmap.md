@@ -143,7 +143,7 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [x] Record successful, failed, and rolled-back deployments using version, Git commit, deployer, target, result, and timestamp
 - [x] Make event publication best-effort so an unavailable observability backend cannot alter deployment or rollback outcomes
 - [x] Display deployment events as Grafana annotations on the hardware dashboard without cluttering weather or platform-health views
-- [ ] Test annotation correlation across successful deployment, failed verification, and rollback paths
+- [x] Test annotation correlation across successful deployment, failed verification, and rollback paths
 
 ### 3. Logs and acceptance
 

@@ -137,3 +137,9 @@ Homepage release `0.1.0-de554092d9a5-20260719T070600Z`. The local journal stored
 the successful version `1.0.0` event, InfluxDB returned one matching row, and
 Grafana returned the required `_time`, `title`, `text`, and `tags` annotation
 fields.
+
+The controlled correlation exercise also passed on 2026-07-19. A deliberately
+invalid verification endpoint produced a `failed` event and restored the
+known-good release; a subsequent valid deployment produced `successful`; an
+explicit rollback produced `rolled_back`; and `labctl status` finished healthy.
+Grafana returned all three result types on the Brain Hardware dashboard.
