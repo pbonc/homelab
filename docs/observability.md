@@ -192,3 +192,9 @@ and treat access to Grafana Explore and Loki as operational access.
 Routine restarts preserve logs and positions. Never use `docker compose down
 --volumes` during routine maintenance. Validate all three configurations with
 `make observability-config` before `make observability-up`.
+
+The initial end-to-end log deployment passed on `brain` on 2026-07-19. Alloy
+started as UID 473, Docker discovery completed through the read-only proxy,
+Loki returned labeled streams for `study-deck` and
+`observability-docker-proxy`, and Grafana reported the `loki-homelab`
+datasource as successfully connected.
