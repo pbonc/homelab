@@ -61,8 +61,7 @@
     - Aikido Security:
         icon: mdi-shield-check-outline
         href: https://app.aikido.dev/
-        siteMonitor: http://192.168.1.23:8010/api/health
-        description: "Security | Open findings"
+        description: "Security | Open Aikido dashboard"
     - Study Deck:
         icon: mdi-head-lightbulb-outline
         href: http://192.168.1.23:8020

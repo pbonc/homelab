@@ -26,7 +26,6 @@ internet without a deliberate authenticated reverse-proxy and TLS design.
 | 8000 | Telemetry Collector | `http://192.168.1.23:8000` | Ecowitt ingestion and telemetry APIs |
 | 8086 | InfluxDB | `http://192.168.1.23:8086` | Time-series API and administration |
 | 3001 | Grafana | `http://192.168.1.23:3001` | Anonymous Viewer dashboards; authenticated administration |
-| 8010 | Security status | `http://192.168.1.23:8010/api/status` | Credential-free aggregate Aikido status |
 | 8020 | Study Deck | `http://192.168.1.23:8020` | LAN-only study notes, quizzes, and local progress |
 | 9090 | Prometheus | `http://192.168.1.23:9090` | Metrics queries and administration on the trusted LAN |
 | 3100 | Loki | `http://192.168.1.23:3100` | Log query API consumed by trusted-LAN Grafana |
@@ -50,20 +49,17 @@ metrics.
 
 ### Inbound on the LAN
 
-- Browser clients access Homepage, Grafana, InfluxDB, telemetry APIs, and the
-  sanitized security-status endpoint.
+- Browser clients access Homepage, Grafana, InfluxDB, and telemetry APIs.
 - The Ecowitt gateway sends weather reports to port 8000.
 - Operators administer `brain` over SSH.
 
 ### Outbound from `brain`
 
 - The GitHub Actions runner maintains its GitHub service connection.
-- The security-status adapter obtains OAuth tokens and reads Aikido's public
-  API.
 - Docker pulls explicitly configured images from their registries.
 
-No inbound connection from Aikido is required because the adapter uses outbound
-polling rather than webhooks.
+The dormant Aikido adapter makes no outbound API calls. Aikido continues to scan
+the repository through its GitHub App integration.
 
 ## Naming and future nodes
 

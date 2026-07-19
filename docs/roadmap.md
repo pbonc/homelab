@@ -105,6 +105,7 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [x] Add a server-side Aikido status adapter on `brain` that stores its API token outside the repository and polls Aikido at a conservative interval
 - [x] Aggregate open findings across the Aikido workspace and expose only severity counts, scan freshness, and a dashboard link through a credential-free LAN endpoint
 - [x] Add an equal-height Aikido card to Homepage without embedding a variable-height widget
+- [x] Retire live Aikido polling when Public REST API access became plan-restricted; retain a static dashboard link and the reversible adapter source
 - [x] Color the card green when clear, yellow for low or medium findings or stale results, orange for high findings, red for critical findings, and gray when status is unavailable
 - [x] Base the card state on open findings rather than closed, ignored, snoozed, or historical findings
 - [x] Verify the API token and detailed findings are never exposed to Homepage clients, logs, or committed configuration

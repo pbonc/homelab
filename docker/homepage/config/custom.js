@@ -14,8 +14,6 @@
 	const UNAVAILABLE_AFTER_MS = 15000;
 	const WEATHER_URL = "http://192.168.1.23:8000/api/current/weather";
 	const WEATHER_REFRESH_MS = 300000;
-	const SECURITY_URL = "http://192.168.1.23:8010/api/status";
-	const SECURITY_REFRESH_MS = 60000;
 	const STUDY_URL = "http://192.168.1.23:8020/api/progress";
 	const STUDY_REFRESH_MS = 60000;
 
@@ -71,57 +69,6 @@
 		if (badge.textContent !== label) {
 			badge.textContent = label;
 		}
-	}
-
-	function setSecurityBadge(card, state, counts = null) {
-		card.dataset.security = state;
-		let badge = card.querySelector(".security-status-badge");
-		if (!badge) {
-			badge = document.createElement("span");
-			badge.className = "security-status-badge";
-			card.appendChild(badge);
-		}
-		badge.replaceChildren();
-		if (!counts) {
-			badge.classList.add("security-status-single");
-			badge.textContent = state === "stale" ? "Stale" : "Unavailable";
-			badge.setAttribute("aria-label", badge.textContent);
-			return;
-		}
-		badge.classList.remove("security-status-single");
-		const values = [
-			["C", counts.critical || 0],
-			["H", counts.high || 0],
-			["M", counts.medium || 0],
-			["L", counts.low || 0],
-		];
-		for (const [label, value] of values) {
-			const item = document.createElement("span");
-			item.textContent = label + ":" + value;
-			badge.appendChild(item);
-		}
-		badge.setAttribute(
-			"aria-label",
-			"Critical " + values[0][1] + ", high " + values[1][1] +
-			", medium " + values[2][1] + ", low " + values[3][1],
-		);
-	}
-
-	async function refreshSecurity() {
-		const card = serviceCard("Aikido Security");
-		if (card) {
-			try {
-				const response = await fetch(SECURITY_URL, { cache: "no-store" });
-				if (!response.ok) throw new Error("HTTP " + response.status);
-				const payload = await response.json();
-				const counts = payload.counts || {};
-				const displayCounts = payload.status === "stale" || payload.status === "unavailable" ? null : counts;
-				setSecurityBadge(card, payload.status, displayCounts);
-			} catch (_error) {
-				setSecurityBadge(card, "unavailable");
-			}
-		}
-		window.setTimeout(refreshSecurity, SECURITY_REFRESH_MS);
 	}
 
 	function setStudyBadge(card, state, label) {
@@ -292,7 +239,6 @@
 	function start() {
 		scheduleUpdate();
 		refreshWeather();
-		refreshSecurity();
 		refreshStudy();
 		new MutationObserver(scheduleUpdate).observe(document.body, { childList: true, subtree: true, characterData: true });
 	}

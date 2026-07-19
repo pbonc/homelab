@@ -2,6 +2,12 @@
 
 ## Aikido scope
 
+> Operational status (2026-07-19): Aikido's Public REST API returns HTTP 402
+> for this workspace. Live polling is disabled, producing zero adapter API
+> calls. Homepage retains a static dashboard link, and repository scanning
+> through the read-only GitHub App remains active. Adapter source and tests are
+> retained for a possible future entitlement.
+
 Aikido is connected to the `pbonc/homelab` repository through its read-only
 GitHub App integration. Additional repositories may be connected later. Autofix
 and other write-capable integrations remain disabled.
@@ -22,8 +28,7 @@ after that baseline triage, without granting automatic-fix write access.
 ## Homepage status boundary
 
 Homepage must never receive Aikido client credentials, access tokens, or finding
-details. A server-side adapter on `brain` will obtain short-lived access tokens,
-query the Aikido workspace, and publish a LAN-only summary containing:
+details. The dormant server-side adapter can publish a LAN-only summary containing:
 
 - Counts for open critical, high, medium, and low findings
 - The state derived from the highest actionable severity
@@ -31,19 +36,18 @@ query the Aikido workspace, and publish a LAN-only summary containing:
 - Whether the cached result is stale
 - A link to the Aikido dashboard
 
-The adapter will use OAuth 2.0 Client Credentials. Its client ID and client
+When enabled, the adapter uses OAuth 2.0 Client Credentials. Its client ID and client
 secret will live in ignored runtime secret files on `brain`, not in environment
 examples, browser code, logs, or repository history.
 
-Polling is preferred over inbound webhooks because `brain` is not exposed to the
-public internet. The initial polling interval will be conservative and cached
-results will be served when Aikido is temporarily unavailable.
+Polling remains disabled while API access is plan-restricted.
 
 ## Adapter operations
 
-The adapter source and Compose stack live in `docker/security-status/`. It
-listens on LAN port `8010`, polls every 15 minutes, and considers cached data
-stale after one hour.
+The dormant adapter source and Compose stack live in `docker/security-status/`.
+When enabled, it listens on LAN port `8010`, polls every 15 minutes, and
+considers cached data stale after one hour. It is not in the active runtime
+inventory; the following operations are retained for reversibility.
 
 The HTTP surface is a minimal ASGI application served by Uvicorn. It deliberately
 does not depend on FastAPI or Starlette; two JSON endpoints do not justify the

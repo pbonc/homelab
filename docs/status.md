@@ -39,7 +39,7 @@ Docker service on `brain` is failed.
 | Criticality | Current use |
 | --- | --- |
 | `critical` | Docker and Homepage; loss removes the primary control surface |
-| `important` | Deployment metadata, telemetry storage and ingestion, Grafana, Aikido status, and the CI runner |
+| `important` | Deployment metadata, telemetry storage and ingestion, Grafana, observability services, and the CI runner |
 | `informational` | Supporting views such as Glances that do not define platform availability |
 
 Overall-state precedence is:
@@ -74,7 +74,6 @@ automation without confirmed runtime evidence.
 | `telemetry.collector` | Important | Homelab operator | Container health, HTTP health, and weather freshness | None |
 | `telemetry.influxdb` | Important | Homelab operator | Container and HTTP health | Write-readiness probe |
 | `telemetry.grafana` | Important | Homelab operator | Container health, database health, and HTTP latency | None |
-| `security.aikido` | Important | Homelab operator | Container health, adapter HTTP health, and cache freshness | None |
 
 ## Initial thresholds
 
@@ -87,5 +86,5 @@ Measurements on `brain` showed local endpoint response times between roughly
 
 An HTTP failure is distinct from stale application data. A collector can answer
 quickly while its most recent weather report is stale; that check reports
-`stale`, not `healthy`. Aikido severity does not determine adapter health,
-but an unavailable or stale adapter cache does.
+`stale`, not `healthy`. Aikido findings remain security work in its dashboard
+and are not part of runtime availability while REST polling is dormant.

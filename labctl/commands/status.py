@@ -25,7 +25,6 @@ CONTAINERS = (
     ("telemetry.collector.container", "telemetry-collector", "important"),
     ("telemetry.influxdb.container", "influxdb", "important"),
     ("telemetry.grafana.container", "grafana", "important"),
-    ("security.aikido.container", "security-status", "important"),
     ("study.deck.container", "study-deck", "informational"),
     ("observability.loki.container", "loki", "important"),
     ("observability.alloy.container", "alloy", "important"),
@@ -37,7 +36,6 @@ ENDPOINTS = (
     ("telemetry.collector.http", "http://127.0.0.1:8000/api/health", "important", "telemetry"),
     ("telemetry.influxdb.http", "http://127.0.0.1:8086/health", "important", "influxdb"),
     ("telemetry.grafana.http", "http://127.0.0.1:3001/api/health", "important", "grafana"),
-    ("security.aikido.http", "http://127.0.0.1:8010/api/status", "important", "aikido"),
     ("study.deck.http", "http://192.168.1.23:8020/api/health", "informational", "study"),
     ("observability.loki.http", "http://192.168.1.23:3100/ready", "important", "loki"),
 )

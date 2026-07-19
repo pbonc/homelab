@@ -3,7 +3,7 @@
 ## Purpose
 
 `brain` is the controller and current workload node for the homelab. It runs
-the control surface, telemetry platform, security-status adapter, and CI runner.
+the control surface, telemetry platform, observability stack, and CI runner.
 Additional nodes should use the same documented contracts rather than becoming
 special cases.
 
@@ -26,13 +26,14 @@ special cases.
 | --- | --- | --- |
 | Homepage | Homepage, Glances, read-only Docker socket proxy | LAN control surface and host summary |
 | Telemetry | Telemetry Collector, InfluxDB, Grafana | Ingestion, durable time-series storage, APIs, and dashboards |
-| Security status | Aikido status adapter | Server-side OAuth, cached workspace severity summary, and LAN-safe status API |
-| Observability | Prometheus, Node Exporter | Persistent host metrics and time-series queries |
+| Security scanning | Aikido GitHub App | Read-only repository scanning and a static Homepage dashboard link |
+| Observability | Prometheus, Node Exporter, Loki, Alloy | Host metrics, availability probes, alerts, and constrained Docker logs |
 | Host service | GitHub Actions runner | Manually triggered validation and production deployment jobs |
 
 The Homepage stack is deployed through immutable releases under
-`/srv/homelab/homepage`. Telemetry and security status currently run from
-their repository Compose definitions on `brain`.
+`/srv/homelab/homepage`. Telemetry and observability currently run from their
+repository Compose definitions on `brain`; the security-status adapter is
+dormant.
 
 ### Planned nodes
 
@@ -63,19 +64,16 @@ their repository Compose definitions on `brain`.
 
 ### Security status
 
-1. The security-status adapter reads ignored file-backed Aikido client
-   credentials.
-2. It obtains short-lived OAuth access tokens and polls workspace-wide open
-   issues every 15 minutes.
-3. It exposes only aggregate severity counts and cache freshness on the LAN.
-4. Homepage reads that sanitized endpoint every minute and colors the Aikido
-   card from the worst open severity.
+1. Aikido scans the repository through its read-only GitHub App integration.
+2. Homepage links to the authenticated Aikido dashboard without copying finding
+   details or credentials.
+3. REST polling is dormant while API access is plan-restricted.
 
 ### Runtime status
 
 `python -m labctl status` evaluates the host Docker service, all deployed
 containers, the GitHub Actions runner, release metadata, HTTP reachability,
-latency, weather freshness, and Aikido cache freshness. Human and JSON output
+latency, and weather freshness. Human and JSON output
 share the versioned contract documented in `docs/status.md`.
 
 ## Security boundaries

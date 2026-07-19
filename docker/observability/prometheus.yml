@@ -49,10 +49,6 @@ scrape_configs:
         labels:
           service: grafana
       - targets:
-          - http://192.168.1.23:8010/api/health
-        labels:
-          service: aikido-status
-      - targets:
           - http://192.168.1.23:8020/api/health
         labels:
           service: study-deck

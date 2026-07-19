@@ -90,8 +90,8 @@ check successfully queried the Prometheus API.
 ## Availability and freshness
 
 Blackbox Exporter probes the public HTTP health surface of Homepage, the
-Telemetry Collector, InfluxDB, Grafana, Aikido status, and Prometheus every 15
-seconds. The exporter is internal to the observability Compose network; only
+Telemetry Collector, InfluxDB, Grafana, Study Deck, Loki, and Prometheus every
+15 seconds. The exporter is internal to the observability Compose network; only
 Prometheus queries it.
 
 The Telemetry Collector independently publishes Prometheus metrics at
