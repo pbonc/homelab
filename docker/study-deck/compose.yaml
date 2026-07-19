@@ -1,0 +1,36 @@
+name: study-deck
+
+services:
+  study-deck:
+    build:
+      context: .
+    image: homelab/study-deck:0.1.0
+    container_name: study-deck
+    ports:
+      - "192.168.1.23:8020:8020"
+    environment:
+      STUDY_DECK_CONTENT: /app/content/deck.json
+      STUDY_DECK_DATABASE: /data/study.db
+    volumes:
+      - study-deck-data:/data
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8020/api/health', timeout=3)"
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 10s
+    restart: unless-stopped
+
+volumes:
+  study-deck-data:

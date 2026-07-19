@@ -4,7 +4,7 @@ SHELL := /usr/bin/env bash
 # CI portability note:
 # GitHub Actions, GitLab CI, and Jenkins should call these same Make targets.
 
-.PHONY: help doctor status lint test telemetry-test telemetry-run telemetry-secrets telemetry-config security-test security-secrets security-config observability-config observability-up observability-down bootstrap docker-up docker-down homepage-validate homepage-deploy homepage-verify homepage-rollback
+.PHONY: help doctor status lint test telemetry-test telemetry-run telemetry-secrets telemetry-config security-test security-secrets security-config observability-config observability-up observability-down study-test study-config study-up study-down bootstrap docker-up docker-down homepage-validate homepage-deploy homepage-verify homepage-rollback
 
 help: ## Show available targets
 >@awk 'BEGIN {FS = ":.*##"; printf "\nAvailable targets:\n"} /^[a-zA-Z0-9_.-]+:.*##/ {printf "  %-14s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -53,6 +53,18 @@ observability-up: ## Start Prometheus and Node Exporter
 
 observability-down: ## Stop Prometheus and Node Exporter without deleting metrics
 >@docker compose --file docker/observability/compose.yaml down
+
+study-test: ## Validate Study Deck content and progress behavior
+>@python3 -m unittest discover -s tests -p "test_study_deck.py" -v
+
+study-config: ## Validate the Study Deck Compose configuration
+>@docker compose --file docker/study-deck/compose.yaml config --quiet
+
+study-up: ## Build and start the Homelab Study Deck
+>@docker compose --file docker/study-deck/compose.yaml up --detach --build
+
+study-down: ## Stop the Study Deck without deleting progress
+>@docker compose --file docker/study-deck/compose.yaml down
 
 homepage-validate: ## Validate Homepage source and Compose configuration
 >@python3 -u scripts/homepage_release.py validate

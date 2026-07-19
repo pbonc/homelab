@@ -15,3 +15,6 @@ docker/telemetry/secrets/
 # Security status runtime configuration and credentials
 docker/security-status/.env
 docker/security-status/secrets/
+
+# Study Deck runtime progress
+docker/study-deck/study.db*

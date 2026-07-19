@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://homelab.local/schemas/study-deck-v1.schema.json",
+  "title": "Homelab study deck",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "notes", "questions"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "topic", "title", "body", "source"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+          "topic": {"type": "string", "minLength": 1},
+          "title": {"type": "string", "minLength": 1},
+          "body": {"type": "string", "minLength": 1},
+          "source": {"type": "string", "pattern": "^docs/[^#]+(#[a-z0-9-]+)?$"}
+        }
+      }
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "topic", "difficulty", "prompt", "choices", "answer_index", "explanation", "source", "interview"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[a-z0-9-]+$"},
+          "topic": {"type": "string", "minLength": 1},
+          "difficulty": {"enum": ["foundation", "working", "deep-dive"]},
+          "prompt": {"type": "string", "minLength": 1},
+          "choices": {"type": "array", "minItems": 2, "maxItems": 6, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+          "answer_index": {"type": "integer", "minimum": 0},
+          "explanation": {"type": "string", "minLength": 1},
+          "source": {"type": "string", "pattern": "^docs/[^#]+(#[a-z0-9-]+)?$"},
+          "interview": {"type": "boolean"}
+        }
+      }
+    }
+  }
+}
