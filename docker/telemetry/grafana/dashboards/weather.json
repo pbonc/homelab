@@ -108,10 +108,10 @@
       "options": {"legend": {"calcs": ["sum"], "displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "single", "sort": "none"}}
     },
     {
-      "id": 14, "title": "Daily Precipitation — Last 30 Days", "type": "timeseries",
+      "id": 14, "title": "Daily Precipitation", "type": "timeseries",
       "gridPos": {"h": 8, "w": 24, "x": 0, "y": 30},
       "datasource": {"type": "influxdb", "uid": "influxdb-telemetry"},
-      "targets": [{"refId": "A", "query": "import \"timezone\"\noption location = timezone.location(name: \"America/Chicago\")\nfrom(bucket: \"telemetry\") |> range(start: -30d) |> filter(fn: (r) => r._measurement == \"telemetry\" and r.source == \"weather\" and r.device_id != \"synthetic-test\" and r._field == \"rain_daily\") |> aggregateWindow(every: 1d, fn: last, createEmpty: false) |> map(fn: (r) => ({r with _field: \"daily_precipitation\"})) |> drop(columns: [\"device_id\", \"handler\", \"source\"])"}],
+      "targets": [{"refId": "A", "query": "import \"timezone\"\noption location = timezone.location(name: \"America/Chicago\")\nfrom(bucket: \"telemetry\") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r._measurement == \"telemetry\" and r.source == \"weather\" and r.device_id != \"synthetic-test\" and r._field == \"rain_daily\") |> aggregateWindow(every: 1d, fn: max, createEmpty: false, timeSrc: \"_start\") |> map(fn: (r) => ({r with _field: \"daily_precipitation\"})) |> drop(columns: [\"device_id\", \"handler\", \"source\"])"}],
       "fieldConfig": {"defaults": {"unit": "suffix: in", "decimals": 2, "min": 0, "custom": {"drawStyle": "bars", "fillOpacity": 70, "lineWidth": 1, "showPoints": "never", "spanNulls": true}}, "overrides": []},
       "options": {"legend": {"calcs": ["sum", "max"], "displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "single", "sort": "none"}}
     }
@@ -124,5 +124,5 @@
   "timezone": "browser",
   "title": "Local Weather",
   "uid": "homelab-weather",
-  "version": 2
+  "version": 3
 }

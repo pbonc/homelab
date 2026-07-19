@@ -74,3 +74,15 @@ Use `instance="brain"` for host panels. The primary hardware selectors are:
 
 Docker bridge and `veth` interfaces should be excluded from host-level network
 panels unless container-network behavior is the subject of the panel.
+
+## Grafana hardware dashboard
+
+Grafana provisions the `Brain Hardware` dashboard at
+`/d/homelab-hardware/brain-hardware`. It contains current CPU, memory, root
+filesystem, CPU package temperature, NVMe temperature, and uptime cards plus
+historical utilization, capacity, disk throughput, LAN traffic, and temperature
+panels.
+
+The initial deployment passed on `brain` on 2026-07-17. Grafana loaded all 12
+panels, inserted the `prometheus-homelab` datasource, and its datasource health
+check successfully queried the Prometheus API.
