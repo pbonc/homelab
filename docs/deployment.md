@@ -48,6 +48,25 @@ The deployment root and verification endpoint may be overridden for controlled t
 HOMEPAGE_DEPLOY_ROOT=/tmp/homepage-release HOMEPAGE_VERIFY_URL=http://127.0.0.1:3000 make homepage-deploy
 ```
 
+## Deployment event journal
+
+Each deploy or rollback appends a versioned event to
+`/srv/homelab/homepage/deployment-events.jsonl`. The local JSONL file is the
+durable event sink and remains independent of Grafana or any metrics backend.
+Its contract is defined by `schemas/deployment-event-v1.schema.json`.
+
+Events identify the service, target, operation, result, version, Git commit,
+deployer, release, and UTC occurrence time. Failed deployments record only the
+exception type and whether the last-known-good release was restored; exception
+messages are omitted to avoid copying arbitrary command output into the event
+journal. The file is append-only during normal operation and each record is
+flushed to disk before the deployment command returns.
+
+Event journaling is deliberately non-authoritative: an inability to record an
+event emits a warning but cannot convert a successful deployment into a failure
+or prevent recovery from a failed candidate. Publication to observability
+backends will consume this contract on a best-effort basis.
+
 ## Safety behavior
 
 - A non-blocking file lock rejects overlapping deployments and rollbacks.

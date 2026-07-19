@@ -102,6 +102,38 @@ class HomepageReleaseTests(unittest.TestCase):
                 self.assertTrue((root / "deployment.lock").exists())
             self.assertIn("pid=", (root / "deployment.lock").read_text(encoding="utf-8"))
 
+    def test_deployment_event_is_versioned_and_append_only(self) -> None:
+        metadata = {
+            "version": "0.1.0",
+            "git_commit": "a" * 40,
+            "deployer": "tester",
+            "deployed_at": "2026-07-19T00:00:00+00:00",
+        }
+        event = homepage_release.deployment_event(
+            metadata,
+            operation="deploy",
+            result="successful",
+            release_id="release-one",
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            homepage_release.append_deployment_event(root, event)
+            homepage_release.append_deployment_event(root, event)
+            records = [
+                json.loads(line)
+                for line in (root / homepage_release.EVENT_JOURNAL)
+                .read_text(encoding="utf-8")
+                .splitlines()
+            ]
+        self.assertEqual(len(records), 2)
+        self.assertEqual(records[0]["schema_version"], "1.0.0")
+        self.assertEqual(records[0]["result"], "successful")
+        self.assertFalse(records[0]["rollback_performed"])
+
+    @patch("scripts.homepage_release.append_deployment_event", side_effect=OSError("offline"))
+    def test_event_journal_failure_does_not_escape(self, _mock_append: MagicMock) -> None:
+        homepage_release.record_deployment_event(Path("/unused"), {"event": "test"})
+
 
 if __name__ == "__main__":
     unittest.main()

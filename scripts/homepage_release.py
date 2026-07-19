@@ -13,6 +13,7 @@ import tempfile
 import time
 import urllib.error
 import urllib.request
+import uuid
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
@@ -29,6 +30,8 @@ DEFAULT_DEPLOY_ROOT = Path("/srv/homelab/homepage")
 DEFAULT_URL = "http://127.0.0.1:3000"
 PROJECT_NAME = "homepage"
 REQUIRED_SERVICES = {"homepage", "glances", "docker-proxy"}
+EVENT_SCHEMA_VERSION = "1.0.0"
+EVENT_JOURNAL = "deployment-events.jsonl"
 
 
 class ReleaseError(RuntimeError):
@@ -140,6 +143,53 @@ def write_metadata(path: Path, metadata: dict[str, str]) -> None:
     path.write_text(json.dumps(metadata, indent=2, sort_keys=True) + "\n", encoding="utf-8")
 
 
+def deployment_event(
+    metadata: dict[str, str],
+    *,
+    operation: str,
+    result: str,
+    release_id: str,
+    rollback_performed: bool = False,
+    failure_type: str | None = None,
+) -> dict[str, object]:
+    event: dict[str, object] = {
+        "schema_version": EVENT_SCHEMA_VERSION,
+        "event_id": str(uuid.uuid4()),
+        "event_type": "deployment",
+        "occurred_at": datetime.now(timezone.utc).isoformat(),
+        "service": "homepage",
+        "target": os.environ.get("HOMELAB_DEPLOY_TARGET", "brain"),
+        "operation": operation,
+        "result": result,
+        "version": metadata["version"],
+        "git_commit": metadata["git_commit"],
+        "deployer": metadata["deployer"],
+        "release_id": release_id,
+        "rollback_performed": rollback_performed,
+    }
+    if failure_type:
+        event["failure_type"] = failure_type
+    return event
+
+
+def append_deployment_event(deploy_root: Path, event: dict[str, object]) -> None:
+    journal = deploy_root / EVENT_JOURNAL
+    with journal.open("a", encoding="utf-8", newline="\n") as event_file:
+        event_file.write(json.dumps(event, separators=(",", ":"), sort_keys=True) + "\n")
+        event_file.flush()
+        os.fsync(event_file.fileno())
+
+
+def record_deployment_event(deploy_root: Path, event: dict[str, object]) -> None:
+    try:
+        append_deployment_event(deploy_root, event)
+    except OSError as exc:
+        print(
+            f"[WARN] Deployment succeeded or failed independently, but event journaling failed: {type(exc).__name__}",
+            file=sys.stderr,
+        )
+
+
 def verify(release: Path, url: str, attempts: int, interval: float) -> None:
     ps = run(compose_command(release, "ps", "--format", "json"), capture=True)
     if not ps:
@@ -211,22 +261,44 @@ def deploy(deploy_root: Path, url: str, attempts: int, interval: float) -> None:
         if previous and previous != release:
             atomic_link(deploy_root / "previous", previous)
 
+        rollback_performed = False
         try:
             activate(release, deploy_root)
             verify(release, url, attempts, interval)
-        except Exception:
+            write_metadata(deploy_root / "deployed.json", metadata)
+        except Exception as exc:
             if previous and previous.exists():
                 print(f"[WARN] Verification failed; restoring {previous.name}", file=sys.stderr)
                 activate(previous, deploy_root)
+                rollback_performed = True
             else:
                 print(
                     "[WARN] Verification failed with no managed release to restore; "
                     "leaving the candidate running for inspection",
                     file=sys.stderr,
                 )
+            record_deployment_event(
+                deploy_root,
+                deployment_event(
+                    metadata,
+                    operation="deploy",
+                    result="failed",
+                    release_id=release_id,
+                    rollback_performed=rollback_performed,
+                    failure_type=type(exc).__name__,
+                ),
+            )
             raise
 
-        write_metadata(deploy_root / "deployed.json", metadata)
+        record_deployment_event(
+            deploy_root,
+            deployment_event(
+                metadata,
+                operation="deploy",
+                result="successful",
+                release_id=release_id,
+            ),
+        )
         print(f"[PASS] Deployed Homepage {release_id}")
 
 
@@ -244,6 +316,17 @@ def rollback(deploy_root: Path, url: str, attempts: int, interval: float) -> Non
         metadata_path = previous / "release.json"
         if metadata_path.exists():
             shutil.copy2(metadata_path, deploy_root / "deployed.json")
+            metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+            record_deployment_event(
+                deploy_root,
+                deployment_event(
+                    metadata,
+                    operation="rollback",
+                    result="rolled_back",
+                    release_id=previous.name,
+                    rollback_performed=True,
+                ),
+            )
         print(f"[PASS] Rolled back Homepage to {previous.name}")
 
 

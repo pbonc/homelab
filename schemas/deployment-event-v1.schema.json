@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://homelab.local/schemas/deployment-event-v1.schema.json",
+  "title": "Homelab deployment event",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "event_id",
+    "event_type",
+    "occurred_at",
+    "service",
+    "target",
+    "operation",
+    "result",
+    "version",
+    "git_commit",
+    "deployer",
+    "release_id",
+    "rollback_performed"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "event_id": {"type": "string", "format": "uuid"},
+    "event_type": {"const": "deployment"},
+    "occurred_at": {"type": "string", "format": "date-time"},
+    "service": {"type": "string", "minLength": 1},
+    "target": {"type": "string", "minLength": 1},
+    "operation": {"enum": ["deploy", "rollback"]},
+    "result": {"enum": ["successful", "failed", "rolled_back"]},
+    "version": {"type": "string", "minLength": 1},
+    "git_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "deployer": {"type": "string", "minLength": 1},
+    "release_id": {"type": "string", "minLength": 1},
+    "rollback_performed": {"type": "boolean"},
+    "failure_type": {"type": "string", "minLength": 1}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"result": {"const": "failed"}}},
+      "then": {"required": ["failure_type"]},
+      "else": {"not": {"required": ["failure_type"]}}
+    }
+  ]
+}
