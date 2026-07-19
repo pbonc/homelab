@@ -118,6 +118,7 @@ services:
     # Grafana Alloy 1.16.1, linux/amd64 manifest pinned.
     image: grafana/alloy@sha256:41e0ad9b7c74cdc0a01ca8ce10f8d8262d49029167fd0b1d2db84a0f10468284
     container_name: alloy
+    user: "473:473"
     command:
       - run
       - /etc/alloy/config.alloy
