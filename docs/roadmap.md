@@ -156,6 +156,19 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [ ] Triage each Aikido baseline finding; document only explicit risk acceptances and leave deferred findings actionable
 - [ ] Gate newly introduced critical and high-severity findings without granting automatic-fix write access
 - [ ] Add container-image and exposed-domain scanning as deployed services expand
+- [ ] Generate SBOMs for locally built images and attach verifiable signatures or provenance without granting deployment-time write access
+
+### 5. Homelab study deck
+
+- [ ] Define a versioned, human-reviewable content schema for notes, multiple-choice questions, explanations, topics, difficulty, and links to repository documentation
+- [ ] Build a lightweight LAN-only study service that keeps question content in Git and personal progress in persistent runtime storage
+- [ ] Add short daily review sessions with shuffled choices, answer explanations, confidence ratings, and simple spaced repetition
+- [ ] Add an interview mode covering architecture, tradeoffs, failure scenarios, security boundaries, and concise project talking points
+- [ ] Seed the deck from completed phases, including deployment rollback, telemetry contracts, Aikido boundaries, runtime health states, Prometheus, Grafana, and outage exercises
+- [ ] Require every technical answer to cite a repository document or deployed configuration so generated or stale claims cannot silently enter the deck
+- [ ] Add an equal-height Homepage card showing due-question count and study status, with the full experience opening as a separate page
+- [ ] Support progress export, reset, backup, and restore without committing personal history or browser data
+- [ ] Verify that notes, quiz responses, and APIs expose no credentials, secret values, private finding details, or unsafe purple-team instructions
 
 ## Phase 7: Reproducible Node Automation
 
@@ -164,8 +177,36 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [ ] Separate non-secret defaults from encrypted or runtime-only secrets
 - [ ] Add check-mode and idempotence validation before using automation on a new node
 - [ ] Document recovery and manual break-glass steps when automation cannot reach a node
+- [ ] Define encrypted off-host backups, recovery-point and recovery-time objectives, and retention for irreplaceable state
+- [ ] Prove a restore into a disposable location and document a clean-Ubuntu rebuild exercise for `brain`
 
-## Phase 8: ADS-B Edge Node
+## Phase 8: Isolated Purple-Team Range
+
+### 1. Safety boundary and reproducibility
+
+- [ ] Define a threat model and an explicit authorization boundary covering only lab-owned targets
+- [ ] Place vulnerable targets on a dedicated network or VLAN with default-deny access to production services, no internet exposure, and restricted outbound access
+- [ ] Provision and destroy the range reproducibly; never reuse production credentials, secrets, volumes, or trusted service accounts
+- [ ] Add an ephemeral attacker workstation or container that can reach only the authorized target network
+- [ ] Verify isolation with positive target-connectivity tests and negative production-connectivity tests
+
+### 2. Targets and detection
+
+- [ ] Deploy one digest-pinned deliberately vulnerable target, beginning with OWASP Juice Shop or crAPI, and document its expected vulnerabilities
+- [ ] Add a second target only after reset, isolation, and evidence collection are repeatable
+- [ ] Collect target availability, application logs, network evidence, and selected runtime-security events without exposing attack payloads on Homepage
+- [ ] Build Grafana views that correlate attack time, target health, network behavior, runtime events, and recovery
+- [ ] Keep vulnerable findings scoped to the range so intentional targets cannot obscure actionable production findings
+
+### 3. Exercises and portfolio evidence
+
+- [ ] Define repeatable attack scenarios with expected preventive, detective, and recovery controls
+- [ ] Execute an authorized exploit, capture evidence, contain the target, rebuild it, and verify recovery
+- [ ] Write a sanitized incident report with timeline, root cause, detection gaps, remediation, and follow-up actions
+- [ ] Demonstrate that the same technique is subsequently blocked, detected earlier, or produces a documented accepted limitation
+- [ ] Publish a portfolio-safe architecture diagram and concise outcome metrics without credentials, live target details, or weaponized instructions
+
+## Phase 9: ADS-B Edge Node
 
 - [ ] Record receiver hardware, SDR model, network identity, and power or storage constraints
 - [ ] Provision the Raspberry Pi receiver through the Phase 7 automation baseline with a role-oriented hostname
@@ -176,7 +217,7 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [ ] Document offline buffering, restart behavior, retention, and troubleshooting
 - [ ] Complete an outage and recovery exercise without affecting the controller node
 
-## Phase 9: Optional Platform Expansion
+## Phase 10: Optional Platform Expansion
 
 - [ ] Add Terraform module and state conventions only when a concrete managed provider or reproducible resource exists
 - [ ] Introduce K3s and Helm only after capacity measurements and a multi-service operational need justify their overhead
@@ -192,6 +233,10 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - Security status is least-privilege, actionable, and free of credentials or finding details
 - Runtime checks distinguish healthy, degraded, stale, unavailable, and failed states
 - Telemetry and deployment events remain useful across restarts and observability outages
+- Locally built artifacts have inspectable dependency inventories and verifiable provenance
 - CI providers call shared repository interfaces instead of embedding unique deployment logic
 - Automation is reproducible from a clean checkout
+- Backups are proven through restoration rather than assumed from successful backup jobs
+- Deliberately vulnerable targets remain isolated, reproducible, disposable, and covered by documented detection and recovery exercises
+- Study material remains traceable to the deployed lab and turns implementation decisions, failures, and recoveries into concise interview explanations
 - Documentation matches deployed infrastructure
