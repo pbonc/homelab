@@ -60,6 +60,10 @@ scrape_configs:
           - http://prometheus:9090/-/ready
         labels:
           service: prometheus
+      - targets:
+          - http://loki:3100/ready
+        labels:
+          service: loki
     relabel_configs:
       - source_labels:
           - __address__

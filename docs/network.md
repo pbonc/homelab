@@ -29,6 +29,7 @@ internet without a deliberate authenticated reverse-proxy and TLS design.
 | 8010 | Security status | `http://192.168.1.23:8010/api/status` | Credential-free aggregate Aikido status |
 | 8020 | Study Deck | `http://192.168.1.23:8020` | LAN-only study notes, quizzes, and local progress |
 | 9090 | Prometheus | `http://192.168.1.23:9090` | Metrics queries and administration on the trusted LAN |
+| 3100 | Loki | `http://192.168.1.23:3100` | Log query API consumed by trusted-LAN Grafana |
 
 All entries are trusted-LAN only. Homepage links should use these verified
 addresses; planned services must not receive click targets.

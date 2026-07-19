@@ -147,3 +147,42 @@ Recording rules and conservative first alerts live in
 `docker/observability/rules/homelab.yml`. Operational responses and the measured
 baseline are documented in `docs/runbooks/observability-alerts.md`. Prometheus
 evaluates alerts locally; no external paging destination is configured.
+
+## Container logs
+
+Loki 3.7.3 stores Docker logs in the `loki-data` named volume using TSDB schema
+v13 and filesystem object storage. Retention is 14 days (`336h`); the compactor
+applies expiry every ten minutes. Filesystem storage has no automatic size cap,
+so root-disk alerts remain the independent capacity guardrail.
+
+Grafana Alloy 1.16.1 discovers and tails Docker containers through
+`observability-docker-proxy`. Alloy never mounts the Docker socket. The proxy
+mounts it read-only, permits container GET operations, refuses POST operations,
+and is reachable only inside the Compose network. Collection is limited to
+Docker stdout and stderr; it does not scrape the host journal, application data
+directories, secret files, or arbitrary host paths. Alloy persists read offsets
+in the `alloy-data` volume so restarts resume without deliberately replaying the
+entire available history.
+
+Grafana provisions the `Homelab Loki` datasource with UID `loki-homelab`.
+Use **Explore**, select that datasource, and begin with:
+
+```logql
+{host="brain", platform="docker"}
+```
+
+Narrow results with a bounded label rather than turning log contents into
+labels:
+
+```logql
+{host="brain", container="telemetry-collector"}
+```
+
+Loki is trusted-LAN only at `http://192.168.1.23:3100`. It has no independent
+authentication, so it must not be port-forwarded or exposed publicly. Logs may
+still contain application-provided sensitive text; do not collect credentials,
+and treat access to Grafana Explore and Loki as operational access.
+
+Routine restarts preserve logs and positions. Never use `docker compose down
+--volumes` during routine maintenance. Validate all three configurations with
+`make observability-config` before `make observability-up`.

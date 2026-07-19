@@ -177,7 +177,7 @@ class StatusTests(unittest.TestCase):
         self.assertEqual(payload["schema_version"], "1.0.0")
         self.assertEqual(payload["generated_at"], "2026-07-17T12:30:00+00:00")
         self.assertEqual(payload["overall_status"], "healthy")
-        self.assertEqual(len(payload["checks"]), 17)
+        self.assertEqual(len(payload["checks"]), 21)
         self.assertTrue(all(check["observed_at"] == payload["generated_at"] for check in payload["checks"]))
 
     def test_exit_codes_only_fail_on_confirmed_actionable_states(self) -> None:
