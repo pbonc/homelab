@@ -40,6 +40,18 @@ class TelemetryApiTests(unittest.TestCase):
         self.assertIn("ecowitt", response.json()["handlers"])
         self.assertEqual(response.json()["active_source_count"], 0)
 
+    def test_metrics_distinguish_storage_health_and_source_freshness(self) -> None:
+        empty = self.client.get("/metrics")
+        self.assertEqual(empty.status_code, 200)
+        self.assertIn("telemetry_collector_storage_up 1", empty.text)
+        self.assertNotIn("telemetry_source_age_seconds{", empty.text)
+
+        payload = json.loads(FIXTURE.read_text(encoding="utf-8"))
+        self.assertEqual(self.client.post("/data/report/", data=payload).status_code, 202)
+        populated = self.client.get("/metrics")
+        self.assertIn('telemetry_source_age_seconds{source="weather"}', populated.text)
+        self.assertIn('telemetry_source_stale{source="weather"} 0', populated.text)
+
     def test_accepts_ecowitt_form_and_returns_current_weather(self) -> None:
         payload = json.loads(FIXTURE.read_text(encoding="utf-8"))
         accepted = self.client.post("/data/report/", data=payload)
@@ -119,6 +131,9 @@ class TelemetryApiTests(unittest.TestCase):
         response = client.get("/api/health")
         self.assertEqual(response.status_code, 503)
         self.assertEqual(response.json()["storage"]["status"], "unavailable")
+        metrics = client.get("/metrics")
+        self.assertEqual(metrics.status_code, 200)
+        self.assertIn("telemetry_collector_storage_up 0", metrics.text)
 
 
 if __name__ == "__main__":

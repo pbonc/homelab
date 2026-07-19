@@ -1,0 +1,56 @@
+{
+  "annotations": {"list": []},
+  "editable": false,
+  "graphTooltip": 1,
+  "panels": [
+    {
+      "id": 1, "title": "HTTP Availability", "type": "stat",
+      "gridPos": {"h": 7, "w": 12, "x": 0, "y": 0},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [{"refId": "A", "expr": "probe_success{job=\"blackbox-http\"}", "legendFormat": "{{service}}", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "none", "decimals": 0, "min": 0, "max": 1, "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "red"}, {"color": "green", "value": 1}]}, "mappings": [{"type": "value", "options": {"0": {"text": "DOWN", "color": "red"}, "1": {"text": "UP", "color": "green"}}}]}, "overrides": []},
+      "options": {"colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "horizontal", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value_and_name", "wideLayout": true}
+    },
+    {
+      "id": 2, "title": "Weather Freshness", "type": "stat",
+      "gridPos": {"h": 7, "w": 6, "x": 12, "y": 0},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [{"refId": "A", "expr": "telemetry_source_age_seconds{source=\"weather\"}", "legendFormat": "Report age", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "s", "decimals": 0, "min": 0, "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "green"}, {"color": "yellow", "value": 120}, {"color": "red", "value": 180}]}}, "overrides": []},
+      "options": {"colorMode": "background", "graphMode": "area", "justifyMode": "center", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value"}
+    },
+    {
+      "id": 3, "title": "Telemetry Storage", "type": "stat",
+      "gridPos": {"h": 7, "w": 6, "x": 18, "y": 0},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [{"refId": "A", "expr": "telemetry_collector_storage_up", "legendFormat": "Storage", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "none", "decimals": 0, "min": 0, "max": 1, "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "red"}, {"color": "green", "value": 1}]}, "mappings": [{"type": "value", "options": {"0": {"text": "DOWN", "color": "red"}, "1": {"text": "UP", "color": "green"}}}]}, "overrides": []},
+      "options": {"colorMode": "background", "graphMode": "none", "justifyMode": "center", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value"}
+    },
+    {
+      "id": 4, "title": "Probe Duration", "type": "timeseries",
+      "gridPos": {"h": 9, "w": 12, "x": 0, "y": 7},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [{"refId": "A", "expr": "probe_duration_seconds{job=\"blackbox-http\"}", "legendFormat": "{{service}}", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "s", "decimals": 3, "min": 0, "custom": {"drawStyle": "line", "fillOpacity": 15, "lineInterpolation": "smooth", "lineWidth": 2, "showPoints": "never", "spanNulls": true}}, "overrides": []},
+      "options": {"legend": {"calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "multi", "sort": "desc"}}
+    },
+    {
+      "id": 5, "title": "Weather Report Age", "type": "timeseries",
+      "gridPos": {"h": 9, "w": 12, "x": 12, "y": 7},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [{"refId": "A", "expr": "telemetry_source_age_seconds{source=\"weather\"}", "legendFormat": "Report age", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "s", "decimals": 0, "min": 0, "custom": {"drawStyle": "line", "fillOpacity": 20, "lineInterpolation": "linear", "lineWidth": 2, "showPoints": "never", "spanNulls": true}, "thresholds": {"mode": "absolute", "steps": [{"color": "green"}, {"color": "yellow", "value": 120}, {"color": "red", "value": 180}]}}, "overrides": []},
+      "options": {"legend": {"calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "single", "sort": "none"}}
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 41,
+  "tags": ["homelab", "availability", "prometheus"],
+  "templating": {"list": []},
+  "time": {"from": "now-6h", "to": "now"},
+  "timezone": "browser",
+  "title": "Platform Health",
+  "uid": "homelab-platform-health",
+  "version": 1
+}

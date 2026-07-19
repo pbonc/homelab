@@ -16,3 +16,49 @@ scrape_configs:
           - node-exporter:9100
         labels:
           instance: brain
+
+  - job_name: telemetry-collector
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - 192.168.1.23:8000
+
+  - job_name: blackbox-http
+    metrics_path: /probe
+    params:
+      module:
+        - http_2xx
+    static_configs:
+      - targets:
+          - http://192.168.1.23:3000
+        labels:
+          service: homepage
+      - targets:
+          - http://192.168.1.23:8000/api/health
+        labels:
+          service: telemetry-collector
+      - targets:
+          - http://192.168.1.23:8086/health
+        labels:
+          service: influxdb
+      - targets:
+          - http://192.168.1.23:3001/api/health
+        labels:
+          service: grafana
+      - targets:
+          - http://192.168.1.23:8010/api/health
+        labels:
+          service: aikido-status
+      - targets:
+          - http://prometheus:9090/-/ready
+        labels:
+          service: prometheus
+    relabel_configs:
+      - source_labels:
+          - __address__
+        target_label: __param_target
+      - source_labels:
+          - __param_target
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115

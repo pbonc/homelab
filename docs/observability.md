@@ -86,3 +86,21 @@ panels.
 The initial deployment passed on `brain` on 2026-07-17. Grafana loaded all 12
 panels, inserted the `prometheus-homelab` datasource, and its datasource health
 check successfully queried the Prometheus API.
+
+## Availability and freshness
+
+Blackbox Exporter probes the public HTTP health surface of Homepage, the
+Telemetry Collector, InfluxDB, Grafana, Aikido status, and Prometheus every 15
+seconds. The exporter is internal to the observability Compose network; only
+Prometheus queries it.
+
+The Telemetry Collector independently publishes Prometheus metrics at
+`/metrics` for storage reachability, latest-report timestamp, report age, and
+the configured stale classification. This keeps two failure modes distinct:
+
+- `probe_success == 0`: the service endpoint cannot complete its HTTP contract
+- `probe_success == 1` with `telemetry_source_stale == 1`: the collector is
+  reachable, but its latest weather report is too old
+
+Grafana provisions these signals in the `Platform Health` dashboard at
+`/d/homelab-platform-health/platform-health`.

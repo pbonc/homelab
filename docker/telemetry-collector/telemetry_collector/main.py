@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, timezone
 from urllib.parse import parse_qsl
 
 from fastapi import FastAPI, HTTPException, Query, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 from telemetry_collector import __version__
@@ -84,6 +84,43 @@ def create_app(
                     "status": "healthy" if storage_healthy else "unavailable",
                 },
             },
+        )
+
+    @application.get("/metrics")
+    def metrics() -> Response:
+        storage_healthy = active_store.healthy()
+        lines = [
+            "# HELP telemetry_collector_storage_up Whether collector storage is reachable.",
+            "# TYPE telemetry_collector_storage_up gauge",
+            f"telemetry_collector_storage_up {1 if storage_healthy else 0}",
+            "# HELP telemetry_source_last_received_timestamp_seconds Unix timestamp of the latest report.",
+            "# TYPE telemetry_source_last_received_timestamp_seconds gauge",
+            "# HELP telemetry_source_age_seconds Age of the latest report in seconds.",
+            "# TYPE telemetry_source_age_seconds gauge",
+            "# HELP telemetry_source_stale Whether the latest report exceeds the configured freshness limit.",
+            "# TYPE telemetry_source_stale gauge",
+        ]
+        if storage_healthy:
+            for source in registry.source_names:
+                try:
+                    latest = active_store.current(source)
+                except StorageUnavailable:
+                    lines[2] = "telemetry_collector_storage_up 0"
+                    break
+                if latest is None:
+                    continue
+                stale, age = _freshness(latest, active_settings)
+                label = f'source="{source}"'
+                lines.extend(
+                    [
+                        f"telemetry_source_last_received_timestamp_seconds{{{label}}} {latest.received_at.timestamp()}",
+                        f"telemetry_source_age_seconds{{{label}}} {age}",
+                        f"telemetry_source_stale{{{label}}} {1 if stale else 0}",
+                    ]
+                )
+        return Response(
+            content="\n".join(lines) + "\n",
+            media_type="text/plain; version=0.0.4; charset=utf-8",
         )
 
     @application.post("/data/report/", status_code=202)
