@@ -160,13 +160,13 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 
 ### 5. Homelab study deck
 
-- [ ] Define a versioned, human-reviewable content schema for notes, multiple-choice questions, explanations, topics, difficulty, and links to repository documentation
-- [ ] Build a lightweight LAN-only study service that keeps question content in Git and personal progress in persistent runtime storage
-- [ ] Add short daily review sessions with shuffled choices, answer explanations, confidence ratings, and simple spaced repetition
-- [ ] Add an interview mode covering architecture, tradeoffs, failure scenarios, security boundaries, and concise project talking points
-- [ ] Seed the deck from completed phases, including deployment rollback, telemetry contracts, Aikido boundaries, runtime health states, Prometheus, Grafana, and outage exercises
-- [ ] Require every technical answer to cite a repository document or deployed configuration so generated or stale claims cannot silently enter the deck
-- [ ] Add an equal-height Homepage card showing due-question count and study status, with the full experience opening as a separate page
+- [x] Define a versioned, human-reviewable content schema for notes, multiple-choice questions, explanations, topics, difficulty, and links to repository documentation
+- [x] Build a lightweight LAN-only study service that keeps question content in Git and personal progress in persistent runtime storage
+- [x] Add short daily review sessions with shuffled choices, answer explanations, confidence ratings, and simple spaced repetition
+- [x] Add an interview mode covering architecture, tradeoffs, failure scenarios, security boundaries, and concise project talking points
+- [x] Seed the deck from completed phases, including deployment rollback, telemetry contracts, Aikido boundaries, runtime health states, Prometheus, Grafana, and outage exercises
+- [x] Require every technical answer to cite a repository document or deployed configuration so generated or stale claims cannot silently enter the deck
+- [x] Add an equal-height Homepage card showing due-question count and study status, with the full experience opening as a separate page
 - [ ] Support progress export, reset, backup, and restore without committing personal history or browser data
 - [ ] Verify that notes, quiz responses, and APIs expose no credentials, secret values, private finding details, or unsafe purple-team instructions
 

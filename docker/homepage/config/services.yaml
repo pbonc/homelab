@@ -63,6 +63,11 @@
         href: https://app.aikido.dev/
         siteMonitor: http://192.168.1.23:8010/api/health
         description: "Security | Open findings"
+    - Study Deck:
+        icon: mdi-head-lightbulb-outline
+        href: http://192.168.1.23:8020
+        siteMonitor: http://192.168.1.23:8020/api/health
+        description: "Learn | Homelab interview practice"
 
 - Planned Services:
     - Jenkins:

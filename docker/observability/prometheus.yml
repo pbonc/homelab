@@ -50,6 +50,10 @@ scrape_configs:
         labels:
           service: aikido-status
       - targets:
+          - http://192.168.1.23:8020/api/health
+        labels:
+          service: study-deck
+      - targets:
           - http://prometheus:9090/-/ready
         labels:
           service: prometheus

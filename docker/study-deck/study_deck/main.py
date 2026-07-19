@@ -6,6 +6,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 
@@ -30,6 +31,12 @@ def create_app(*, deck: Deck | None = None, store: ProgressStore | None = None) 
     active_deck = deck or Deck(CONTENT_PATH)
     active_store = store or ProgressStore(DATABASE_PATH)
     application = FastAPI(title="Homelab Study Deck", version=__version__)
+    application.add_middleware(
+        CORSMiddleware,
+        allow_origins=["http://192.168.1.23:3000"],
+        allow_methods=["GET"],
+        allow_headers=["*"],
+    )
 
     @application.get("/", include_in_schema=False)
     def index() -> FileResponse:
@@ -92,12 +99,7 @@ def create_app(*, deck: Deck | None = None, store: ProgressStore | None = None) 
 
     @application.get("/api/progress")
     def progress() -> dict[str, object]:
-        states = active_store.states()
-        now = datetime.now(timezone.utc)
-        due = sum(datetime.fromisoformat(str(state["due_at"])) <= now for state in states.values())
-        attempts = sum(int(state["attempts"]) for state in states.values())
-        correct = sum(int(state["correct"]) for state in states.values())
-        return {"questions": len(active_deck.questions), "studied": len(states), "due": due, "attempts": attempts, "correct": correct}
+        return active_store.summary(len(active_deck.questions))
 
     @application.delete("/api/progress", status_code=204)
     def reset_progress() -> None:

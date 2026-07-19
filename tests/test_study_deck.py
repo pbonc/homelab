@@ -53,6 +53,13 @@ class StudyDeckTests(unittest.TestCase):
             store.reset()
             self.assertEqual(store.states(), {})
 
+    def test_unseen_questions_are_counted_as_due(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            deck = Deck(CONTENT)
+            summary = ProgressStore(Path(directory) / "study.db").summary(len(deck.questions))
+            self.assertEqual(summary["due"], len(deck.questions))
+            self.assertEqual(summary["studied"], 0)
+
 
 if __name__ == "__main__":
     unittest.main()

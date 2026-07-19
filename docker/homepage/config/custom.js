@@ -16,6 +16,8 @@
 	const WEATHER_REFRESH_MS = 300000;
 	const SECURITY_URL = "http://192.168.1.23:8010/api/status";
 	const SECURITY_REFRESH_MS = 60000;
+	const STUDY_URL = "http://192.168.1.23:8020/api/progress";
+	const STUDY_REFRESH_MS = 60000;
 
 	let missingSince = null;
 	let unavailableTimer = null;
@@ -120,6 +122,33 @@
 			}
 		}
 		window.setTimeout(refreshSecurity, SECURITY_REFRESH_MS);
+	}
+
+	function setStudyBadge(card, state, label) {
+		card.dataset.study = state;
+		let badge = card.querySelector(".study-status-badge");
+		if (!badge) {
+			badge = document.createElement("span");
+			badge.className = "study-status-badge";
+			card.appendChild(badge);
+		}
+		badge.textContent = label;
+	}
+
+	async function refreshStudy() {
+		const card = serviceCard("Study Deck");
+		if (card) {
+			try {
+				const response = await fetch(STUDY_URL, { cache: "no-store" });
+				if (!response.ok) throw new Error("HTTP " + response.status);
+				const payload = await response.json();
+				const due = Number(payload.due) || 0;
+				setStudyBadge(card, due > 0 ? "due" : "clear", due > 0 ? "Due " + due : "Caught up");
+			} catch (_error) {
+				setStudyBadge(card, "unavailable", "Unavailable");
+			}
+		}
+		window.setTimeout(refreshStudy, STUDY_REFRESH_MS);
 	}
 
 	function updateBrainHealth() {
@@ -264,6 +293,7 @@
 		scheduleUpdate();
 		refreshWeather();
 		refreshSecurity();
+		refreshStudy();
 		new MutationObserver(scheduleUpdate).observe(document.body, { childList: true, subtree: true, characterData: true });
 	}
 

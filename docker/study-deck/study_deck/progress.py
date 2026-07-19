@@ -68,6 +68,19 @@ class ProgressStore:
             )
         return {"box": new_box, "due_at": due_at.isoformat(), "attempts": attempts, "correct": correct_total}
 
+    def summary(self, total_questions: int) -> dict[str, int]:
+        states = self.states()
+        now = datetime.now(timezone.utc)
+        due = total_questions - len(states)
+        due += sum(datetime.fromisoformat(str(state["due_at"])) <= now for state in states.values())
+        return {
+            "questions": total_questions,
+            "studied": len(states),
+            "due": due,
+            "attempts": sum(int(state["attempts"]) for state in states.values()),
+            "correct": sum(int(state["correct"]) for state in states.values()),
+        }
+
     def reset(self) -> None:
         with self._connect() as connection:
             connection.execute("DELETE FROM question_progress")

@@ -27,6 +27,7 @@ internet without a deliberate authenticated reverse-proxy and TLS design.
 | 8086 | InfluxDB | `http://192.168.1.23:8086` | Time-series API and administration |
 | 3001 | Grafana | `http://192.168.1.23:3001` | Anonymous Viewer dashboards; authenticated administration |
 | 8010 | Security status | `http://192.168.1.23:8010/api/status` | Credential-free aggregate Aikido status |
+| 8020 | Study Deck | `http://192.168.1.23:8020` | LAN-only study notes, quizzes, and local progress |
 | 9090 | Prometheus | `http://192.168.1.23:9090` | Metrics queries and administration on the trusted LAN |
 
 All entries are trusted-LAN only. Homepage links should use these verified
