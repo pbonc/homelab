@@ -149,6 +149,7 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 ### 3. Logs and acceptance
 
 - [x] Add Loki and a constrained log collector after metrics and availability checks are stable
+- [x] Move Prometheus and Loki into deployed Homepage cards and expose Alloy's container health after live verification
 - [x] Add observability runbooks and retention or capacity notes
 - [ ] Exercise disk-pressure, failed-deployment, log-backend-outage, and metrics-backend-outage scenarios
 

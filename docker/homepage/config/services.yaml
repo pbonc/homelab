@@ -67,6 +67,21 @@
         href: http://192.168.1.23:8020
         siteMonitor: http://192.168.1.23:8020/api/health
         description: "Learn | Homelab interview practice"
+    - Prometheus:
+        icon: si-prometheus
+        href: http://192.168.1.23:9090
+        siteMonitor: http://192.168.1.23:9090/-/ready
+        description: "Observe | Metrics and alert evaluation"
+    - Loki:
+        icon: si-grafana
+        href: http://192.168.1.23:3001/explore
+        siteMonitor: http://192.168.1.23:3100/ready
+        description: "Observe | Search Docker logs in Grafana"
+    - Alloy:
+        icon: mdi-pipe
+        description: "Observe | Constrained Docker log collector"
+        server: brain-docker
+        container: alloy
 
 - Planned Services:
     - Jenkins:
@@ -78,12 +93,6 @@
     - CardOS:
         icon: mdi-credit-card-outline
         description: "Planned | Portfolio application"
-    - Prometheus:
-        icon: mdi-timeline-clock-outline
-        description: "Planned | Metrics collection"
-    - Loki:
-        icon: mdi-file-document-multiple-outline
-        description: "Planned | Log aggregation"
     - Uptime Kuma:
         icon: mdi-heart-pulse
         description: "Planned | Availability checks"
