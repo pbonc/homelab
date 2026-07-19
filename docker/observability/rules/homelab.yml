@@ -1,0 +1,89 @@
+groups:
+  - name: homelab-recording
+    interval: 30s
+    rules:
+      - record: instance:node_cpu_utilization:ratio
+        expr: 1 - avg without (cpu, mode) (rate(node_cpu_seconds_total{mode="idle"}[5m]))
+
+      - record: instance:node_memory_utilization:ratio
+        expr: 1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)
+
+      - record: instance:node_root_filesystem_utilization:ratio
+        expr: 1 - (node_filesystem_avail_bytes{mountpoint="/",fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes{mountpoint="/",fstype!~"tmpfs|overlay"})
+
+      - record: service:http_probe_duration_seconds:avg5m
+        expr: avg_over_time(probe_duration_seconds[5m])
+
+  - name: homelab-alerts
+    rules:
+      - alert: HomepageUnavailable
+        expr: probe_success{service="homepage"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: Homepage has been unreachable for two minutes
+          runbook: docs/runbooks/observability-alerts.md#homepage-or-service-unavailable
+
+      - alert: ServiceUnavailable
+        expr: probe_success{service!="homepage"} == 0
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.service }} has been unreachable for three minutes"
+          runbook: docs/runbooks/observability-alerts.md#homepage-or-service-unavailable
+
+      - alert: PrometheusTargetDown
+        expr: up == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Prometheus target {{ $labels.job }} / {{ $labels.instance }} is down"
+          runbook: docs/runbooks/observability-alerts.md#prometheus-target-down
+
+      - alert: BrainCpuHigh
+        expr: instance:node_cpu_utilization:ratio{instance="brain"} > 0.85
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: brain CPU utilization has exceeded 85% for 15 minutes
+          runbook: docs/runbooks/observability-alerts.md#host-resource-pressure
+
+      - alert: BrainMemoryHigh
+        expr: instance:node_memory_utilization:ratio{instance="brain"} > 0.85
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: brain memory utilization has exceeded 85% for 15 minutes
+          runbook: docs/runbooks/observability-alerts.md#host-resource-pressure
+
+      - alert: BrainRootDiskHigh
+        expr: instance:node_root_filesystem_utilization:ratio{instance="brain"} > 0.80
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: brain root filesystem utilization has exceeded 80% for 30 minutes
+          runbook: docs/runbooks/observability-alerts.md#host-resource-pressure
+
+      - alert: BrainRootDiskCritical
+        expr: instance:node_root_filesystem_utilization:ratio{instance="brain"} > 0.90
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: brain root filesystem utilization has exceeded 90% for 10 minutes
+          runbook: docs/runbooks/observability-alerts.md#host-resource-pressure
+
+      - alert: ServiceProbeSlow
+        expr: service:http_probe_duration_seconds:avg5m > 0.5
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.service }} probe latency has averaged over 500 ms for 10 minutes"
+          runbook: docs/runbooks/observability-alerts.md#slow-http-probe

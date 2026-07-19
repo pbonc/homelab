@@ -143,3 +143,7 @@ invalid verification endpoint produced a `failed` event and restored the
 known-good release; a subsequent valid deployment produced `successful`; an
 explicit rollback produced `rolled_back`; and `labctl status` finished healthy.
 Grafana returned all three result types on the Brain Hardware dashboard.
+Recording rules and conservative first alerts live in
+`docker/observability/rules/homelab.yml`. Operational responses and the measured
+baseline are documented in `docs/runbooks/observability-alerts.md`. Prometheus
+evaluates alerts locally; no external paging destination is configured.

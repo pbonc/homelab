@@ -47,6 +47,7 @@ security-config: ## Validate the resolved security status Compose configuration
 
 observability-config: ## Validate the Prometheus and Node Exporter Compose configuration
 >@docker compose --file docker/observability/compose.yaml config --quiet
+>@docker compose --file docker/observability/compose.yaml run --rm --no-deps --entrypoint promtool prometheus check config /etc/prometheus/prometheus.yml
 
 observability-up: ## Start Prometheus and Node Exporter
 >@docker compose --file docker/observability/compose.yaml up --detach
