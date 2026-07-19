@@ -35,7 +35,7 @@ ENDPOINTS = (
     ("telemetry.influxdb.http", "http://127.0.0.1:8086/health", "important", "influxdb"),
     ("telemetry.grafana.http", "http://127.0.0.1:3001/api/health", "important", "grafana"),
     ("security.aikido.http", "http://127.0.0.1:8010/api/status", "important", "aikido"),
-    ("study.deck.http", "http://127.0.0.1:8020/api/health", "informational", "study"),
+    ("study.deck.http", "http://192.168.1.23:8020/api/health", "informational", "study"),
 )
 
 

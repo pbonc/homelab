@@ -60,6 +60,14 @@ class StudyDeckTests(unittest.TestCase):
             self.assertEqual(summary["due"], len(deck.questions))
             self.assertEqual(summary["studied"], 0)
 
+    def test_progress_export_can_restore_a_fresh_database(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            first = ProgressStore(Path(directory) / "first.db")
+            first.record("question-one", correct=True, confidence=5)
+            second = ProgressStore(Path(directory) / "second.db")
+            second.restore(first.export())
+            self.assertEqual(second.states(), first.states())
+
 
 if __name__ == "__main__":
     unittest.main()

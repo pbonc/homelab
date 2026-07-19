@@ -42,6 +42,27 @@ curl --fail --silent --show-error http://192.168.1.23:8020/api/health
 Open `http://192.168.1.23:8020`. Stop the container without deleting progress
 with `make study-down`.
 
+Export a versioned progress backup without copying the live SQLite database:
+
+```bash
+curl --fail --silent --show-error \
+  http://192.168.1.23:8020/api/progress/export \
+  --output study-progress.json
+```
+
+Restore it with:
+
+```bash
+curl --fail --silent --show-error \
+  --header "Content-Type: application/json" \
+  --data-binary @study-progress.json \
+  http://192.168.1.23:8020/api/progress/restore
+```
+
+Restore validates the schema and question IDs, then replaces existing personal
+progress. Backups contain question IDs and review history, never answer text or
+credentials. `DELETE /api/progress` remains the deliberate reset operation.
+
 The service is bound to the trusted LAN address, drops all Linux capabilities,
 prevents privilege escalation, and uses a read-only root filesystem. The SQLite
 volume is its only persistent writable path. Question content must never include

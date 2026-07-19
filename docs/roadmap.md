@@ -167,8 +167,8 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [x] Seed the deck from completed phases, including deployment rollback, telemetry contracts, Aikido boundaries, runtime health states, Prometheus, Grafana, and outage exercises
 - [x] Require every technical answer to cite a repository document or deployed configuration so generated or stale claims cannot silently enter the deck
 - [x] Add an equal-height Homepage card showing due-question count and study status, with the full experience opening as a separate page
-- [ ] Support progress export, reset, backup, and restore without committing personal history or browser data
-- [ ] Verify that notes, quiz responses, and APIs expose no credentials, secret values, private finding details, or unsafe purple-team instructions
+- [x] Support progress export, reset, backup, and restore without committing personal history or browser data
+- [x] Verify that notes, quiz responses, and APIs expose no credentials, secret values, private finding details, or unsafe purple-team instructions
 
 ## Phase 7: Reproducible Node Automation
 

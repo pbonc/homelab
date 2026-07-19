@@ -21,6 +21,20 @@ class AnswerSubmission(BaseModel):
     confidence: int = Field(ge=1, le=5)
 
 
+class ProgressEntry(BaseModel):
+    question_id: str = Field(min_length=1)
+    box: int = Field(ge=0, le=5)
+    due_at: datetime
+    attempts: int = Field(ge=0)
+    correct: int = Field(ge=0)
+    last_answered_at: datetime
+
+
+class ProgressBackup(BaseModel):
+    schema_version: str
+    progress: list[ProgressEntry]
+
+
 APP_ROOT = Path(__file__).resolve().parents[1]
 CONTENT_PATH = Path(os.environ.get("STUDY_DECK_CONTENT", APP_ROOT / "content" / "deck.json"))
 DATABASE_PATH = Path(os.environ.get("STUDY_DECK_DATABASE", APP_ROOT / "study.db"))
@@ -104,6 +118,29 @@ def create_app(*, deck: Deck | None = None, store: ProgressStore | None = None) 
     @application.delete("/api/progress", status_code=204)
     def reset_progress() -> None:
         active_store.reset()
+
+    @application.get("/api/progress/export")
+    def export_progress() -> dict[str, object]:
+        return {
+            "schema_version": "1.0.0",
+            "exported_at": datetime.now(timezone.utc).isoformat(),
+            "progress": active_store.export(),
+        }
+
+    @application.post("/api/progress/restore")
+    def restore_progress(backup: ProgressBackup) -> dict[str, int]:
+        if backup.schema_version != "1.0.0":
+            raise HTTPException(status_code=422, detail="unsupported progress schema version")
+        question_ids = [entry.question_id for entry in backup.progress]
+        if len(question_ids) != len(set(question_ids)):
+            raise HTTPException(status_code=422, detail="duplicate question id in progress backup")
+        if set(question_ids) - set(active_deck.questions):
+            raise HTTPException(status_code=422, detail="unknown question id in progress backup")
+        entries = [entry.model_dump(mode="json") for entry in backup.progress]
+        if any(int(entry["correct"]) > int(entry["attempts"]) for entry in entries):
+            raise HTTPException(status_code=422, detail="correct count cannot exceed attempts")
+        active_store.restore(entries)
+        return active_store.summary(len(active_deck.questions))
 
     return application
 

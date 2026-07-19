@@ -81,6 +81,25 @@ class ProgressStore:
             "correct": sum(int(state["correct"]) for state in states.values()),
         }
 
+    def export(self) -> list[dict[str, object]]:
+        return sorted(self.states().values(), key=lambda state: str(state["question_id"]))
+
+    def restore(self, entries: list[dict[str, object]]) -> None:
+        with self._connect() as connection:
+            connection.execute("DELETE FROM question_progress")
+            connection.executemany(
+                """INSERT INTO question_progress
+                   (question_id, box, due_at, attempts, correct, last_answered_at)
+                   VALUES (?, ?, ?, ?, ?, ?)""",
+                [
+                    (
+                        str(entry["question_id"]), int(entry["box"]), str(entry["due_at"]),
+                        int(entry["attempts"]), int(entry["correct"]), str(entry["last_answered_at"]),
+                    )
+                    for entry in entries
+                ],
+            )
+
     def reset(self) -> None:
         with self._connect() as connection:
             connection.execute("DELETE FROM question_progress")
