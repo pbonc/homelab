@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import sys
 import unittest
+import uuid
 from pathlib import Path
 
 
@@ -85,6 +86,30 @@ class TelemetryApiTests(unittest.TestCase):
         self.assertEqual(history.status_code, 200)
         self.assertEqual(history.json()["count"], 1)
         self.assertEqual(history.json()["data"][0]["source"], "weather")
+
+    def test_accepts_versioned_deployment_event(self) -> None:
+        payload = {
+            "schema_version": "1.0.0",
+            "event_id": str(uuid.uuid4()),
+            "event_type": "deployment",
+            "occurred_at": "2026-07-19T12:00:00+00:00",
+            "service": "homepage",
+            "target": "brain",
+            "operation": "deploy",
+            "result": "successful",
+            "version": "0.1.0",
+            "git_commit": "a" * 40,
+            "deployer": "tester",
+            "release_id": "release-one",
+            "rollback_performed": False,
+        }
+        response = self.client.post("/api/events/deployment", json=payload)
+        self.assertEqual(response.status_code, 202)
+        self.assertEqual(response.json()["event_id"], payload["event_id"])
+
+    def test_rejects_invalid_deployment_event(self) -> None:
+        response = self.client.post("/api/events/deployment", json={"result": "successful"})
+        self.assertEqual(response.status_code, 422)
 
     def test_rejects_wrong_content_type(self) -> None:
         response = self.client.post("/data/report/", json={"tempf": "75"})

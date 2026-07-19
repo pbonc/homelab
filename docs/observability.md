@@ -108,3 +108,25 @@ Grafana provisions these signals in the `Platform Health` dashboard at
 The initial deployment passed on `brain` on 2026-07-19. All six HTTP probes
 reported `probe_success == 1`, telemetry storage reported up, the live weather
 report was current, and Grafana loaded all five Platform Health panels.
+
+## Deployment annotations
+
+The Telemetry Collector validates version `1.0.0` deployment events and writes
+them to InfluxDB as the `deployment_event` measurement. Grafana provisions a
+`Deployments` annotation query on the Local Weather, Brain Hardware, and
+Platform Health dashboards. The query pivots each event into timestamp, title,
+text, and tag columns while respecting the dashboard time picker.
+
+To view an annotation:
+
+1. Open any of those three dashboards and select a range that includes a recent
+   Homepage deployment, such as **Last 24 hours**.
+2. Find the orange event marker on a time-series panel and hover over it.
+3. Read the result, version, shortened Git commit, deployer, and event tags in
+   the tooltip.
+4. If markers are hidden, open **Dashboard settings**, select
+   **Annotations**, and enable the **Deployments** query.
+
+Annotations intentionally appear on time-series panels, not stat cards. The
+local JSONL journal remains the recovery source when InfluxDB publication is
+temporarily unavailable.

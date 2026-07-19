@@ -65,7 +65,10 @@ flushed to disk before the deployment command returns.
 Event journaling is deliberately non-authoritative: an inability to record an
 event emits a warning but cannot convert a successful deployment into a failure
 or prevent recovery from a failed candidate. Publication to observability
-backends will consume this contract on a best-effort basis.
+backends consumes this contract on a best-effort basis. After the local append,
+the release command posts the sanitized event to the Telemetry Collector at
+`/api/events/deployment`. A publication failure leaves the durable JSONL record
+intact and produces only a warning.
 
 ## Safety behavior
 

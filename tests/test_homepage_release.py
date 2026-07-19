@@ -130,9 +130,23 @@ class HomepageReleaseTests(unittest.TestCase):
         self.assertEqual(records[0]["result"], "successful")
         self.assertFalse(records[0]["rollback_performed"])
 
+    @patch("scripts.homepage_release.urllib.request.urlopen", side_effect=OSError("offline"))
     @patch("scripts.homepage_release.append_deployment_event", side_effect=OSError("offline"))
-    def test_event_journal_failure_does_not_escape(self, _mock_append: MagicMock) -> None:
+    def test_event_journal_failure_does_not_escape(
+        self, _mock_append: MagicMock, _mock_urlopen: MagicMock
+    ) -> None:
         homepage_release.record_deployment_event(Path("/unused"), {"event": "test"})
+
+    @patch("scripts.homepage_release.urllib.request.urlopen")
+    def test_event_publication_posts_json(self, mock_urlopen: MagicMock) -> None:
+        response = MagicMock()
+        response.status = 202
+        mock_urlopen.return_value.__enter__.return_value = response
+        with tempfile.TemporaryDirectory() as directory:
+            homepage_release.record_deployment_event(Path(directory), {"event": "test"})
+        request = mock_urlopen.call_args.args[0]
+        self.assertEqual(request.method, "POST")
+        self.assertEqual(json.loads(request.data), {"event": "test"})
 
 
 if __name__ == "__main__":

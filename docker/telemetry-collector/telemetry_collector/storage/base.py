@@ -4,7 +4,7 @@ from datetime import datetime
 from threading import Lock
 from typing import Protocol
 
-from telemetry_collector.models import TelemetryEnvelope
+from telemetry_collector.models import DeploymentEvent, TelemetryEnvelope
 
 
 class StorageUnavailable(RuntimeError):
@@ -27,10 +27,13 @@ class TelemetryStore(Protocol):
 
     def healthy(self) -> bool: ...
 
+    def write_deployment_event(self, event: DeploymentEvent) -> None: ...
+
 
 class MemoryTelemetryStore:
     def __init__(self) -> None:
         self._records: list[TelemetryEnvelope] = []
+        self.deployment_events: list[DeploymentEvent] = []
         self._lock = Lock()
 
     def write(self, envelope: TelemetryEnvelope) -> None:
@@ -60,3 +63,7 @@ class MemoryTelemetryStore:
 
     def healthy(self) -> bool:
         return True
+
+    def write_deployment_event(self, event: DeploymentEvent) -> None:
+        with self._lock:
+            self.deployment_events.append(event)

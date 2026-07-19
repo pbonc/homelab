@@ -3,9 +3,68 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, field
 from datetime import datetime
 from typing import TypeAlias
+from uuid import UUID
 
 
 Scalar: TypeAlias = str | int | float | bool
+
+
+@dataclass(frozen=True)
+class DeploymentEvent:
+    schema_version: str
+    event_id: str
+    event_type: str
+    occurred_at: datetime
+    service: str
+    target: str
+    operation: str
+    result: str
+    version: str
+    git_commit: str
+    deployer: str
+    release_id: str
+    rollback_performed: bool
+    failure_type: str | None = None
+
+    @classmethod
+    def from_dict(cls, payload: dict[str, object]) -> "DeploymentEvent":
+        required = {
+            "schema_version", "event_id", "event_type", "occurred_at", "service",
+            "target", "operation", "result", "version", "git_commit", "deployer",
+            "release_id", "rollback_performed",
+        }
+        allowed = required | {"failure_type"}
+        if set(payload) - allowed or required - set(payload):
+            raise ValueError("deployment event fields do not match schema 1.0.0")
+        if payload["schema_version"] != "1.0.0" or payload["event_type"] != "deployment":
+            raise ValueError("unsupported deployment event contract")
+        UUID(str(payload["event_id"]))
+        occurred_at = datetime.fromisoformat(str(payload["occurred_at"]))
+        if occurred_at.tzinfo is None:
+            raise ValueError("occurred_at must include a timezone")
+        operation = str(payload["operation"])
+        result = str(payload["result"])
+        if operation not in {"deploy", "rollback"}:
+            raise ValueError("unsupported deployment operation")
+        if result not in {"successful", "failed", "rolled_back"}:
+            raise ValueError("unsupported deployment result")
+        failure_type = payload.get("failure_type")
+        if (result == "failed") != isinstance(failure_type, str):
+            raise ValueError("failed events require failure_type only")
+        git_commit = str(payload["git_commit"])
+        if len(git_commit) != 40 or any(char not in "0123456789abcdef" for char in git_commit):
+            raise ValueError("git_commit must be a full lowercase SHA-1")
+        if not isinstance(payload["rollback_performed"], bool):
+            raise ValueError("rollback_performed must be boolean")
+        strings = {name: str(payload[name]) for name in ("service", "target", "version", "deployer", "release_id")}
+        if any(not value for value in strings.values()):
+            raise ValueError("deployment event strings cannot be empty")
+        return cls(
+            schema_version="1.0.0", event_id=str(payload["event_id"]), event_type="deployment",
+            occurred_at=occurred_at, operation=operation, result=result,
+            git_commit=git_commit, rollback_performed=payload["rollback_performed"],
+            failure_type=failure_type if isinstance(failure_type, str) else None, **strings,
+        )
 
 
 @dataclass(frozen=True)

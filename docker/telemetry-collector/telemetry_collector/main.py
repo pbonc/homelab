@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from telemetry_collector import __version__
 from telemetry_collector.config import Settings
-from telemetry_collector.models import Scalar, TelemetryEnvelope
+from telemetry_collector.models import DeploymentEvent, Scalar, TelemetryEnvelope
 from telemetry_collector.registry import registry
 from telemetry_collector.sources.ecowitt import EcowittPayloadError
 from telemetry_collector.storage.base import MemoryTelemetryStore, StorageUnavailable, TelemetryStore
@@ -146,6 +146,20 @@ def create_app(
             "observed_at": envelope.observed_at.isoformat(),
             "measurement_count": len(envelope.measurements),
         }
+
+    @application.post("/api/events/deployment", status_code=202)
+    async def deployment_event(request: Request) -> dict[str, object]:
+        try:
+            payload = await request.json()
+            if not isinstance(payload, dict):
+                raise ValueError("deployment event must be an object")
+            event = DeploymentEvent.from_dict(payload)
+            active_store.write_deployment_event(event)
+        except (ValueError, KeyError, TypeError) as exc:
+            raise HTTPException(status_code=422, detail=str(exc)) from exc
+        except StorageUnavailable as exc:
+            raise HTTPException(status_code=503, detail={"code": "storage_unavailable"}) from exc
+        return {"status": "accepted", "event_id": event.event_id}
 
     @application.get("/api/current/{source}")
     def current(source: str) -> dict[str, object]:

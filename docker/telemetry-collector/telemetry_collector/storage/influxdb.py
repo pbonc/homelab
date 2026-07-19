@@ -5,7 +5,7 @@ import re
 from datetime import datetime
 
 from telemetry_collector.config import Settings
-from telemetry_collector.models import TelemetryEnvelope
+from telemetry_collector.models import DeploymentEvent, TelemetryEnvelope
 from telemetry_collector.storage.base import StorageUnavailable
 
 
@@ -107,3 +107,30 @@ from(bucket: "{_flux_string(self._bucket)}")
             return bool(self._client.ping())
         except Exception:
             return False
+
+    def write_deployment_event(self, event: DeploymentEvent) -> None:
+        from influxdb_client import Point, WritePrecision
+
+        summary = f"{event.operation} {event.version} ({event.git_commit[:12]}) by {event.deployer}"
+        point = (
+            Point("deployment_event")
+            .tag("service", event.service)
+            .tag("target", event.target)
+            .tag("operation", event.operation)
+            .tag("result", event.result)
+            .tag("version", event.version)
+            .tag("git_commit", event.git_commit)
+            .tag("deployer", event.deployer)
+            .tag("release_id", event.release_id)
+            .field("title", f"{event.service}: {event.result}")
+            .field("text", summary)
+            .field("tags", f"deployment,{event.service},{event.result},{event.target}")
+            .field("rollback_performed", event.rollback_performed)
+            .time(event.occurred_at, WritePrecision.NS)
+        )
+        if event.failure_type:
+            point.field("failure_type", event.failure_type)
+        try:
+            self._write_api.write(bucket=self._bucket, org=self._org, record=point)
+        except Exception as exc:
+            raise StorageUnavailable(f"InfluxDB event write failed: {exc}") from exc

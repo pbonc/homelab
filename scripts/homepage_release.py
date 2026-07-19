@@ -28,6 +28,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 SOURCE_DIR = REPO_ROOT / "docker" / "homepage"
 DEFAULT_DEPLOY_ROOT = Path("/srv/homelab/homepage")
 DEFAULT_URL = "http://127.0.0.1:3000"
+DEFAULT_EVENT_URL = "http://127.0.0.1:8000/api/events/deployment"
 PROJECT_NAME = "homepage"
 REQUIRED_SERVICES = {"homepage", "glances", "docker-proxy"}
 EVENT_SCHEMA_VERSION = "1.0.0"
@@ -186,6 +187,22 @@ def record_deployment_event(deploy_root: Path, event: dict[str, object]) -> None
     except OSError as exc:
         print(
             f"[WARN] Deployment succeeded or failed independently, but event journaling failed: {type(exc).__name__}",
+            file=sys.stderr,
+        )
+    event_url = os.environ.get("HOMELAB_EVENT_URL", DEFAULT_EVENT_URL)
+    try:
+        request = urllib.request.Request(
+            event_url,
+            data=json.dumps(event, separators=(",", ":")).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        with urllib.request.urlopen(request, timeout=3) as response:
+            if not 200 <= response.status < 300:
+                raise OSError(f"HTTP {response.status}")
+    except (OSError, TimeoutError, urllib.error.URLError):
+        print(
+            "[WARN] Deployment event was journaled locally but observability publication failed",
             file=sys.stderr,
         )
 
