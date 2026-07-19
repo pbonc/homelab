@@ -164,6 +164,10 @@ directories, secret files, or arbitrary host paths. Alloy persists read offsets
 in the `alloy-data` volume so restarts resume without deliberately replaying the
 entire available history.
 
+The one-shot `alloy-storage-init` service grants only `CAP_CHOWN`, assigns the
+positions volume to Alloy's non-root UID 473, and exits before Alloy starts.
+The long-running Alloy service remains non-root with all capabilities dropped.
+
 Grafana provisions the `Homelab Loki` datasource with UID `loki-homelab`.
 Use **Explore**, select that datasource, and begin with:
 

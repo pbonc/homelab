@@ -131,6 +131,8 @@ services:
         condition: service_healthy
       docker-log-proxy:
         condition: service_healthy
+      alloy-storage-init:
+        condition: service_completed_successfully
     healthcheck:
       test:
         - CMD
@@ -149,6 +151,26 @@ services:
     security_opt:
       - no-new-privileges:true
     restart: unless-stopped
+
+  alloy-storage-init:
+    image: grafana/alloy@sha256:41e0ad9b7c74cdc0a01ca8ce10f8d8262d49029167fd0b1d2db84a0f10468284
+    container_name: alloy-storage-init
+    user: "0:0"
+    entrypoint:
+      - /bin/chown
+      - -R
+      - "473:473"
+      - /var/lib/alloy/data
+    volumes:
+      - alloy-data:/var/lib/alloy/data
+    read_only: true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+    security_opt:
+      - no-new-privileges:true
+    restart: "no"
 
 volumes:
   prometheus-data:
