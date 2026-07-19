@@ -168,6 +168,7 @@ services:
       - ALL
     cap_add:
       - CHOWN
+      - DAC_OVERRIDE
     security_opt:
       - no-new-privileges:true
     restart: "no"
