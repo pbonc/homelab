@@ -104,3 +104,7 @@ the configured stale classification. This keeps two failure modes distinct:
 
 Grafana provisions these signals in the `Platform Health` dashboard at
 `/d/homelab-platform-health/platform-health`.
+
+The initial deployment passed on `brain` on 2026-07-19. All six HTTP probes
+reported `probe_success == 1`, telemetry storage reported up, the live weather
+report was current, and Grafana loaded all five Platform Health panels.
