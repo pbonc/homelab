@@ -2,6 +2,8 @@
 - Infrastructure Nodes:
     - brain:
         icon: mdi-server
+        href: http://192.168.1.23:3001/d/homelab-hardware/brain-hardware
+        target: _blank
         description: "Active | Homelab controller"
         widgets:
           - type: glances
