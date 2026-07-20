@@ -1,0 +1,20 @@
+---
+- name: Verify homelab node connectivity
+  hosts: all
+  gather_facts: true
+  become: false
+
+  tasks:
+    - name: Verify the managed node is Linux
+      ansible.builtin.assert:
+        that:
+          - ansible_system == "Linux"
+        fail_msg: "{{ inventory_hostname }} is not a supported Linux node"
+        success_msg: "{{ inventory_hostname }} is reachable and reports Linux"
+
+    - name: Report the resolved connection identity
+      ansible.builtin.debug:
+        msg: >-
+          {{ inventory_hostname }} resolves to {{ ansible_host | default(inventory_hostname) }}
+          as {{ ansible_user | default('the current SSH user') }}
+      changed_when: false

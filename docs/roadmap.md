@@ -175,7 +175,7 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 
 ## Phase 7: Reproducible Node Automation
 
-- [ ] Define an Ansible inventory and connection model for `brain` and future edge nodes
+- [x] Define an Ansible inventory and connection model for `brain` and future edge nodes
 - [ ] Add a minimal bootstrap role for users, SSH access, time synchronization, base packages, and Docker where required
 - [ ] Separate non-secret defaults from encrypted or runtime-only secrets
 - [ ] Add check-mode and idempotence validation before using automation on a new node

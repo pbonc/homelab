@@ -1,0 +1,5 @@
+---
+# Non-secret defaults shared by managed homelab nodes.
+homelab_environment: production
+homelab_timezone: America/Chicago
+ansible_port: 22

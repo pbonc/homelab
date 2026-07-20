@@ -8,6 +8,11 @@ docker/homepage/config/status.json
 __pycache__/
 *.py[cod]
 
+# Ansible local state and runtime-only vault credentials
+.ansible/
+*.retry
+ansible/.vault-password*
+
 # Telemetry runtime configuration and secrets
 docker/telemetry/.env
 docker/telemetry/secrets/

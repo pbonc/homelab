@@ -4,7 +4,7 @@ SHELL := /usr/bin/env bash
 # CI portability note:
 # GitHub Actions, GitLab CI, and Jenkins should call these same Make targets.
 
-.PHONY: help doctor status lint test telemetry-test telemetry-run telemetry-secrets telemetry-config security-test security-secrets security-config observability-config observability-up observability-down study-test study-config study-up study-down bootstrap docker-up docker-down homepage-validate homepage-deploy homepage-verify homepage-rollback
+.PHONY: help doctor status lint test telemetry-test telemetry-run telemetry-secrets telemetry-config security-test security-secrets security-config observability-config observability-up observability-down study-test study-config study-up study-down ansible-inventory ansible-ping ansible-check bootstrap docker-up docker-down homepage-validate homepage-deploy homepage-verify homepage-rollback
 
 help: ## Show available targets
 >@awk 'BEGIN {FS = ":.*##"; printf "\nAvailable targets:\n"} /^[a-zA-Z0-9_.-]+:.*##/ {printf "  %-14s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -68,6 +68,15 @@ study-up: ## Build and start the Homelab Study Deck
 
 study-down: ## Stop the Study Deck without deleting progress
 >@docker compose --file docker/study-deck/compose.yaml down
+
+ansible-inventory: ## Show the effective production Ansible inventory
+>@ANSIBLE_CONFIG="$(CURDIR)/ansible/ansible.cfg" ansible-inventory --graph
+
+ansible-ping: ## Verify SSH and Python connectivity to managed nodes
+>@ANSIBLE_CONFIG="$(CURDIR)/ansible/ansible.cfg" ansible all --module-name ansible.builtin.ping
+
+ansible-check: ## Validate the read-only connectivity playbook in check mode
+>@ANSIBLE_CONFIG="$(CURDIR)/ansible/ansible.cfg" ansible-playbook --check ansible/playbooks/connectivity.yml
 
 homepage-validate: ## Validate Homepage source and Compose configuration
 >@python3 -u scripts/homepage_release.py validate
