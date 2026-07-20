@@ -35,7 +35,7 @@ services:
   telemetry-collector:
     build:
       context: ../telemetry-collector
-    image: homelab/telemetry-collector:0.1.0
+    image: homelab/telemetry-collector:0.2.0
     container_name: telemetry-collector
     ports:
       - "8000:8000"

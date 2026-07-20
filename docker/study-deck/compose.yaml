@@ -4,7 +4,7 @@ services:
   study-deck:
     build:
       context: .
-    image: homelab/study-deck:0.1.0
+    image: homelab/study-deck:0.2.0
     container_name: study-deck
     ports:
       - "192.168.1.23:8020:8020"

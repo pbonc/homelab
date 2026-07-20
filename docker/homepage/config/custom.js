@@ -175,6 +175,8 @@
 		banner = document.createElement("a");
 		banner.className = "local-weather-header";
 		banner.href = "http://192.168.1.23:3001/d/homelab-weather/local-weather";
+		banner.target = "_blank";
+		banner.rel = "noopener noreferrer";
 		banner.setAttribute("aria-label", "Open the Local Weather dashboard in Grafana");
 		banner.textContent = "Local weather: waiting for telemetry";
 		if (informationWidgets) {
