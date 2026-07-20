@@ -42,7 +42,7 @@
         icon: mdi-access-point-network
         href: http://192.168.1.23:8000/docs
         siteMonitor: http://192.168.1.23:8000/api/health
-        description: "Running on brain | Generic ingestion API"
+        description: "Running on brain | Ingestion API v{{HOMEPAGE_VAR_TELEMETRY_VERSION}}"
     - InfluxDB:
         icon: si-influxdb
         href: http://192.168.1.23:8086
@@ -66,14 +66,14 @@
         icon: mdi-head-lightbulb-outline
         href: http://192.168.1.23:8020
         siteMonitor: http://192.168.1.23:8020/api/health
-        description: "Learn | Homelab interview practice"
+        description: "Learn | Interview practice v{{HOMEPAGE_VAR_STUDY_DECK_VERSION}}"
     - Prometheus:
         icon: si-prometheus
         href: http://192.168.1.23:3001/d/homelab-platform-health/platform-health
         siteMonitor: http://192.168.1.23:9090/-/ready
         description: "Observe | Platform metrics and alerts"
     - Loki:
-        icon: si-grafana
+        icon: mdi-file-search-outline
         href: http://192.168.1.23:3001/d/homelab-container-logs/container-logs
         siteMonitor: http://192.168.1.23:3100/ready
         description: "Observe | Container logs and errors"

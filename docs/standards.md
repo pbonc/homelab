@@ -40,6 +40,9 @@ CI providers must call the same targets instead of duplicating shell logic:
   deployment documentation together where they apply.
 - Current baselines are Dashboard `0.6.0`, Telemetry Collector `0.2.0`, Study
   Deck `0.2.0`, and dormant Security Status Adapter `0.1.0`.
+- Display versions on Homepage only for Homelab-owned, independently released
+  applications. Keep upstream service versions and image digests in Compose and
+  operational documentation rather than repeating them across cards.
 
 ## Security Standards
 
