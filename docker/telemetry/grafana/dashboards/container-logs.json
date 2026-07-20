@@ -14,7 +14,7 @@
       "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0},
       "id": 1,
       "options": {"colorMode": "background", "graphMode": "none", "justifyMode": "auto", "orientation": "auto", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "showPercentChange": false, "textMode": "auto", "wideLayout": true},
-      "targets": [{"datasource": {"type": "loki", "uid": "loki-homelab"}, "editorMode": "code", "expr": "sum(count_over_time({host=\"brain\", service=~\"$service\"} |~ \"(?i)(error|exception|fatal|panic)\" [$__range]))", "queryType": "instant", "refId": "A"}],
+      "targets": [{"datasource": {"type": "loki", "uid": "loki-homelab"}, "editorMode": "code", "expr": "sum(count_over_time({host=\"brain\", service=~\"$service\", detected_level=~\"error|critical\"}[$__range]))", "queryType": "instant", "refId": "A"}],
       "title": "Errors in Selected Range",
       "type": "stat"
     },
@@ -34,7 +34,7 @@
       "gridPos": {"h": 4, "w": 6, "x": 0, "y": 4},
       "id": 3,
       "options": {"dedupStrategy": "none", "enableInfiniteScrolling": false, "enableLogDetails": true, "prettifyLogMessage": false, "showCommonLabels": false, "showLabels": false, "showTime": true, "sortOrder": "Descending", "wrapLogMessage": true},
-      "targets": [{"datasource": {"type": "loki", "uid": "loki-homelab"}, "editorMode": "code", "expr": "{host=\"brain\", service=~\"$service\"} |~ \"(?i)(error|exception|fatal|panic)\"", "queryType": "range", "refId": "A"}],
+      "targets": [{"datasource": {"type": "loki", "uid": "loki-homelab"}, "editorMode": "code", "expr": "{host=\"brain\", service=~\"$service\", detected_level=~\"error|critical\"}", "queryType": "range", "refId": "A"}],
       "title": "Recent Errors",
       "type": "logs"
     },
@@ -77,6 +77,6 @@
   "timezone": "browser",
   "title": "Container Logs",
   "uid": "homelab-container-logs",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }

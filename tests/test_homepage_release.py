@@ -11,7 +11,7 @@ from scripts import homepage_release
 
 class HomepageReleaseTests(unittest.TestCase):
     def test_dashboard_version_comes_from_version_env(self) -> None:
-        self.assertEqual(homepage_release.dashboard_version(), "0.6.1")
+        self.assertEqual(homepage_release.dashboard_version(), "0.6.2")
 
     def test_compose_command_uses_stable_project_name(self) -> None:
         command = homepage_release.compose_command(Path("/release"), "config", "--quiet")

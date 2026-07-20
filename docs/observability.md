@@ -172,8 +172,12 @@ non-root with all capabilities dropped.
 
 Grafana provisions the `Homelab Loki` datasource with UID `loki-homelab`.
 The `Homelab / Container Logs` dashboard provides a service selector, error
-count, recent errors, per-service log rate, and a searchable log stream. Use
-**Explore** for ad hoc queries, select that datasource, and begin with:
+count, recent errors, per-service log rate, and a searchable log stream. Error
+panels select Loki's parsed `detected_level` values `error` and
+`critical`; they do not search for error-like words in message text. This avoids
+counting successful Loki query logs that contain the text of their own filter.
+
+Use **Explore** for ad hoc queries, select that datasource, and begin with:
 
 ```logql
 {host="brain", platform="docker"}

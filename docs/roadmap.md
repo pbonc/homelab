@@ -15,7 +15,7 @@
 - [x] Add Glances-backed CPU, memory, and root filesystem metrics to `brain`
 - [x] Classify `brain` as active, warning, critical, or unavailable from live metrics
 - [x] Style planned and future cards as inactive inventory
-- [x] Display the dashboard semantic version (initially `0.1.0`, currently `0.6.1`)
+- [x] Display the dashboard semantic version (initially `0.1.0`, currently `0.6.2`)
 - [x] Retire the unsupported status JSON polling path
 - [x] Add UTF-8, URL, lifecycle, and version validation
 - [x] Add Glances readiness, host-header validation, and restricted CORS configuration
