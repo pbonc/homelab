@@ -211,12 +211,13 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 
 ## Phase 9: ADS-B Edge Node
 
-- [ ] Record receiver hardware, SDR model, network identity, and power or storage constraints
+- [x] Record receiver hardware, SDR model, network identity, and power or storage constraints
+- [x] Replace the Homepage ADS-B placeholder with a monitored PiAware card that opens the local SkyAware map in a new tab
 - [ ] Provision the Raspberry Pi receiver through the Phase 7 automation baseline with a role-oriented hostname
 - [ ] Verify local aircraft decoding and feed freshness before adding remote telemetry
-- [ ] Monitor host health, SDR connectivity, receiver processes, and feed freshness
+- [ ] Install a constrained metrics exporter and monitor Pi host health, SDR connectivity, receiver processes, and feed freshness
 - [ ] Collect aircraft count, message rate, and reception-range metrics
-- [ ] Add an ADS-B collector plugin, Homepage summary, and detailed Grafana dashboard
+- [ ] Add an ADS-B collector plugin and a detailed Grafana dashboard without exposing receiver secrets or precise private location data
 - [ ] Document offline buffering, restart behavior, retention, and troubleshooting
 - [ ] Complete an outage and recovery exercise without affecting the controller node
 

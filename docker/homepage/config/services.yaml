@@ -21,9 +21,12 @@
     - atlas:
         icon: mdi-chip
         description: "Future | GPU server"
-    - adsb-pi:
+    - piaware:
         icon: mdi-raspberry-pi
-        description: "Future | ADS-B receiver node"
+        href: http://192.168.1.27/skyaware/
+        target: _blank
+        siteMonitor: http://192.168.1.27/skyaware/
+        description: "Live | ADS-B receiver and local aircraft map"
 
 - Deployed Services:
     - Homepage:
