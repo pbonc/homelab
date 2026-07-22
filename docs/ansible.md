@@ -3,9 +3,9 @@
 ## Connection model
 
 The production inventory lives in
-`ansible/inventories/production/hosts.yml`. `brain` is the only active managed
-node. Future edge-node groups are intentionally empty until their hostname,
-address, and SSH identity have been verified.
+`ansible/inventories/production/hosts.yml`. `brain` is the controller node and
+`piaware` is the first active edge node. Future nodes remain absent until their
+hostname, address, and SSH identity have been verified.
 
 Run Ansible from a Linux control environment: `brain`, a Linux workstation, or
 WSL. Native Windows is not an Ansible control-node target. Managed nodes require
@@ -31,10 +31,13 @@ Before the first Ansible run, establish and verify the SSH trust relationship:
 
 ```bash
 ssh dar@192.168.1.23 'hostname; id'
+ssh pi@192.168.1.27 'hostname; id'
 ```
 
-Confirm that the returned hostname is `brain` and verify an unexpected host-key
-prompt out of band. Do not bypass host-key checking.
+Confirm that the returned hostnames are `brain` and `piaware`, respectively,
+and verify an unexpected host-key prompt out of band. Do not bypass host-key
+checking. The `pi` account is the PiAware image's initial administrative
+identity; Phase 7 automation will replace it as the routine operator account.
 
 ## Validate connectivity
 

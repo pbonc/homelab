@@ -12,13 +12,14 @@ class AnsibleLayoutTests(unittest.TestCase):
         self.assertIn("host_key_checking = True", config)
         self.assertNotIn("host_key_checking = False", config)
 
-    def test_brain_is_the_only_active_inventory_host(self):
+    def test_verified_nodes_are_active_inventory_hosts(self):
         inventory = (
             ANSIBLE / "inventories" / "production" / "hosts.yml"
         ).read_text(encoding="utf-8")
         self.assertIn("brain:", inventory)
         self.assertIn("ansible_host: 192.168.1.23", inventory)
-        self.assertIn("edge_nodes:\n      hosts: {}", inventory)
+        self.assertIn("piaware:", inventory)
+        self.assertIn("ansible_host: 192.168.1.27", inventory)
 
     def test_inventory_does_not_embed_credentials_or_private_keys(self):
         inventory_root = ANSIBLE / "inventories"

@@ -17,6 +17,21 @@
 - Local service composition and testing
 - Monitoring and operational visibility tooling
 
+## ADS-B Edge Node: piaware
+
+- Model: Raspberry Pi 4 Model B Rev 1.4
+- Architecture: AArch64
+- Memory card: approximately 64 GB; root filesystem approximately 58 GB
+- OS: Raspbian GNU/Linux 12 (Bookworm)
+- Network address: `192.168.1.27`
+- SDR: Realtek RTL2832U DVB-T USB receiver
+- Workload: PiAware, `dump1090-fa`, and FlightAware feeder client
+
+The receiver was verified with key-based SSH. The SDR is visible over USB,
+`dump1090-fa` is producing local ADS-B data, and PiAware is connected upstream.
+The private feeder identifier is intentionally excluded from repository
+documentation.
+
 ## Capacity Notes
 
 Given the current hardware footprint:

@@ -9,6 +9,8 @@ assumptions that future nodes and services must preserve.
 
 - Controller hostname: `brain`
 - Controller address: `192.168.1.23`
+- ADS-B edge hostname: `piaware`
+- ADS-B edge address: `192.168.1.27`
 - Current client network: trusted home LAN
 - Primary administration path: SSH
 - Public inbound exposure: none intended
@@ -29,6 +31,13 @@ internet without a deliberate authenticated reverse-proxy and TLS design.
 | 8020 | Study Deck | `http://192.168.1.23:8020` | LAN-only study notes, quizzes, and local progress |
 | 9090 | Prometheus | `http://192.168.1.23:9090` | Metrics queries and administration on the trusted LAN |
 | 3100 | Loki | `http://192.168.1.23:3100` | Log query API consumed by trusted-LAN Grafana |
+
+## Managed nodes
+
+| Host | Address | Role | Administration |
+| --- | --- | --- | --- |
+| `brain` | `192.168.1.23` | Controller and service host | `dar`, public-key SSH |
+| `piaware` | `192.168.1.27` | ADS-B receiver edge node | Temporary `pi` bootstrap account, public-key SSH |
 
 All entries are trusted-LAN only. Homepage links should use these verified
 addresses; planned services must not receive click targets.
@@ -65,8 +74,8 @@ the repository through its GitHub App integration.
 
 - Hostnames are stable, lowercase, and role-oriented.
 - `brain` remains the controller identity.
-- The ADS-B Raspberry Pi receives its final hostname and address during its
-  automated provisioning phase.
+- `piaware` is the role-oriented hostname for the ADS-B Raspberry Pi; its
+  verified LAN address is `192.168.1.27`.
 - `atlas` remains an inventory placeholder until hardware and networking are
   verified.
 
