@@ -110,6 +110,17 @@ class AnsibleLayoutTests(unittest.TestCase):
         )
         self.assertIn("Explain first-run check-mode deferral", tasks)
 
+    def test_break_glass_runbook_preserves_security_boundaries(self):
+        runbook = (
+            ROOT / "docs" / "runbooks" / "ansible-break-glass.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("Do not accept it or delete the old entry", runbook)
+        self.assertIn("physical console", runbook)
+        self.assertIn("sudo visudo -cf /etc/sudoers", runbook)
+        self.assertIn("changed=0", runbook)
+        self.assertNotIn("StrictHostKeyChecking=no", runbook)
+        self.assertNotIn("flightaware", runbook.lower())
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -176,3 +176,8 @@ The PiAware baseline was applied and verified from the WSL control environment:
 the apply and subsequent check-mode run both completed with `changed=0`,
 `failed=0`, and `unreachable=0`. PiAware, `dump1090-fa`, `ntpsec`, key-based
 administration, and passwordless sudo remained healthy after convergence.
+
+When normal access fails, follow
+`docs/runbooks/ansible-break-glass.md`. It preserves host-key verification,
+uses the retained PiAware recovery identity or physical console only when
+necessary, and requires a zero-change Ansible check before recovery is closed.

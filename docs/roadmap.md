@@ -179,7 +179,7 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [x] Add a minimal bootstrap role for users, SSH access, time synchronization, base packages, and Docker where required
 - [x] Separate non-secret defaults from encrypted or runtime-only secrets
 - [x] Add check-mode and idempotence validation before using automation on a new node
-- [ ] Document recovery and manual break-glass steps when automation cannot reach a node
+- [x] Document recovery and manual break-glass steps when automation cannot reach a node
 - [ ] Define encrypted off-host backups, recovery-point and recovery-time objectives, and retention for irreplaceable state
 - [ ] Prove a restore into a disposable location and document a clean-Ubuntu rebuild exercise for `brain`
 
