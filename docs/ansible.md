@@ -36,8 +36,8 @@ ssh pi@192.168.1.27 'hostname; id'
 
 Confirm that the returned hostnames are `brain` and `piaware`, respectively,
 and verify an unexpected host-key prompt out of band. Do not bypass host-key
-checking. The `pi` account is the PiAware image's initial administrative
-identity; Phase 7 automation will replace it as the routine operator account.
+checking. The `pi` account was the PiAware image's initial bootstrap identity;
+inventory now uses the automation-managed `dar` account for routine access.
 
 ## Validate connectivity
 
@@ -79,6 +79,12 @@ key, configures the `America/Chicago` timezone and system time synchronization,
 and installs a small base package set. Docker is opt-in and remains disabled on
 PiAware because its receiver stack does not require it.
 
+Time synchronization is provider-aware. The PiAware host explicitly retains
+its image-managed `ntpsec` service; the role does not install
+`systemd-timesyncd`, because those packages conflict and replacing the provider
+would remove PiAware release ownership. Every future node must select an
+already-installed provider deliberately.
+
 The administrator receives passwordless sudo backed by its SSH key. This avoids
 putting a reusable password or password hash into Git and allows subsequent
 non-interactive automation. Possession of the private administrative key is
@@ -90,6 +96,10 @@ control shell, export the public half of the dedicated homelab key:
 ```bash
 export HOMELAB_ADMIN_PUBLIC_KEY="$(cat ~/.ssh/id_ed25519_homelab.pub)"
 ```
+
+The role trims Windows or Unix line endings and reconciles the key by algorithm
+and key body, preventing CRLF input or comment changes from creating duplicate
+authorized-key entries.
 
 Preview the first run while connecting through the PiAware image's temporary
 `pi` account. `sudo` requests the changed Pi password:
@@ -104,6 +114,11 @@ Review every proposed change, then apply the identical target selection:
 make ansible-bootstrap ARGS="--limit piaware --ask-become-pass"
 ```
 
+On the first preview, creation of the administrator is reported but its `.ssh`
+directory and authorized key are explicitly deferred because check mode does
+not actually create the account. The apply run creates them together. A second
+check-mode run must then report no changes; that is the idempotence proof.
+
 Before changing inventory or SSH policy, prove the new identity from the
 control environment:
 
@@ -114,3 +129,16 @@ ssh -i ~/.ssh/id_ed25519_homelab dar@192.168.1.27 'hostname; id; sudo -n true; t
 The role deliberately does not disable the `pi` account or password-based SSH.
 Those changes require a separate access-hardening step after the new identity,
 sudo path, and a documented break-glass method have all been verified.
+
+After the first successful apply and identity verification, inventory connects
+as `dar`. Prove idempotence without a become-password prompt:
+
+```bash
+make ansible-bootstrap-check \
+  ARGS="--limit piaware --private-key $HOME/.ssh/id_ed25519_homelab"
+```
+
+The PiAware baseline was applied and verified from the WSL control environment:
+the apply and subsequent check-mode run both completed with `changed=0`,
+`failed=0`, and `unreachable=0`. PiAware, `dump1090-fa`, `ntpsec`, key-based
+administration, and passwordless sudo remained healthy after convergence.

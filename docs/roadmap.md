@@ -176,9 +176,9 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 ## Phase 7: Reproducible Node Automation
 
 - [x] Define an Ansible inventory and connection model for `brain` and future edge nodes
-- [ ] Add a minimal bootstrap role for users, SSH access, time synchronization, base packages, and Docker where required
+- [x] Add a minimal bootstrap role for users, SSH access, time synchronization, base packages, and Docker where required
 - [ ] Separate non-secret defaults from encrypted or runtime-only secrets
-- [ ] Add check-mode and idempotence validation before using automation on a new node
+- [x] Add check-mode and idempotence validation before using automation on a new node
 - [ ] Document recovery and manual break-glass steps when automation cannot reach a node
 - [ ] Define encrypted off-host backups, recovery-point and recovery-time objectives, and retention for irreplaceable state
 - [ ] Prove a restore into a disposable location and document a clean-Ubuntu rebuild exercise for `brain`
@@ -213,7 +213,7 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 
 - [x] Record receiver hardware, SDR model, network identity, and power or storage constraints
 - [x] Replace the Homepage ADS-B placeholder with a monitored PiAware card that opens the local SkyAware map in a new tab
-- [ ] Provision the Raspberry Pi receiver through the Phase 7 automation baseline with a role-oriented hostname
+- [x] Provision the Raspberry Pi receiver through the Phase 7 automation baseline with a role-oriented hostname
 - [ ] Verify local aircraft decoding and feed freshness before adding remote telemetry
 - [ ] Install a constrained metrics exporter and monitor Pi host health, SDR connectivity, receiver processes, and feed freshness
 - [ ] Collect aircraft count, message rate, and reception-range metrics

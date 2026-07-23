@@ -38,7 +38,7 @@ internet without a deliberate authenticated reverse-proxy and TLS design.
 | Host | Address | Role | Administration |
 | --- | --- | --- | --- |
 | `brain` | `192.168.1.23` | Controller and service host | `dar`, public-key SSH |
-| `piaware` | `192.168.1.27` | ADS-B receiver edge node | Temporary `pi` bootstrap account, public-key SSH |
+| `piaware` | `192.168.1.27` | ADS-B receiver edge node | `dar`, public-key SSH; retained `pi` break-glass account |
 
 All entries are trusted-LAN only. Homepage links should use these verified
 addresses; planned services must not receive click targets.

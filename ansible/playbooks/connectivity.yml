@@ -8,7 +8,7 @@
     - name: Verify the managed node is Linux
       ansible.builtin.assert:
         that:
-          - ansible_system == "Linux"
+          - ansible_facts["system"] == "Linux"
         fail_msg: "{{ inventory_hostname }} is not a supported Linux node"
         success_msg: "{{ inventory_hostname }} is reachable and reports Linux"
 

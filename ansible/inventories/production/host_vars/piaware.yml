@@ -1,0 +1,5 @@
+---
+# The PiAware image owns and configures ntpsec. Do not replace it with
+# systemd-timesyncd; the packages conflict and doing so would remove
+# piaware-release.
+homelab_time_service: ntpsec

@@ -2,12 +2,15 @@
 - name: Verify the node baseline inputs
   ansible.builtin.assert:
     that:
-      - ansible_os_family == "Debian"
+      - ansible_facts["os_family"] == "Debian"
       - homelab_admin_user | length > 0
-      - homelab_admin_public_key is match('^ssh-(ed25519|rsa|ecdsa-[^ ]+) [A-Za-z0-9+/=]+(?: .*)?$')
+      - homelab_admin_public_key_normalized.startswith("ssh-ed25519 ")
+      - homelab_admin_public_key_normalized.split() | length >= 2
+      - homelab_admin_public_key_normalized | length > 80
     fail_msg: >-
-      The baseline supports Debian-family nodes and requires a valid public key
-      in HOMELAB_ADMIN_PUBLIC_KEY.
+      The baseline supports Debian-family nodes and requires a non-empty
+      administrator name plus an ED25519 public key supplied through
+      HOMELAB_ADMIN_PUBLIC_KEY.
 
 - name: Refresh the APT package index
   ansible.builtin.apt:
@@ -36,11 +39,33 @@
     mode: "0644"
   notify: Restart time synchronization
 
+- name: Discover installed services
+  ansible.builtin.service_facts:
+
+- name: Verify the selected time provider exists
+  ansible.builtin.assert:
+    that:
+      - (homelab_time_service ~ ".service") in ansible_facts["services"]
+    fail_msg: >-
+      The selected time service {{ homelab_time_service }} is not installed.
+      Choose the node's existing provider rather than replacing it implicitly.
+
 - name: Enable time synchronization
   ansible.builtin.service:
-    name: systemd-timesyncd
+    name: "{{ homelab_time_service }}"
     enabled: true
     state: started
+
+- name: Check whether the administrator already exists
+  ansible.builtin.command:
+    argv:
+      - getent
+      - passwd
+      - "{{ homelab_admin_user }}"
+  register: homelab_admin_before
+  changed_when: false
+  failed_when: false
+  check_mode: false
 
 - name: Create the homelab administrator
   ansible.builtin.user:
@@ -52,6 +77,7 @@
     state: present
 
 - name: Create the administrator SSH directory
+  when: not ansible_check_mode or homelab_admin_before.rc == 0
   ansible.builtin.file:
     path: "/home/{{ homelab_admin_user }}/.ssh"
     state: directory
@@ -60,19 +86,31 @@
     mode: "0700"
 
 - name: Install the administrator public key
+  when: not ansible_check_mode or homelab_admin_before.rc == 0
   ansible.builtin.lineinfile:
     path: "/home/{{ homelab_admin_user }}/.ssh/authorized_keys"
-    line: "{{ homelab_admin_public_key }}"
+    regexp: >-
+      ^{{ homelab_admin_public_key_normalized.split()[0] | regex_escape }}
+      {{ homelab_admin_public_key_normalized.split()[1] | regex_escape }}(?: .*)?\r?$
+    line: "{{ homelab_admin_public_key_normalized }}"
     create: true
     owner: "{{ homelab_admin_user }}"
     group: "{{ homelab_admin_user }}"
     mode: "0600"
 
+- name: Explain first-run check-mode deferral
+  when:
+    - ansible_check_mode
+    - homelab_admin_before.rc != 0
+  ansible.builtin.debug:
+    msg: >-
+      The administrator SSH directory and authorized key are deferred in this
+      preview because {{ homelab_admin_user }} does not exist yet. They will be
+      created during the apply run and validated by the second check-mode run.
+
 - name: Configure key-backed administrator sudo access
   ansible.builtin.copy:
-    content: >-
-      {{ homelab_admin_user }} ALL=(ALL:ALL)
-      {{ 'NOPASSWD: ' if homelab_admin_passwordless_sudo else '' }}ALL
+    content: "{{ homelab_admin_user }} ALL=(ALL:ALL) {{ 'NOPASSWD: ' if homelab_admin_passwordless_sudo else '' }}ALL\n"
     dest: "/etc/sudoers.d/90-homelab-{{ homelab_admin_user }}"
     owner: root
     group: root

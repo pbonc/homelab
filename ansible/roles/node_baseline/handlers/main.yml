@@ -1,5 +1,5 @@
 ---
 - name: Restart time synchronization
   ansible.builtin.service:
-    name: systemd-timesyncd
+    name: "{{ homelab_time_service }}"
     state: restarted
