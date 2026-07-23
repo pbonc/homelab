@@ -38,7 +38,7 @@ CI providers must call the same targets instead of duplicating shell logic:
   a compatible implementation release does not change a schema version.
 - Update the application constant, local image tag, displayed version, and
   deployment documentation together where they apply.
-- Current baselines are Dashboard `0.6.2`, Telemetry Collector `0.2.0`, Study
+- Current baselines are Dashboard `0.7.0`, Telemetry Collector `0.2.0`, Study
   Deck `0.2.0`, and dormant Security Status Adapter `0.1.0`.
 - Display versions on Homepage only for Homelab-owned, independently released
   applications. Keep upstream service versions and image digests in Compose and

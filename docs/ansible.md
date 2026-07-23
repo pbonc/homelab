@@ -71,3 +71,46 @@ To use a non-default key without storing its path in Git, load it into
 Non-secret shared values belong in `group_vars`. Secret handling is a separate
 Phase 7 deliverable; until it is implemented, secrets remain runtime-only and
 must not be added to inventory files.
+
+## Bootstrap an edge node
+
+The `node_baseline` role creates the `dar` administrator, installs its public
+key, configures the `America/Chicago` timezone and system time synchronization,
+and installs a small base package set. Docker is opt-in and remains disabled on
+PiAware because its receiver stack does not require it.
+
+The administrator receives passwordless sudo backed by its SSH key. This avoids
+putting a reusable password or password hash into Git and allows subsequent
+non-interactive automation. Possession of the private administrative key is
+therefore equivalent to root access; keep it encrypted and off managed nodes.
+
+The role never reads a private key or commits a public key. In the Linux/WSL
+control shell, export the public half of the dedicated homelab key:
+
+```bash
+export HOMELAB_ADMIN_PUBLIC_KEY="$(cat ~/.ssh/id_ed25519_homelab.pub)"
+```
+
+Preview the first run while connecting through the PiAware image's temporary
+`pi` account. `sudo` requests the changed Pi password:
+
+```bash
+make ansible-bootstrap-check ARGS="--limit piaware --ask-become-pass"
+```
+
+Review every proposed change, then apply the identical target selection:
+
+```bash
+make ansible-bootstrap ARGS="--limit piaware --ask-become-pass"
+```
+
+Before changing inventory or SSH policy, prove the new identity from the
+control environment:
+
+```bash
+ssh -i ~/.ssh/id_ed25519_homelab dar@192.168.1.27 'hostname; id; sudo -n true; timedatectl'
+```
+
+The role deliberately does not disable the `pi` account or password-based SSH.
+Those changes require a separate access-hardening step after the new identity,
+sudo path, and a documented break-glass method have all been verified.

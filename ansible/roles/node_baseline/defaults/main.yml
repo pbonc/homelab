@@ -1,0 +1,18 @@
+---
+# Safe, non-secret defaults. Supply the public key at runtime through the
+# HOMELAB_ADMIN_PUBLIC_KEY environment variable.
+homelab_admin_user: dar
+homelab_admin_groups:
+  - sudo
+homelab_admin_public_key: "{{ lookup('ansible.builtin.env', 'HOMELAB_ADMIN_PUBLIC_KEY') }}"
+homelab_admin_passwordless_sudo: true
+
+homelab_base_packages:
+  - ca-certificates
+  - curl
+  - git
+  - systemd-timesyncd
+  - vim-tiny
+
+homelab_install_docker: false
+homelab_docker_package: docker.io

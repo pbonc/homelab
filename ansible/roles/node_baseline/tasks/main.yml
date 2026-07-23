@@ -1,0 +1,101 @@
+---
+- name: Verify the node baseline inputs
+  ansible.builtin.assert:
+    that:
+      - ansible_os_family == "Debian"
+      - homelab_admin_user | length > 0
+      - homelab_admin_public_key is match('^ssh-(ed25519|rsa|ecdsa-[^ ]+) [A-Za-z0-9+/=]+(?: .*)?$')
+    fail_msg: >-
+      The baseline supports Debian-family nodes and requires a valid public key
+      in HOMELAB_ADMIN_PUBLIC_KEY.
+
+- name: Refresh the APT package index
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Install baseline packages
+  ansible.builtin.apt:
+    name: "{{ homelab_base_packages }}"
+    state: present
+
+- name: Link the system timezone data
+  ansible.builtin.file:
+    src: "/usr/share/zoneinfo/{{ homelab_timezone }}"
+    dest: /etc/localtime
+    state: link
+    force: true
+  notify: Restart time synchronization
+
+- name: Record the system timezone name
+  ansible.builtin.copy:
+    content: "{{ homelab_timezone }}\n"
+    dest: /etc/timezone
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart time synchronization
+
+- name: Enable time synchronization
+  ansible.builtin.service:
+    name: systemd-timesyncd
+    enabled: true
+    state: started
+
+- name: Create the homelab administrator
+  ansible.builtin.user:
+    name: "{{ homelab_admin_user }}"
+    groups: "{{ homelab_admin_groups }}"
+    append: true
+    create_home: true
+    shell: /bin/bash
+    state: present
+
+- name: Create the administrator SSH directory
+  ansible.builtin.file:
+    path: "/home/{{ homelab_admin_user }}/.ssh"
+    state: directory
+    owner: "{{ homelab_admin_user }}"
+    group: "{{ homelab_admin_user }}"
+    mode: "0700"
+
+- name: Install the administrator public key
+  ansible.builtin.lineinfile:
+    path: "/home/{{ homelab_admin_user }}/.ssh/authorized_keys"
+    line: "{{ homelab_admin_public_key }}"
+    create: true
+    owner: "{{ homelab_admin_user }}"
+    group: "{{ homelab_admin_user }}"
+    mode: "0600"
+
+- name: Configure key-backed administrator sudo access
+  ansible.builtin.copy:
+    content: >-
+      {{ homelab_admin_user }} ALL=(ALL:ALL)
+      {{ 'NOPASSWD: ' if homelab_admin_passwordless_sudo else '' }}ALL
+    dest: "/etc/sudoers.d/90-homelab-{{ homelab_admin_user }}"
+    owner: root
+    group: root
+    mode: "0440"
+    validate: /usr/sbin/visudo -cf %s
+
+- name: Install Docker where explicitly required
+  when: homelab_install_docker | bool
+  block:
+    - name: Install the Docker package
+      ansible.builtin.apt:
+        name: "{{ homelab_docker_package }}"
+        state: present
+
+    - name: Enable the Docker service
+      ansible.builtin.service:
+        name: docker
+        enabled: true
+        state: started
+
+    - name: Permit the administrator to use Docker
+      ansible.builtin.user:
+        name: "{{ homelab_admin_user }}"
+        groups:
+          - docker
+        append: true

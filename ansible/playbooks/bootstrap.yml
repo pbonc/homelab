@@ -1,0 +1,8 @@
+---
+- name: Apply the minimal edge-node baseline
+  hosts: edge_nodes
+  gather_facts: true
+  become: true
+
+  roles:
+    - role: node_baseline

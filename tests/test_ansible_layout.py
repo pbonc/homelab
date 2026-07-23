@@ -39,6 +39,26 @@ class AnsibleLayoutTests(unittest.TestCase):
             with self.subTest(value=value):
                 self.assertNotIn(value, contents)
 
+    def test_baseline_requires_runtime_public_key_and_preserves_password_access(self):
+        defaults = (ANSIBLE / "roles" / "node_baseline" / "defaults" / "main.yml").read_text(
+            encoding="utf-8"
+        )
+        tasks = (ANSIBLE / "roles" / "node_baseline" / "tasks" / "main.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("HOMELAB_ADMIN_PUBLIC_KEY", defaults)
+        self.assertNotIn("ssh-ed25519 AAAA", defaults)
+        self.assertNotIn("PasswordAuthentication", tasks)
+        self.assertNotIn("state: absent", tasks)
+        self.assertIn("validate: /usr/sbin/visudo -cf %s", tasks)
+        self.assertIn("homelab_admin_passwordless_sudo: true", defaults)
+
+    def test_docker_is_opt_in_for_the_baseline(self):
+        defaults = (ANSIBLE / "roles" / "node_baseline" / "defaults" / "main.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("homelab_install_docker: false", defaults)
+
 
 if __name__ == "__main__":
     unittest.main()

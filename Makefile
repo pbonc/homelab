@@ -4,7 +4,7 @@ SHELL := /usr/bin/env bash
 # CI portability note:
 # GitHub Actions, GitLab CI, and Jenkins should call these same Make targets.
 
-.PHONY: help doctor status lint test telemetry-test telemetry-run telemetry-secrets telemetry-config security-test security-secrets security-config observability-config observability-up observability-down study-test study-config study-up study-down ansible-inventory ansible-ping ansible-check bootstrap docker-up docker-down homepage-validate homepage-deploy homepage-verify homepage-rollback
+.PHONY: help doctor status lint test telemetry-test telemetry-run telemetry-secrets telemetry-config security-test security-secrets security-config observability-config observability-up observability-down study-test study-config study-up study-down ansible-inventory ansible-ping ansible-check ansible-bootstrap-check ansible-bootstrap bootstrap docker-up docker-down homepage-validate homepage-deploy homepage-verify homepage-rollback
 
 help: ## Show available targets
 >@awk 'BEGIN {FS = ":.*##"; printf "\nAvailable targets:\n"} /^[a-zA-Z0-9_.-]+:.*##/ {printf "  %-14s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -77,6 +77,12 @@ ansible-ping: ## Verify SSH and Python connectivity to managed nodes
 
 ansible-check: ## Validate the read-only connectivity playbook in check mode
 >@ANSIBLE_CONFIG="$(CURDIR)/ansible/ansible.cfg" ansible-playbook --check ansible/playbooks/connectivity.yml
+
+ansible-bootstrap-check: ## Preview the edge-node baseline (use ARGS for limits and become prompt)
+>@ANSIBLE_CONFIG="$(CURDIR)/ansible/ansible.cfg" ansible-playbook --check --diff ansible/playbooks/bootstrap.yml $(ARGS)
+
+ansible-bootstrap: ## Apply the edge-node baseline (use ARGS for limits and become prompt)
+>@ANSIBLE_CONFIG="$(CURDIR)/ansible/ansible.cfg" ansible-playbook ansible/playbooks/bootstrap.yml $(ARGS)
 
 homepage-validate: ## Validate Homepage source and Compose configuration
 >@python3 -u scripts/homepage_release.py validate
