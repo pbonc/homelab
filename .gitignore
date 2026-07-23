@@ -12,6 +12,7 @@ __pycache__/
 .ansible/
 *.retry
 ansible/.vault-password*
+ansible/inventories/*/group_vars/all/vault.yml
 
 # Telemetry runtime configuration and secrets
 docker/telemetry/.env

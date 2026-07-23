@@ -34,6 +34,7 @@ class AnsibleLayoutTests(unittest.TestCase):
         contents = "\n".join(
             path.read_text(encoding="utf-8")
             for path in inventory_root.rglob("*.yml")
+            if path.name != "vault.yml"
         ).lower()
         forbidden = (
             "ansible_password",
@@ -46,6 +47,16 @@ class AnsibleLayoutTests(unittest.TestCase):
         for value in forbidden:
             with self.subTest(value=value):
                 self.assertNotIn(value, contents)
+
+    def test_runtime_vault_is_ignored_and_example_contains_no_value(self):
+        ignore = (ROOT / ".gitignore").read_text(encoding="utf-8")
+        example = (ANSIBLE / "examples" / "vault-variables.yml.example").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("ansible/inventories/*/group_vars/all/vault.yml", ignore)
+        self.assertIn("vault_example_service_token", example)
+        self.assertIn("REPLACE_INSIDE_ENCRYPTED_VAULT", example)
+        self.assertNotIn("$ANSIBLE_VAULT;", example)
 
     def test_baseline_requires_runtime_public_key_and_preserves_password_access(self):
         defaults = (ANSIBLE / "roles" / "node_baseline" / "defaults" / "main.yml").read_text(

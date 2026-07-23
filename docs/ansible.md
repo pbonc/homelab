@@ -68,9 +68,43 @@ To use a non-default key without storing its path in Git, load it into
    to the underlying Ansible command when testing a single new node.
 5. Only apply a mutating playbook after its check-mode output has been reviewed.
 
-Non-secret shared values belong in `group_vars`. Secret handling is a separate
-Phase 7 deliverable; until it is implemented, secrets remain runtime-only and
-must not be added to inventory files.
+Non-secret shared values belong in committed `group_vars`; secrets must never
+be added to those plaintext inventory files.
+
+## Variable and secret boundaries
+
+Ansible inputs use three deliberately separate classes:
+
+1. Committed non-secret defaults live in `group_vars`, `host_vars`, and role
+   defaults. Hostnames, ports, package names, service providers, and feature
+   switches belong here.
+2. Persistent secrets live only in the ignored production vault at
+   `ansible/inventories/production/group_vars/all/vault.yml`. Secret variable
+   names use the `vault_` prefix. The vault password belongs in the operator's
+   password manager, never in the repository or on a managed node.
+3. Ephemeral inputs are supplied through the control-shell environment. The
+   administrator public key uses this path so the repository stays reusable,
+   even though the public half is not itself secret.
+
+Create the encrypted vault directly—never create a plaintext file and encrypt
+it afterward:
+
+```bash
+make ansible-vault-create
+```
+
+The example at `ansible/examples/vault-variables.yml.example` documents naming
+only. Enter real values in the encrypted editor. Later changes use:
+
+```bash
+make ansible-vault-edit
+make ansible-vault-view
+```
+
+For playbook execution, let Ansible prompt for the vault password with
+`--ask-vault-pass`, or point `ANSIBLE_VAULT_PASSWORD_FILE` at an operator-owned
+file outside the repository. Do not pass secrets as command-line extra vars,
+where shell history and process inspection can expose them.
 
 ## Bootstrap an edge node
 

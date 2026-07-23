@@ -1,0 +1,4 @@
+---
+# Variable names belong in reviewable code; real values must be entered only
+# inside `ansible-vault create` or `ansible-vault edit`.
+vault_example_service_token: REPLACE_INSIDE_ENCRYPTED_VAULT
