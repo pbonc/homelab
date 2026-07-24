@@ -12,6 +12,10 @@
 		},
 	};
 	const UNAVAILABLE_AFTER_MS = 15000;
+	const PIAWARE_THRESHOLDS = {
+		warningAgeSeconds: 30,
+		criticalAgeSeconds: 60,
+	};
 	const WEATHER_URL = "http://192.168.1.23:8000/api/current/weather";
 	const WEATHER_REFRESH_MS = 300000;
 	const STUDY_URL = "http://192.168.1.23:8020/api/progress";
@@ -51,6 +55,8 @@
 
 	let missingSince = null;
 	let unavailableTimer = null;
+	let piawareMissingSince = null;
+	let piawareUnavailableTimer = null;
 	let updateQueued = false;
 
 	function serviceCard(name) {
@@ -85,6 +91,11 @@
 
 		const totalBytes = bytes(total[1], total[2]);
 		return totalBytes > 0 ? (bytes(used[1], used[2]) / totalBytes) * 100 : null;
+	}
+
+	function metricNumber(text, label) {
+		const match = text.match(new RegExp(`${label}\\s*(\\d+(?:\\.\\d+)?)`, "i"));
+		return match ? Number(match[1]) : null;
 	}
 
 	function setBadge(card, state, label) {
@@ -185,6 +196,53 @@
 
 		if (warnings.length) {
 			setBadge(card, "warning", `Attention: ${warnings.join(", ")}`);
+		} else {
+			setBadge(card, "active", "Active");
+		}
+	}
+
+	function updatePiawareHealth() {
+		const card = serviceCard("piaware");
+		if (!card) {
+			return;
+		}
+
+		const text = card.textContent.replace(/\s+/g, " ");
+		const aircraft = metricNumber(text, "Aircraft");
+		const feedAge = metricNumber(text, "Feed Age");
+		const range = metricNumber(text, "Range");
+
+		if (aircraft === null || feedAge === null || range === null) {
+			if (piawareMissingSince === null) {
+				piawareMissingSince = Date.now();
+			}
+			const missingFor = Date.now() - piawareMissingSince;
+			if (missingFor >= UNAVAILABLE_AFTER_MS) {
+				setBadge(card, "unavailable", "Unavailable");
+			} else {
+				if (!card.dataset.health) {
+					setBadge(card, "checking", "Checking");
+				}
+				if (piawareUnavailableTimer === null) {
+					piawareUnavailableTimer = window.setTimeout(() => {
+						piawareUnavailableTimer = null;
+						scheduleUpdate();
+					}, UNAVAILABLE_AFTER_MS - missingFor);
+				}
+			}
+			return;
+		}
+
+		piawareMissingSince = null;
+		if (piawareUnavailableTimer !== null) {
+			window.clearTimeout(piawareUnavailableTimer);
+			piawareUnavailableTimer = null;
+		}
+
+		if (feedAge >= PIAWARE_THRESHOLDS.criticalAgeSeconds) {
+			setBadge(card, "critical", `Stale: ${Math.round(feedAge)}s`);
+		} else if (feedAge >= PIAWARE_THRESHOLDS.warningAgeSeconds) {
+			setBadge(card, "warning", `Delayed: ${Math.round(feedAge)}s`);
 		} else {
 			setBadge(card, "active", "Active");
 		}
@@ -325,6 +383,7 @@
 			weatherBanner();
 			markLifecycleCards();
 			updateBrainHealth();
+			updatePiawareHealth();
 		});
 	}
 
