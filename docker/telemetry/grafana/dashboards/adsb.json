@@ -1,0 +1,107 @@
+{
+  "annotations": {"list": []},
+  "editable": false,
+  "graphTooltip": 1,
+  "panels": [
+    {
+      "id": 1, "title": "Receiver Target", "type": "stat",
+      "gridPos": {"h": 6, "w": 6, "x": 0, "y": 0},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [{"refId": "A", "expr": "up{job=\"piaware-node\",instance=\"piaware\"}", "legendFormat": "Receiver", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "none", "decimals": 0, "min": 0, "max": 1, "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "red"}, {"color": "green", "value": 1}]}, "mappings": [{"type": "value", "options": {"0": {"text": "DOWN", "color": "red"}, "1": {"text": "UP", "color": "green"}}}]}, "overrides": []},
+      "options": {"colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "horizontal", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value_and_name", "wideLayout": true}
+    },
+    {
+      "id": 2, "title": "Aircraft Visible", "type": "stat",
+      "gridPos": {"h": 6, "w": 6, "x": 6, "y": 0},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [{"refId": "A", "expr": "piaware_aircraft_visible{instance=\"piaware\"}", "legendFormat": "Aircraft", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "short", "decimals": 0, "min": 0, "color": {"mode": "continuous-GrYlRd"}}, "overrides": []},
+      "options": {"colorMode": "value", "graphMode": "area", "justifyMode": "center", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value_and_name"}
+    },
+    {
+      "id": 3, "title": "Decoder Report Age", "type": "stat",
+      "gridPos": {"h": 6, "w": 6, "x": 12, "y": 0},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [{"refId": "A", "expr": "piaware_feed_report_age_seconds{instance=\"piaware\"}", "legendFormat": "Report age", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "s", "decimals": 1, "min": 0, "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "green"}, {"color": "yellow", "value": 30}, {"color": "red", "value": 60}]}}, "overrides": []},
+      "options": {"colorMode": "background", "graphMode": "area", "justifyMode": "center", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value_and_name"}
+    },
+    {
+      "id": 4, "title": "SDR", "type": "stat",
+      "gridPos": {"h": 6, "w": 6, "x": 18, "y": 0},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [{"refId": "A", "expr": "piaware_sdr_present{instance=\"piaware\"}", "legendFormat": "RTL2832U", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "none", "decimals": 0, "min": 0, "max": 1, "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "red"}, {"color": "green", "value": 1}]}, "mappings": [{"type": "value", "options": {"0": {"text": "MISSING", "color": "red"}, "1": {"text": "PRESENT", "color": "green"}}}]}, "overrides": []},
+      "options": {"colorMode": "background", "graphMode": "none", "justifyMode": "center", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value_and_name"}
+    },
+    {
+      "id": 5, "title": "Receiver Services", "type": "stat",
+      "gridPos": {"h": 5, "w": 24, "x": 0, "y": 6},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [{"refId": "A", "expr": "piaware_service_up{instance=\"piaware\"}", "legendFormat": "{{service}}", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "none", "decimals": 0, "min": 0, "max": 1, "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "red"}, {"color": "green", "value": 1}]}, "mappings": [{"type": "value", "options": {"0": {"text": "DOWN", "color": "red"}, "1": {"text": "UP", "color": "green"}}}]}, "overrides": []},
+      "options": {"colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "horizontal", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value_and_name", "wideLayout": true}
+    },
+    {
+      "id": 6, "title": "Aircraft Observed", "type": "timeseries",
+      "gridPos": {"h": 9, "w": 12, "x": 0, "y": 11},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [
+        {"refId": "A", "expr": "piaware_aircraft_visible{instance=\"piaware\"}", "legendFormat": "Current report", "range": true},
+        {"refId": "B", "expr": "piaware_aircraft_seen_60_seconds{instance=\"piaware\"}", "legendFormat": "Seen in 60 seconds", "range": true}
+      ],
+      "fieldConfig": {"defaults": {"unit": "short", "decimals": 0, "min": 0, "custom": {"drawStyle": "line", "fillOpacity": 18, "lineInterpolation": "smooth", "lineWidth": 2, "showPoints": "never", "spanNulls": true}}, "overrides": []},
+      "options": {"legend": {"calcs": ["lastNotNull", "min", "max"], "displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "multi", "sort": "desc"}}
+    },
+    {
+      "id": 7, "title": "Decoder Message Rate", "type": "timeseries",
+      "gridPos": {"h": 9, "w": 12, "x": 12, "y": 11},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [{"refId": "A", "expr": "rate(piaware_messages_total{instance=\"piaware\"}[5m])", "legendFormat": "Messages / second", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "ops", "decimals": 1, "min": 0, "custom": {"drawStyle": "line", "fillOpacity": 20, "lineInterpolation": "smooth", "lineWidth": 2, "showPoints": "never", "spanNulls": true}}, "overrides": []},
+      "options": {"legend": {"calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "single", "sort": "none"}}
+    },
+    {
+      "id": 8, "title": "Pi CPU Usage", "type": "timeseries",
+      "gridPos": {"h": 8, "w": 6, "x": 0, "y": 20},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [{"refId": "A", "expr": "100 - (avg(rate(node_cpu_seconds_total{instance=\"piaware\",mode=\"idle\"}[5m])) * 100)", "legendFormat": "CPU", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "percent", "decimals": 1, "min": 0, "max": 100, "custom": {"drawStyle": "line", "fillOpacity": 20, "lineWidth": 2, "showPoints": "never", "spanNulls": true}}, "overrides": []},
+      "options": {"legend": {"calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "single", "sort": "none"}}
+    },
+    {
+      "id": 9, "title": "Pi Memory Usage", "type": "timeseries",
+      "gridPos": {"h": 8, "w": 6, "x": 6, "y": 20},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [{"refId": "A", "expr": "100 * (1 - node_memory_MemAvailable_bytes{instance=\"piaware\"} / node_memory_MemTotal_bytes{instance=\"piaware\"})", "legendFormat": "Memory", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "percent", "decimals": 1, "min": 0, "max": 100, "custom": {"drawStyle": "line", "fillOpacity": 20, "lineWidth": 2, "showPoints": "never", "spanNulls": true}}, "overrides": []},
+      "options": {"legend": {"calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "single", "sort": "none"}}
+    },
+    {
+      "id": 10, "title": "Pi Root Filesystem", "type": "timeseries",
+      "gridPos": {"h": 8, "w": 6, "x": 12, "y": 20},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [{"refId": "A", "expr": "100 * (1 - node_filesystem_avail_bytes{instance=\"piaware\",mountpoint=\"/\",fstype!~\"tmpfs|overlay\"} / node_filesystem_size_bytes{instance=\"piaware\",mountpoint=\"/\",fstype!~\"tmpfs|overlay\"})", "legendFormat": "Disk used", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "percent", "decimals": 1, "min": 0, "max": 100, "custom": {"drawStyle": "line", "fillOpacity": 20, "lineWidth": 2, "showPoints": "never", "spanNulls": true}}, "overrides": []},
+      "options": {"legend": {"calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "single", "sort": "none"}}
+    },
+    {
+      "id": 11, "title": "Pi Temperature", "type": "timeseries",
+      "gridPos": {"h": 8, "w": 6, "x": 18, "y": 20},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [{"refId": "A", "expr": "max(node_hwmon_temp_celsius{instance=\"piaware\"})", "legendFormat": "Temperature", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "celsius", "decimals": 1, "min": 0, "custom": {"drawStyle": "line", "fillOpacity": 20, "lineWidth": 2, "showPoints": "never", "spanNulls": true}, "thresholds": {"mode": "absolute", "steps": [{"color": "green"}, {"color": "yellow", "value": 70}, {"color": "red", "value": 80}]}}, "overrides": []},
+      "options": {"legend": {"calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "single", "sort": "none"}}
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 41,
+  "tags": ["homelab", "adsb", "piaware", "prometheus"],
+  "templating": {"list": []},
+  "time": {"from": "now-6h", "to": "now"},
+  "timezone": "browser",
+  "title": "ADS-B Receiver",
+  "uid": "homelab-adsb",
+  "version": 1
+}

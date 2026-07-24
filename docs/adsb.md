@@ -67,3 +67,11 @@ curl --fail --silent \
 
 The Prometheus query should return `1`. Do not add location labels or
 per-aircraft fields to these metrics.
+
+## Grafana
+
+The provisioned **ADS-B Receiver** dashboard is available at
+`http://192.168.1.23:3001/d/homelab-adsb/ads-b-receiver`. It combines receiver
+freshness, aggregate aircraft and message activity, SDR and service state, and
+Pi host capacity. It deliberately has no map, coordinates, feeder identifier,
+aircraft identifiers, callsigns, positions, or tracks.

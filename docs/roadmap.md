@@ -218,7 +218,8 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [x] Verify local aircraft decoding and feed freshness before adding remote telemetry
 - [x] Install a constrained metrics exporter and monitor Pi host health, SDR connectivity, receiver processes, and feed freshness
 - [ ] Collect aircraft count, message rate, and reception-range metrics
-- [ ] Add an ADS-B collector plugin and a detailed Grafana dashboard without exposing receiver secrets or precise private location data
+- [x] Add a detailed Grafana dashboard without exposing receiver secrets, aircraft identities, or precise private location data
+- [ ] Integrate ADS-B through the generic collector plugin contract if durable storage or non-Prometheus consumers justify it
 - [ ] Document offline buffering, restart behavior, retention, and troubleshooting
 - [ ] Complete an outage and recovery exercise without affecting the controller node
 
