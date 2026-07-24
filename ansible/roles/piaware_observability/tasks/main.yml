@@ -85,6 +85,8 @@
       - /usr/local/sbin/piaware-export-metrics
       - --aircraft-json
       - "{{ piaware_aircraft_json }}"
+      - --country-ranges
+      - "{{ piaware_country_ranges }}"
       - --output
       - "{{ piaware_metrics_file }}"
   changed_when: true

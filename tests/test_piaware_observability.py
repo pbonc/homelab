@@ -89,6 +89,15 @@ class PiAwareObservabilityTests(unittest.TestCase):
         self.assertIn("OnUnitActiveSec=15s", timer)
         self.assertIn("Persistent=false", timer)
 
+    def test_service_and_immediate_collection_supply_country_ranges(self):
+        tasks = (ROLE / "tasks" / "main.yml").read_text(encoding="utf-8")
+        service = (
+            ROLE / "templates" / "piaware-metrics.service.j2"
+        ).read_text(encoding="utf-8")
+        self.assertIn("--country-ranges {{ piaware_country_ranges }}", service)
+        self.assertIn("- --country-ranges", tasks)
+        self.assertIn('- "{{ piaware_country_ranges }}"', tasks)
+
 
 if __name__ == "__main__":
     unittest.main()
