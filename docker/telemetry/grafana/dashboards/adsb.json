@@ -96,7 +96,7 @@
     },
     {
       "id": 12, "title": "Peak Aircraft in Selected Range", "type": "stat",
-      "gridPos": {"h": 6, "w": 4, "x": 0, "y": 28},
+      "gridPos": {"h": 8, "w": 4, "x": 0, "y": 28},
       "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
       "targets": [{"refId": "A", "expr": "max_over_time(piaware_aircraft_visible{instance=\"piaware\"}[$__range])", "legendFormat": "Peak", "instant": true, "range": false}],
       "fieldConfig": {"defaults": {"unit": "short", "decimals": 0, "min": 0, "color": {"mode": "fixed", "fixedColor": "green"}}, "overrides": []},
@@ -104,7 +104,7 @@
     },
     {
       "id": 13, "title": "Average Aircraft in Selected Range", "type": "stat",
-      "gridPos": {"h": 6, "w": 4, "x": 4, "y": 28},
+      "gridPos": {"h": 8, "w": 4, "x": 4, "y": 28},
       "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
       "targets": [{"refId": "A", "expr": "avg_over_time(piaware_aircraft_visible{instance=\"piaware\"}[$__range])", "legendFormat": "Average", "instant": true, "range": false}],
       "fieldConfig": {"defaults": {"unit": "short", "decimals": 1, "min": 0, "color": {"mode": "fixed", "fixedColor": "green"}}, "overrides": []},
@@ -127,7 +127,7 @@
       "options": {"displayMode": "basic", "minVizHeight": 20, "minVizWidth": 72, "namePlacement": "bottom", "orientation": "vertical", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "showUnfilled": true, "sizing": "manual", "valueMode": "text"}
     },
     {
-      "id": 16, "title": "Reception Range", "type": "timeseries",
+      "id": 16, "title": "Reception Range (Current)", "type": "stat",
       "gridPos": {"h": 8, "w": 12, "x": 0, "y": 36},
       "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
       "targets": [
@@ -135,8 +135,8 @@
         {"refId": "B", "expr": "piaware_reception_range_p95_nautical_miles{instance=\"piaware\"}", "legendFormat": "95th percentile", "range": true},
         {"refId": "C", "expr": "piaware_reception_range_median_nautical_miles{instance=\"piaware\"}", "legendFormat": "Median", "range": true}
       ],
-      "fieldConfig": {"defaults": {"unit": "suffix: nmi", "decimals": 1, "min": 0, "custom": {"drawStyle": "line", "fillOpacity": 15, "lineInterpolation": "smooth", "lineWidth": 2, "showPoints": "never", "spanNulls": true}}, "overrides": []},
-      "options": {"legend": {"calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "multi", "sort": "desc"}}
+      "fieldConfig": {"defaults": {"unit": "suffix: nmi", "decimals": 1, "min": 0, "color": {"mode": "fixed", "fixedColor": "blue"}}, "overrides": []},
+      "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "center", "orientation": "horizontal", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "text": {"titleSize": 12, "valueSize": 26}, "textMode": "value_and_name", "wideLayout": true}
     },
     {
       "id": 17, "title": "Peak Range in Selected Range", "type": "stat",

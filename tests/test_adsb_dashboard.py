@@ -31,6 +31,25 @@ class AdsbDashboardTests(unittest.TestCase):
             self.assertEqual(panel["options"]["sizing"], "manual")
             self.assertIn("sort_desc(", panel["targets"][0]["expr"])
 
+        panels = {panel["title"]: panel for panel in dashboard["panels"]}
+        category_row = (
+            panels["Peak Aircraft in Selected Range"],
+            panels["Average Aircraft in Selected Range"],
+            panels["Registration Countries (Current)"],
+            panels["Inferred Operators (Current)"],
+        )
+        self.assertEqual({panel["gridPos"]["h"] for panel in category_row}, {8})
+
+        reception = panels["Reception Range (Current)"]
+        self.assertEqual(reception["type"], "stat")
+        self.assertEqual(reception["gridPos"]["h"], 8)
+        self.assertEqual(reception["options"]["orientation"], "horizontal")
+        self.assertEqual(reception["options"]["textMode"], "value_and_name")
+        self.assertEqual(
+            {target["legendFormat"] for target in reception["targets"]},
+            {"Maximum", "95th percentile", "Median"},
+        )
+
         encoded = json.dumps(dashboard).lower()
         for metric in (
             "piaware_aircraft_visible",
