@@ -4,7 +4,7 @@ SHELL := /usr/bin/env bash
 # CI portability note:
 # GitHub Actions, GitLab CI, and Jenkins should call these same Make targets.
 
-.PHONY: help doctor status lint test telemetry-test telemetry-run telemetry-secrets telemetry-config security-test security-secrets security-config observability-config observability-up observability-down study-test study-config study-up study-down ansible-inventory ansible-ping ansible-check ansible-bootstrap-check ansible-bootstrap ansible-vault-create ansible-vault-edit ansible-vault-view bootstrap docker-up docker-down homepage-validate homepage-deploy homepage-verify homepage-rollback
+.PHONY: help doctor status lint test telemetry-test telemetry-run telemetry-secrets telemetry-config security-test security-secrets security-config observability-config observability-up observability-down study-test study-config study-up study-down ansible-inventory ansible-ping ansible-check ansible-bootstrap-check ansible-bootstrap ansible-vault-create ansible-vault-edit ansible-vault-view backup-init backup-run backup-check backup-snapshots backup-restore-test backup-prune bootstrap docker-up docker-down homepage-validate homepage-deploy homepage-verify homepage-rollback
 
 help: ## Show available targets
 >@awk 'BEGIN {FS = ":.*##"; printf "\nAvailable targets:\n"} /^[a-zA-Z0-9_.-]+:.*##/ {printf "  %-14s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -94,6 +94,24 @@ ansible-vault-edit: ## Edit the ignored production variable vault interactively
 
 ansible-vault-view: ## View the ignored production variable vault
 >@ANSIBLE_CONFIG="$(CURDIR)/ansible/ansible.cfg" ansible-vault view ansible/inventories/production/group_vars/all/vault.yml
+
+backup-init: ## Initialize the encrypted workstation Restic repository once
+>@bash scripts/homelab_backup.sh init
+
+backup-run: ## Export and encrypt all irreplaceable homelab state
+>@bash scripts/homelab_backup.sh backup
+
+backup-check: ## Verify a subset of encrypted repository data
+>@bash scripts/homelab_backup.sh check
+
+backup-snapshots: ## List encrypted homelab snapshots
+>@bash scripts/homelab_backup.sh snapshots
+
+backup-restore-test: ## Restore and validate every encrypted backup data class
+>@bash scripts/homelab_backup.sh restore-test
+
+backup-prune: ## Apply retention and reclaim repository space
+>@bash scripts/homelab_backup.sh prune
 
 homepage-validate: ## Validate Homepage source and Compose configuration
 >@python3 -u scripts/homepage_release.py validate

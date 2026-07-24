@@ -121,6 +121,32 @@ class AnsibleLayoutTests(unittest.TestCase):
         self.assertNotIn("StrictHostKeyChecking=no", runbook)
         self.assertNotIn("flightaware", runbook.lower())
 
+    def test_backup_job_encrypts_before_windows_storage(self):
+        script = (ROOT / "scripts" / "homelab_backup.sh").read_text(encoding="utf-8")
+        scheduler = (
+            ROOT / "scripts" / "install_backup_task.ps1"
+        ).read_text(encoding="utf-8")
+        docs = (ROOT / "docs" / "backups.md").read_text(encoding="utf-8")
+        self.assertIn("/mnt/c/Users/darji/HomelabBackups/restic", script)
+        self.assertIn("restic backup", script)
+        self.assertIn("influx backup", script)
+        self.assertIn("/api/progress/export", script)
+        self.assertIn("restore-test", script)
+        self.assertIn("restic restore latest", script)
+        self.assertIn(
+            "http://192.168.1.23:8020/api/progress/export",
+            script,
+        )
+        self.assertIn("var/cache/piaware/feeder_id", script)
+        self.assertIn("--keep-daily 7", script)
+        self.assertNotIn("StrictHostKeyChecking=no", script)
+        self.assertNotIn("RESTIC_PASSWORD=", script)
+        self.assertIn("No plaintext database export", docs)
+        self.assertIn("New-ScheduledTaskTrigger -Daily", scheduler)
+        self.assertIn("StartWhenAvailable", scheduler)
+        self.assertIn("make backup-run", scheduler)
+        self.assertIn("Interactive", scheduler)
+
 
 if __name__ == "__main__":
     unittest.main()
