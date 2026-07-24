@@ -1,0 +1,2 @@
+# Managed by Ansible. Exposed only on the receiver's trusted LAN address.
+ARGS="--web.listen-address={{ piaware_node_exporter_address }}:{{ piaware_node_exporter_port }} --collector.textfile.directory={{ piaware_textfile_directory }}"

@@ -1,0 +1,15 @@
+[Unit]
+Description=Export privacy-safe aggregate PiAware metrics
+After=dump1090-fa.service
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+ExecStart=/usr/local/sbin/piaware-export-metrics --aircraft-json {{ piaware_aircraft_json }} --output {{ piaware_metrics_file }}
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths={{ piaware_textfile_directory }}
+

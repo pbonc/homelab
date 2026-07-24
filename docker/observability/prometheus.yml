@@ -20,6 +20,14 @@ scrape_configs:
         labels:
           instance: brain
 
+  - job_name: piaware-node
+    static_configs:
+      - targets:
+          - 192.168.1.27:9100
+        labels:
+          instance: piaware
+          role: adsb-edge
+
   - job_name: telemetry-collector
     metrics_path: /metrics
     static_configs:

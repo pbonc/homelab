@@ -1,0 +1,109 @@
+---
+- name: Verify the PiAware observability target
+  ansible.builtin.assert:
+    that:
+      - ansible_facts["hostname"] == "piaware"
+      - piaware_node_exporter_address == "192.168.1.27"
+      - piaware_node_exporter_address != "192.168.1.23"
+    fail_msg: >-
+      Refusing to install PiAware observability anywhere except the
+      inventory-managed piaware receiver at 192.168.1.27.
+
+- name: Check whether Node Exporter is already installed
+  ansible.builtin.command:
+    argv:
+      - dpkg-query
+      - --show
+      - "{{ piaware_node_exporter_package }}"
+  register: piaware_exporter_before
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: Install the packaged Node Exporter
+  ansible.builtin.apt:
+    name: "{{ piaware_node_exporter_package }}"
+    state: present
+    update_cache: true
+
+- name: Create the Node Exporter textfile directory
+  ansible.builtin.file:
+    path: "{{ piaware_textfile_directory }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Install the aggregate PiAware metrics collector
+  ansible.builtin.template:
+    src: piaware-export-metrics.py.j2
+    dest: /usr/local/sbin/piaware-export-metrics
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Bind Node Exporter to the Pi LAN address
+  ansible.builtin.template:
+    src: prometheus-node-exporter.default.j2
+    dest: /etc/default/prometheus-node-exporter
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart PiAware Node Exporter
+
+- name: Install the PiAware metrics service
+  ansible.builtin.template:
+    src: piaware-metrics.service.j2
+    dest: /etc/systemd/system/piaware-metrics.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload PiAware systemd units
+
+- name: Install the PiAware metrics timer
+  ansible.builtin.template:
+    src: piaware-metrics.timer.j2
+    dest: /etc/systemd/system/piaware-metrics.timer
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Reload PiAware systemd units
+
+- name: Apply unit changes before enabling services
+  ansible.builtin.meta: flush_handlers
+
+- name: Enable and start Node Exporter
+  ansible.builtin.systemd_service:
+    name: prometheus-node-exporter
+    enabled: true
+    state: started
+  when: not ansible_check_mode or piaware_exporter_before.rc == 0
+
+- name: Generate the first aggregate metrics file
+  ansible.builtin.command:
+    argv:
+      - /usr/local/sbin/piaware-export-metrics
+      - --aircraft-json
+      - "{{ piaware_aircraft_json }}"
+      - --output
+      - "{{ piaware_metrics_file }}"
+  changed_when: true
+  when: not ansible_check_mode
+
+- name: Enable the aggregate metrics timer
+  ansible.builtin.systemd_service:
+    name: piaware-metrics.timer
+    enabled: true
+    state: started
+    daemon_reload: true
+  when: not ansible_check_mode
+
+- name: Explain first-run check-mode service deferral
+  ansible.builtin.debug:
+    msg: >-
+      Service activation is deferred in this preview because Node Exporter
+      is not installed yet. Apply the playbook, then run check mode again
+      to prove idempotence.
+  when:
+    - ansible_check_mode
+    - piaware_exporter_before.rc != 0

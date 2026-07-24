@@ -1,0 +1,105 @@
+#!/usr/bin/env python3
+"""Export aggregate receiver metrics without aircraft or location identifiers."""
+
+import argparse
+import json
+import os
+import subprocess
+import tempfile
+import time
+from pathlib import Path
+
+
+SERVICES = ("piaware", "dump1090-fa", "lighttpd")
+
+
+def service_up(name):
+    result = subprocess.run(
+        ["systemctl", "is-active", "--quiet", name],
+        check=False,
+    )
+    return 1 if result.returncode == 0 else 0
+
+
+def sdr_present():
+    for vendor_file in Path("/sys/bus/usb/devices").glob("*/idVendor"):
+        product_file = vendor_file.with_name("idProduct")
+        try:
+            if (
+                vendor_file.read_text(encoding="ascii").strip().lower() == "0bda"
+                and product_file.read_text(encoding="ascii").strip().lower() == "2832"
+            ):
+                return 1
+        except OSError:
+            continue
+    return 0
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--aircraft-json", required=True)
+    parser.add_argument("--output", required=True)
+    args = parser.parse_args()
+
+    source = Path(args.aircraft_json)
+    with source.open(encoding="utf-8") as handle:
+        report = json.load(handle)
+
+    aircraft = report.get("aircraft", [])
+    now = time.time()
+    generated = float(report["now"])
+    seen_60 = sum(
+        1
+        for item in aircraft
+        if isinstance(item.get("seen"), (int, float)) and item["seen"] <= 60
+    )
+
+    lines = [
+        "# HELP piaware_feed_report_age_seconds Age of the latest decoder report.",
+        "# TYPE piaware_feed_report_age_seconds gauge",
+        f"piaware_feed_report_age_seconds {max(0.0, now - generated):.3f}",
+        "# HELP piaware_aircraft_visible Aircraft present in the latest aggregate report.",
+        "# TYPE piaware_aircraft_visible gauge",
+        f"piaware_aircraft_visible {len(aircraft)}",
+        "# HELP piaware_aircraft_seen_60_seconds Aircraft observed during the last minute.",
+        "# TYPE piaware_aircraft_seen_60_seconds gauge",
+        f"piaware_aircraft_seen_60_seconds {seen_60}",
+        "# HELP piaware_messages_total Decoder messages processed since service start.",
+        "# TYPE piaware_messages_total counter",
+        f"piaware_messages_total {int(report.get('messages', 0))}",
+        "# HELP piaware_sdr_present Whether the expected RTL2832U receiver is attached.",
+        "# TYPE piaware_sdr_present gauge",
+        f"piaware_sdr_present {sdr_present()}",
+    ]
+    for service in SERVICES:
+        lines.extend(
+            [
+                f'piaware_service_up{{service="{service}"}} {service_up(service)}',
+            ]
+        )
+    lines.extend(
+        [
+            "# HELP piaware_metrics_generated_timestamp_seconds Collector generation time.",
+            "# TYPE piaware_metrics_generated_timestamp_seconds gauge",
+            f"piaware_metrics_generated_timestamp_seconds {now:.3f}",
+            "",
+        ]
+    )
+
+    destination = Path(args.output)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(
+        mode="w",
+        encoding="utf-8",
+        dir=destination.parent,
+        prefix=".piaware.",
+        delete=False,
+    ) as handle:
+        handle.write("\n".join(lines))
+        temporary = handle.name
+    os.chmod(temporary, 0o644)
+    os.replace(temporary, destination)
+
+
+if __name__ == "__main__":
+    main()
