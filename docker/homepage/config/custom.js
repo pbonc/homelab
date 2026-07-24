@@ -20,6 +20,10 @@
 	const WEATHER_REFRESH_MS = 300000;
 	const STUDY_URL = "http://192.168.1.23:8020/api/progress";
 	const STUDY_REFRESH_MS = 60000;
+	const PROMETHEUS_URL = "http://192.168.1.23:9090/api/v1/query";
+	const PIAWARE_REFRESH_MS = 30000;
+	const PIAWARE_QUERY =
+		'{__name__=~"piaware_aircraft_visible|piaware_feed_report_age_seconds|piaware_reception_range_max_nautical_miles",instance="piaware"}';
 	const RESOURCE_GROUPS = [
 		{
 			name: "Live views",
@@ -55,8 +59,6 @@
 
 	let missingSince = null;
 	let unavailableTimer = null;
-	let piawareMissingSince = null;
-	let piawareUnavailableTimer = null;
 	let updateQueued = false;
 
 	function serviceCard(name) {
@@ -91,11 +93,6 @@
 
 		const totalBytes = bytes(total[1], total[2]);
 		return totalBytes > 0 ? (bytes(used[1], used[2]) / totalBytes) * 100 : null;
-	}
-
-	function metricNumber(text, label) {
-		const match = text.match(new RegExp(`${label}\\s*(\\d+(?:\\.\\d+)?)`, "i"));
-		return match ? Number(match[1]) : null;
 	}
 
 	function setBadge(card, state, label) {
@@ -201,51 +198,78 @@
 		}
 	}
 
-	function updatePiawareHealth() {
+	function renderPiawareMetrics(card, values) {
+		let metrics = card.querySelector(".piaware-metrics");
+		if (!metrics) {
+			metrics = document.createElement("div");
+			metrics.className = "piaware-metrics";
+			card.appendChild(metrics);
+		}
+
+		const fields = [
+			["Aircraft", Math.round(values.aircraft).toLocaleString()],
+			["Feed age", `${Math.round(values.feedAge)} s`],
+			["Range", `${Math.round(values.range)} nmi`],
+		];
+		metrics.replaceChildren(
+			...fields.map(([label, value]) => {
+				const field = document.createElement("span");
+				field.className = "piaware-metric";
+				const labelNode = document.createElement("small");
+				labelNode.textContent = label;
+				const valueNode = document.createElement("strong");
+				valueNode.textContent = value;
+				field.append(labelNode, valueNode);
+				return field;
+			}),
+		);
+	}
+
+	async function refreshPiaware() {
 		const card = serviceCard("piaware");
 		if (!card) {
+			window.setTimeout(refreshPiaware, PIAWARE_REFRESH_MS);
 			return;
 		}
 
-		const text = card.textContent.replace(/\s+/g, " ");
-		const aircraft = metricNumber(text, "Aircraft");
-		const feedAge = metricNumber(text, "Feed Age");
-		const range = metricNumber(text, "Range");
-
-		if (aircraft === null || feedAge === null || range === null) {
-			if (piawareMissingSince === null) {
-				piawareMissingSince = Date.now();
+		try {
+			const url = new URL(PROMETHEUS_URL);
+			url.searchParams.set("query", PIAWARE_QUERY);
+			const response = await fetch(url, { cache: "no-store" });
+			if (!response.ok) throw new Error(`HTTP ${response.status}`);
+			const payload = await response.json();
+			if (payload.status !== "success" || !Array.isArray(payload.data?.result)) {
+				throw new Error("invalid Prometheus response");
 			}
-			const missingFor = Date.now() - piawareMissingSince;
-			if (missingFor >= UNAVAILABLE_AFTER_MS) {
-				setBadge(card, "unavailable", "Unavailable");
+
+			const metrics = Object.fromEntries(
+				payload.data.result.map((item) => [
+					item.metric?.__name__,
+					Number(item.value?.[1]),
+				]),
+			);
+			const values = {
+				aircraft: metrics.piaware_aircraft_visible,
+				feedAge: metrics.piaware_feed_report_age_seconds,
+				range: metrics.piaware_reception_range_max_nautical_miles,
+			};
+			if (Object.values(values).some((value) => !Number.isFinite(value))) {
+				throw new Error("missing PiAware metrics");
+			}
+
+			renderPiawareMetrics(card, values);
+			if (values.feedAge >= PIAWARE_THRESHOLDS.criticalAgeSeconds) {
+				setBadge(card, "critical", `Stale: ${Math.round(values.feedAge)}s`);
+			} else if (values.feedAge >= PIAWARE_THRESHOLDS.warningAgeSeconds) {
+				setBadge(card, "warning", `Delayed: ${Math.round(values.feedAge)}s`);
 			} else {
-				if (!card.dataset.health) {
-					setBadge(card, "checking", "Checking");
-				}
-				if (piawareUnavailableTimer === null) {
-					piawareUnavailableTimer = window.setTimeout(() => {
-						piawareUnavailableTimer = null;
-						scheduleUpdate();
-					}, UNAVAILABLE_AFTER_MS - missingFor);
-				}
+				setBadge(card, "active", "Active");
 			}
-			return;
+		} catch (_error) {
+			card.querySelector(".piaware-metrics")?.remove();
+			setBadge(card, "unavailable", "Unavailable");
 		}
-
-		piawareMissingSince = null;
-		if (piawareUnavailableTimer !== null) {
-			window.clearTimeout(piawareUnavailableTimer);
-			piawareUnavailableTimer = null;
-		}
-
-		if (feedAge >= PIAWARE_THRESHOLDS.criticalAgeSeconds) {
-			setBadge(card, "critical", `Stale: ${Math.round(feedAge)}s`);
-		} else if (feedAge >= PIAWARE_THRESHOLDS.warningAgeSeconds) {
-			setBadge(card, "warning", `Delayed: ${Math.round(feedAge)}s`);
-		} else {
-			setBadge(card, "active", "Active");
-		}
+		window.setTimeout(refreshPiaware, PIAWARE_REFRESH_MS);
 	}
 
 	function markLifecycleCards() {
@@ -383,7 +407,6 @@
 			weatherBanner();
 			markLifecycleCards();
 			updateBrainHealth();
-			updatePiawareHealth();
 		});
 	}
 
@@ -391,6 +414,7 @@
 		scheduleUpdate();
 		refreshWeather();
 		refreshStudy();
+		refreshPiaware();
 		new MutationObserver(scheduleUpdate).observe(document.body, { childList: true, subtree: true, characterData: true });
 	}
 
