@@ -132,6 +132,9 @@ piaware_metrics_generated_timestamp_seconds 1784919545
             mock_urlopen.call_args.args[0].headers["Accept"],
             "text/plain",
         )
+        response.read.assert_called_once_with(
+            status.PIAWARE_METRICS_RESPONSE_MAX_BYTES + 1
+        )
 
     @patch("labctl.commands.status.time.perf_counter", side_effect=[1.0, 1.01])
     @patch("labctl.commands.status.urlopen")

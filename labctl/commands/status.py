@@ -16,6 +16,8 @@ VALID_STATUSES = {"healthy", "degraded", "stale", "unavailable", "failed"}
 EXIT_CODES = {"healthy": 0, "unavailable": 0, "degraded": 1, "stale": 1, "failed": 2}
 HTTP_WARNING_MS = 500.0
 HTTP_TIMEOUT_SECONDS = 3.0
+HTTP_RESPONSE_MAX_BYTES = 65536
+PIAWARE_METRICS_RESPONSE_MAX_BYTES = 2 * 1024 * 1024
 TELEMETRY_STALE_SECONDS = 180.0
 PIAWARE_STALE_SECONDS = 60.0
 
@@ -201,7 +203,12 @@ def _http_probe(url: str, kind: str, now: datetime | None = None) -> dict[str, o
     request = Request(url, headers={"Accept": accept, "User-Agent": "labctl/1"})
     try:
         with urlopen(request, timeout=HTTP_TIMEOUT_SECONDS) as response:
-            body = response.read(65536).decode("utf-8", "replace")
+            body_limit = (
+                PIAWARE_METRICS_RESPONSE_MAX_BYTES
+                if kind == "piaware"
+                else HTTP_RESPONSE_MAX_BYTES
+            )
+            raw_body = response.read(body_limit + 1)
             code = response.status
     except HTTPError as exc:
         return {"status": "failed", "summary": f"HTTP {exc.code}", "http_status": exc.code}
@@ -209,6 +216,14 @@ def _http_probe(url: str, kind: str, now: datetime | None = None) -> dict[str, o
         return {"status": "failed", "summary": type(exc).__name__, "http_status": None}
 
     latency_ms = round((time.perf_counter() - started) * 1000, 1)
+    if len(raw_body) > body_limit:
+        return {
+            "status": "failed",
+            "summary": f"HTTP response exceeds {body_limit} bytes",
+            "http_status": code,
+            "latency_ms": latency_ms,
+        }
+    body = raw_body.decode("utf-8", "replace")
     status = "degraded" if latency_ms > HTTP_WARNING_MS else "healthy"
     summary = f"HTTP {code} in {latency_ms:.1f} ms"
     payload: object = None
