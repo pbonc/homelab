@@ -21,6 +21,7 @@ class PiAwareObservabilityTests(unittest.TestCase):
             ROLE / "templates" / "piaware-export-metrics.py.j2"
         ).read_text(encoding="utf-8")
         compile(collector, "piaware-export-metrics", "exec")
+        self.assertNotIn("{{", collector)
         expected = (
             "piaware_feed_report_age_seconds",
             "piaware_aircraft_visible",

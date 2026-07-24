@@ -74,7 +74,10 @@ def main():
     for service in SERVICES:
         lines.extend(
             [
-                f'piaware_service_up{{service="{service}"}} {service_up(service)}',
+                'piaware_service_up{service="'
+                + service
+                + '"} '
+                + str(service_up(service)),
             ]
         )
     lines.extend(
