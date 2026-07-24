@@ -23,7 +23,10 @@
 	const PROMETHEUS_URL = "http://192.168.1.23:9090/api/v1/query";
 	const PIAWARE_REFRESH_MS = 30000;
 	const PIAWARE_QUERY =
-		'{__name__=~"piaware_aircraft_visible|piaware_feed_report_age_seconds|piaware_reception_range_max_nautical_miles",instance="piaware"}';
+		'{__name__=~"piaware_aircraft_visible|piaware_feed_report_age_seconds|piaware_reception_range_max_nautical_miles",instance="piaware"}' +
+		' or label_replace(100 - avg(rate(node_cpu_seconds_total{instance="piaware",mode="idle"}[5m])) * 100, "stat", "cpu", "", "")' +
+		' or label_replace((1 - node_memory_MemAvailable_bytes{instance="piaware"} / node_memory_MemTotal_bytes{instance="piaware"}) * 100, "stat", "memory", "", "")' +
+		' or node_uname_info{instance="piaware"}';
 	const RESOURCE_GROUPS = [
 		{
 			name: "Live views",
@@ -199,6 +202,25 @@
 	}
 
 	function renderPiawareMetrics(card, values) {
+		let hardware = card.querySelector(".piaware-hardware");
+		if (!hardware) {
+			hardware = document.createElement("div");
+			hardware.className = "piaware-hardware";
+			card.appendChild(hardware);
+		}
+		hardware.replaceChildren(
+			Object.assign(document.createElement("span"), {
+				className: "piaware-os",
+				textContent: `${values.osName} ${values.osRelease}`,
+			}),
+			Object.assign(document.createElement("span"), {
+				textContent: `CPU ${values.cpu.toFixed(1)}%`,
+			}),
+			Object.assign(document.createElement("span"), {
+				textContent: `Mem ${values.memory.toFixed(1)}%`,
+			}),
+		);
+
 		let metrics = card.querySelector(".piaware-metrics");
 		if (!metrics) {
 			metrics = document.createElement("div");
@@ -243,17 +265,32 @@
 			}
 
 			const metrics = Object.fromEntries(
-				payload.data.result.map((item) => [
-					item.metric?.__name__,
-					Number(item.value?.[1]),
-				]),
+				payload.data.result
+					.filter((item) => item.metric?.__name__?.startsWith("piaware_"))
+					.map((item) => [
+						item.metric.__name__,
+						Number(item.value?.[1]),
+					]),
 			);
+			const cpu = payload.data.result.find((item) => item.metric?.stat === "cpu");
+			const memory = payload.data.result.find((item) => item.metric?.stat === "memory");
+			const uname = payload.data.result.find((item) => item.metric?.__name__ === "node_uname_info");
 			const values = {
 				aircraft: metrics.piaware_aircraft_visible,
 				feedAge: metrics.piaware_feed_report_age_seconds,
 				range: metrics.piaware_reception_range_max_nautical_miles,
+				cpu: Number(cpu?.value?.[1]),
+				memory: Number(memory?.value?.[1]),
+				osName: uname?.metric?.sysname,
+				osRelease: uname?.metric?.release,
 			};
-			if (Object.values(values).some((value) => !Number.isFinite(value))) {
+			if (
+				[values.aircraft, values.feedAge, values.range, values.cpu, values.memory].some(
+					(value) => !Number.isFinite(value),
+				) ||
+				!values.osName ||
+				!values.osRelease
+			) {
 				throw new Error("missing PiAware metrics");
 			}
 
@@ -266,6 +303,7 @@
 				setBadge(card, "active", "Active");
 			}
 		} catch (_error) {
+			card.querySelector(".piaware-hardware")?.remove();
 			card.querySelector(".piaware-metrics")?.remove();
 			setBadge(card, "unavailable", "Unavailable");
 		}

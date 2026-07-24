@@ -26,6 +26,10 @@ class HomepagePiAwareTests(unittest.TestCase):
         self.assertIn("piaware_aircraft_visible", custom)
         self.assertIn("piaware_feed_report_age_seconds", custom)
         self.assertIn("piaware_reception_range_max_nautical_miles", custom)
+        self.assertIn("node_cpu_seconds_total", custom)
+        self.assertIn("node_memory_MemAvailable_bytes", custom)
+        self.assertIn("node_uname_info", custom)
+        self.assertIn("piaware-hardware", custom)
         self.assertIn("renderPiawareMetrics(card, values)", custom)
 
     def test_piaware_reuses_brain_health_states_and_badge(self):
