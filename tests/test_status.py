@@ -100,6 +100,67 @@ class StatusTests(unittest.TestCase):
         self.assertEqual(result["status"], "stale")
         self.assertEqual(result["latency_ms"], 10.0)
 
+    @patch("labctl.commands.status.time.perf_counter", side_effect=[1.0, 1.01])
+    @patch("labctl.commands.status.urlopen")
+    def test_http_probe_validates_piaware_freshness_and_dependencies(
+        self,
+        mock_urlopen: MagicMock,
+        _mock_clock: MagicMock,
+    ) -> None:
+        response = MagicMock()
+        response.status = 200
+        response.read.return_value = b"""
+piaware_feed_report_age_seconds 2
+piaware_aircraft_visible 41
+piaware_aircraft_seen_60_seconds 35
+piaware_messages_total 12345
+piaware_sdr_present 1
+piaware_service_up{service="piaware"} 1
+piaware_service_up{service="dump1090-fa"} 1
+piaware_service_up{service="lighttpd"} 1
+piaware_metrics_generated_timestamp_seconds 1784919545
+"""
+        mock_urlopen.return_value.__enter__.return_value = response
+        result = status._http_probe(
+            "http://192.168.1.27:9100/metrics",
+            "piaware",
+            now=datetime.fromtimestamp(1784919549, UTC),
+        )
+        self.assertEqual(result["status"], "healthy")
+        self.assertIn("41 aircraft", result["summary"])
+        self.assertEqual(
+            mock_urlopen.call_args.args[0].headers["Accept"],
+            "text/plain",
+        )
+
+    @patch("labctl.commands.status.time.perf_counter", side_effect=[1.0, 1.01])
+    @patch("labctl.commands.status.urlopen")
+    def test_http_probe_marks_stale_piaware_report(
+        self,
+        mock_urlopen: MagicMock,
+        _mock_clock: MagicMock,
+    ) -> None:
+        response = MagicMock()
+        response.status = 200
+        response.read.return_value = b"""
+piaware_feed_report_age_seconds 61
+piaware_aircraft_visible 0
+piaware_aircraft_seen_60_seconds 0
+piaware_messages_total 12345
+piaware_sdr_present 1
+piaware_service_up{service="piaware"} 1
+piaware_service_up{service="dump1090-fa"} 1
+piaware_service_up{service="lighttpd"} 1
+piaware_metrics_generated_timestamp_seconds 1784919549
+"""
+        mock_urlopen.return_value.__enter__.return_value = response
+        result = status._http_probe(
+            "http://192.168.1.27:9100/metrics",
+            "piaware",
+            now=datetime.fromtimestamp(1784919549, UTC),
+        )
+        self.assertEqual(result["status"], "stale")
+
     def test_overall_status_uses_criticality_and_explicit_unavailable(self) -> None:
         unavailable = status._check(
             "docker.service", "runtime", "critical", "unavailable", "unsupported", "now"
@@ -177,7 +238,7 @@ class StatusTests(unittest.TestCase):
         self.assertEqual(payload["schema_version"], "1.0.0")
         self.assertEqual(payload["generated_at"], "2026-07-17T12:30:00+00:00")
         self.assertEqual(payload["overall_status"], "healthy")
-        self.assertEqual(len(payload["checks"]), 19)
+        self.assertEqual(len(payload["checks"]), 20)
         self.assertTrue(all(check["observed_at"] == payload["generated_at"] for check in payload["checks"]))
 
     def test_exit_codes_only_fail_on_confirmed_actionable_states(self) -> None:

@@ -17,6 +17,7 @@ EXIT_CODES = {"healthy": 0, "unavailable": 0, "degraded": 1, "stale": 1, "failed
 HTTP_WARNING_MS = 500.0
 HTTP_TIMEOUT_SECONDS = 3.0
 TELEMETRY_STALE_SECONDS = 180.0
+PIAWARE_STALE_SECONDS = 60.0
 
 CONTAINERS = (
     ("homepage.container", "homepage", "critical"),
@@ -38,6 +39,7 @@ ENDPOINTS = (
     ("telemetry.grafana.http", "http://127.0.0.1:3001/api/health", "important", "grafana"),
     ("study.deck.http", "http://192.168.1.23:8020/api/health", "informational", "study"),
     ("observability.loki.http", "http://192.168.1.23:3100/ready", "important", "loki"),
+    ("adsb.piaware.metrics", "http://192.168.1.27:9100/metrics", "important", "piaware"),
 )
 
 
@@ -195,7 +197,8 @@ def _runner_status() -> dict[str, str]:
 
 def _http_probe(url: str, kind: str, now: datetime | None = None) -> dict[str, object]:
     started = time.perf_counter()
-    request = Request(url, headers={"Accept": "application/json", "User-Agent": "labctl/1"})
+    accept = "text/plain" if kind == "piaware" else "application/json"
+    request = Request(url, headers={"Accept": accept, "User-Agent": "labctl/1"})
     try:
         with urlopen(request, timeout=HTTP_TIMEOUT_SECONDS) as response:
             body = response.read(65536).decode("utf-8", "replace")
@@ -243,6 +246,58 @@ def _http_probe(url: str, kind: str, now: datetime | None = None) -> dict[str, o
             status = "stale"
         elif payload.get("status") == "unavailable":
             status = "degraded"
+    elif kind == "piaware":
+        samples: dict[str, float] = {}
+        for line in body.splitlines():
+            if not line or line.startswith("#"):
+                continue
+            fields = line.rsplit(None, 1)
+            if len(fields) != 2:
+                continue
+            try:
+                samples[fields[0]] = float(fields[1])
+            except ValueError:
+                continue
+
+        required = (
+            "piaware_feed_report_age_seconds",
+            "piaware_aircraft_visible",
+            "piaware_aircraft_seen_60_seconds",
+            "piaware_messages_total",
+            "piaware_sdr_present",
+            "piaware_metrics_generated_timestamp_seconds",
+            'piaware_service_up{service="piaware"}',
+            'piaware_service_up{service="dump1090-fa"}',
+            'piaware_service_up{service="lighttpd"}',
+        )
+        missing = [name for name in required if name not in samples]
+        if missing:
+            status = "failed"
+            summary += f"; missing {len(missing)} required metrics"
+        else:
+            current_time = (now or datetime.now(UTC)).timestamp()
+            report_age = max(0.0, samples["piaware_feed_report_age_seconds"])
+            collector_age = max(
+                0.0,
+                current_time - samples["piaware_metrics_generated_timestamp_seconds"],
+            )
+            aircraft = max(0, round(samples["piaware_aircraft_visible"]))
+            failed_services = [
+                name
+                for name in ("piaware", "dump1090-fa", "lighttpd")
+                if samples[f'piaware_service_up{{service="{name}"}}'] != 1
+            ]
+            if samples["piaware_sdr_present"] != 1 or failed_services:
+                status = "failed"
+            elif (
+                report_age > PIAWARE_STALE_SECONDS
+                or collector_age > PIAWARE_STALE_SECONDS
+            ):
+                status = "stale"
+            summary += (
+                f"; {aircraft} aircraft; report age {round(report_age)} s; "
+                f"collector age {round(collector_age)} s"
+            )
 
     return {
         "status": status,
