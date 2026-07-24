@@ -14,6 +14,8 @@ class HomepagePiAwareTests(unittest.TestCase):
             "\n- Deployed Services:",
             1,
         )[0]
+        self.assertIn("\n        widget:\n", piaware)
+        self.assertNotIn("\n        widgets:\n", piaware)
         self.assertIn("type: prometheusmetric", piaware)
         self.assertIn("url: http://192.168.1.23:9090", piaware)
         self.assertIn('piaware_aircraft_visible{instance="piaware"}', piaware)

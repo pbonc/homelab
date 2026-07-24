@@ -27,31 +27,31 @@
         target: _blank
         siteMonitor: http://192.168.1.27/skyaware/
         description: "Live | ADS-B receiver and local aircraft map"
-        widgets:
-          - type: prometheusmetric
-            url: http://192.168.1.23:9090
-            refreshInterval: 30000
-            metrics:
-              - label: Aircraft
-                query: piaware_aircraft_visible{instance="piaware"}
-                format:
-                  type: number
-                  options:
-                    maximumFractionDigits: 0
-              - label: Feed Age
-                query: piaware_feed_report_age_seconds{instance="piaware"}
-                format:
-                  type: number
-                  suffix: " s"
-                  options:
-                    maximumFractionDigits: 0
-              - label: Range
-                query: piaware_reception_range_max_nautical_miles{instance="piaware"}
-                format:
-                  type: number
-                  suffix: " nmi"
-                  options:
-                    maximumFractionDigits: 0
+        widget:
+          type: prometheusmetric
+          url: http://192.168.1.23:9090
+          refreshInterval: 30000
+          metrics:
+            - label: Aircraft
+              query: piaware_aircraft_visible{instance="piaware"}
+              format:
+                type: number
+                options:
+                  maximumFractionDigits: 0
+            - label: Feed Age
+              query: piaware_feed_report_age_seconds{instance="piaware"}
+              format:
+                type: number
+                suffix: " s"
+                options:
+                  maximumFractionDigits: 0
+            - label: Range
+              query: piaware_reception_range_max_nautical_miles{instance="piaware"}
+              format:
+                type: number
+                suffix: " nmi"
+                options:
+                  maximumFractionDigits: 0
 
 - Deployed Services:
     - Homepage:
