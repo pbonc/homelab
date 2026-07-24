@@ -26,6 +26,10 @@ class AdsbDashboardTests(unittest.TestCase):
             "node_cpu_seconds_total",
             "node_memory_memavailable_bytes",
             "node_filesystem_avail_bytes",
+            "max_over_time",
+            "avg_over_time",
+            "piaware_aircraft_by_registration_country",
+            "piaware_aircraft_by_operator",
         ):
             self.assertIn(metric, encoded)
 

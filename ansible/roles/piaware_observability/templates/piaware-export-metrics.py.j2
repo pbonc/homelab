@@ -4,13 +4,36 @@
 import argparse
 import json
 import os
+import re
 import subprocess
 import tempfile
 import time
+from collections import Counter
 from pathlib import Path
 
 
 SERVICES = ("piaware", "dump1090-fa", "lighttpd")
+OPERATOR_CODES = {
+    "AAL": "American",
+    "ACA": "Air Canada",
+    "ASH": "Mesa",
+    "DAL": "Delta",
+    "ENY": "Envoy",
+    "FDX": "FedEx",
+    "FFT": "Frontier",
+    "JBU": "JetBlue",
+    "NKS": "Spirit",
+    "RPA": "Republic",
+    "SKW": "SkyWest",
+    "SWA": "Southwest",
+    "UAL": "United",
+    "UPS": "UPS",
+}
+COUNTRY_RANGE_PATTERN = re.compile(
+    r"start:\s*0x([0-9A-Fa-f]+).*?"
+    r"end:\s*0x([0-9A-Fa-f]+).*?"
+    r'country:\s*"([^"]+)"'
+)
 
 
 def service_up(name):
@@ -35,9 +58,45 @@ def sdr_present():
     return 0
 
 
+def country_ranges(path):
+    source = Path(path).read_text(encoding="utf-8")
+    return [
+        (int(start, 16), int(end, 16), country)
+        for start, end, country in COUNTRY_RANGE_PATTERN.findall(source)
+    ]
+
+
+def registration_country(hex_address, ranges):
+    if not isinstance(hex_address, str) or hex_address.startswith("~"):
+        return "Unknown"
+    try:
+        address = int(hex_address, 16)
+    except ValueError:
+        return "Unknown"
+    for start, end, country in ranges:
+        if start <= address <= end:
+            return country
+    return "Unknown"
+
+
+def inferred_operator(flight):
+    if not isinstance(flight, str):
+        return "Unknown"
+    normalized = flight.strip().upper()
+    match = re.match(r"^([A-Z]{3})\d", normalized)
+    if not match:
+        return "Unknown"
+    return OPERATOR_CODES.get(match.group(1), "Other / unrecognized")
+
+
+def prometheus_label(value):
+    return value.replace("\\", "\\\\").replace("\n", "\\n").replace('"', '\\"')
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--aircraft-json", required=True)
+    parser.add_argument("--country-ranges", required=True)
     parser.add_argument("--output", required=True)
     args = parser.parse_args()
 
@@ -48,11 +107,16 @@ def main():
     aircraft = report.get("aircraft", [])
     now = time.time()
     generated = float(report["now"])
+    ranges = country_ranges(args.country_ranges)
     seen_60 = sum(
         1
         for item in aircraft
         if isinstance(item.get("seen"), (int, float)) and item["seen"] <= 60
     )
+    countries = Counter(
+        registration_country(item.get("hex"), ranges) for item in aircraft
+    )
+    operators = Counter(inferred_operator(item.get("flight")) for item in aircraft)
 
     lines = [
         "# HELP piaware_feed_report_age_seconds Age of the latest decoder report.",
@@ -70,7 +134,29 @@ def main():
         "# HELP piaware_sdr_present Whether the expected RTL2832U receiver is attached.",
         "# TYPE piaware_sdr_present gauge",
         f"piaware_sdr_present {sdr_present()}",
+        "# HELP piaware_aircraft_by_registration_country Aircraft in the latest report grouped by inferred state of registration.",
+        "# TYPE piaware_aircraft_by_registration_country gauge",
     ]
+    for country, count in sorted(countries.items()):
+        lines.append(
+            'piaware_aircraft_by_registration_country{country="'
+            + prometheus_label(country)
+            + '"} '
+            + str(count)
+        )
+    lines.extend(
+        [
+            "# HELP piaware_aircraft_by_operator Aircraft in the latest report grouped by inferred callsign operator.",
+            "# TYPE piaware_aircraft_by_operator gauge",
+        ]
+    )
+    for operator, count in sorted(operators.items()):
+        lines.append(
+            'piaware_aircraft_by_operator{operator="'
+            + prometheus_label(operator)
+            + '"} '
+            + str(count)
+        )
     for service in SERVICES:
         lines.extend(
             [

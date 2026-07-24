@@ -24,6 +24,8 @@ The Ansible-managed collector publishes only:
 - decoder report age;
 - aggregate visible-aircraft and last-minute aircraft counts;
 - the cumulative decoder message counter;
+- current registration-country counts inferred from ICAO address allocation;
+- current operator counts inferred from a bounded callsign-prefix mapping;
 - expected SDR presence;
 - receiver service state; and
 - standard Node Exporter host metrics.
@@ -67,6 +69,12 @@ curl --fail --silent \
 
 The Prometheus query should return `1`. Do not add location labels or
 per-aircraft fields to these metrics.
+
+Country means the aircraft's inferred state of registration, not its departure,
+destination, current location, owner, or operator. Operator counts are inferred
+from recognized three-letter callsign prefixes and intentionally include
+`Other / unrecognized` and `Unknown` buckets. The classifier uses SkyAware's
+locally installed ICAO range table and exports only aggregate counts.
 
 ## Grafana
 

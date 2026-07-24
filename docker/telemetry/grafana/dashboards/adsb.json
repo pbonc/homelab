@@ -93,6 +93,38 @@
       "targets": [{"refId": "A", "expr": "max(node_hwmon_temp_celsius{instance=\"piaware\"})", "legendFormat": "Temperature", "range": true}],
       "fieldConfig": {"defaults": {"unit": "celsius", "decimals": 1, "min": 0, "custom": {"drawStyle": "line", "fillOpacity": 20, "lineWidth": 2, "showPoints": "never", "spanNulls": true}, "thresholds": {"mode": "absolute", "steps": [{"color": "green"}, {"color": "yellow", "value": 70}, {"color": "red", "value": 80}]}}, "overrides": []},
       "options": {"legend": {"calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "single", "sort": "none"}}
+    },
+    {
+      "id": 12, "title": "Peak Aircraft in Selected Range", "type": "stat",
+      "gridPos": {"h": 6, "w": 6, "x": 0, "y": 28},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [{"refId": "A", "expr": "max_over_time(piaware_aircraft_visible{instance=\"piaware\"}[$__range])", "legendFormat": "Peak", "instant": true, "range": false}],
+      "fieldConfig": {"defaults": {"unit": "short", "decimals": 0, "min": 0, "color": {"mode": "continuous-GrYlRd"}}, "overrides": []},
+      "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "center", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value_and_name"}
+    },
+    {
+      "id": 13, "title": "Average Aircraft in Selected Range", "type": "stat",
+      "gridPos": {"h": 6, "w": 6, "x": 6, "y": 28},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [{"refId": "A", "expr": "avg_over_time(piaware_aircraft_visible{instance=\"piaware\"}[$__range])", "legendFormat": "Average", "instant": true, "range": false}],
+      "fieldConfig": {"defaults": {"unit": "short", "decimals": 1, "min": 0, "color": {"mode": "continuous-GrYlRd"}}, "overrides": []},
+      "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "center", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value_and_name"}
+    },
+    {
+      "id": 14, "title": "Current Registration Countries", "type": "bargauge",
+      "gridPos": {"h": 10, "w": 6, "x": 12, "y": 28},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [{"refId": "A", "expr": "piaware_aircraft_by_registration_country{instance=\"piaware\"}", "legendFormat": "{{country}}", "instant": true, "range": false}],
+      "fieldConfig": {"defaults": {"unit": "short", "decimals": 0, "min": 0, "color": {"mode": "continuous-GrYlRd"}}, "overrides": []},
+      "options": {"displayMode": "gradient", "minVizHeight": 10, "minVizWidth": 0, "namePlacement": "auto", "orientation": "horizontal", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "showUnfilled": true, "sizing": "auto", "valueMode": "color"}
+    },
+    {
+      "id": 15, "title": "Current Inferred Operators", "type": "bargauge",
+      "gridPos": {"h": 10, "w": 6, "x": 18, "y": 28},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [{"refId": "A", "expr": "piaware_aircraft_by_operator{instance=\"piaware\"}", "legendFormat": "{{operator}}", "instant": true, "range": false}],
+      "fieldConfig": {"defaults": {"unit": "short", "decimals": 0, "min": 0, "color": {"mode": "continuous-GrYlRd"}}, "overrides": []},
+      "options": {"displayMode": "gradient", "minVizHeight": 10, "minVizWidth": 0, "namePlacement": "auto", "orientation": "horizontal", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "showUnfilled": true, "sizing": "auto", "valueMode": "color"}
     }
   ],
   "refresh": "30s",

@@ -33,8 +33,39 @@ class PiAwareObservabilityTests(unittest.TestCase):
         )
         for metric in expected:
             self.assertIn(metric, collector)
-        for forbidden in ("feeder_id", "flight", "callsign", "latitude", "longitude"):
+        self.assertIn("piaware_aircraft_by_registration_country", collector)
+        self.assertIn("piaware_aircraft_by_operator", collector)
+        for forbidden in ("feeder_id", "latitude", "longitude"):
             self.assertNotIn(forbidden, collector.lower())
+        self.assertNotIn("{hex=", collector.lower())
+        self.assertNotIn("{flight=", collector.lower())
+        self.assertNotIn("{callsign=", collector.lower())
+
+    def test_classifier_uses_local_ranges_and_bounded_operator_groups(self):
+        collector = (
+            ROLE / "templates" / "piaware-export-metrics.py.j2"
+        ).read_text(encoding="utf-8")
+        namespace = {"__name__": "classifier_test"}
+        exec(compile(collector, "piaware-export-metrics", "exec"), namespace)
+        ranges = [
+            (0xA00000, 0xAFFFFF, "United States"),
+            (0xC00000, 0xC3FFFF, "Canada"),
+        ]
+        self.assertEqual(
+            namespace["registration_country"]("A12345", ranges),
+            "United States",
+        )
+        self.assertEqual(
+            namespace["registration_country"]("C01234", ranges),
+            "Canada",
+        )
+        self.assertEqual(namespace["registration_country"]("~ABC123", ranges), "Unknown")
+        self.assertEqual(namespace["inferred_operator"]("UAL123 "), "United")
+        self.assertEqual(
+            namespace["inferred_operator"]("XYZ123"),
+            "Other / unrecognized",
+        )
+        self.assertEqual(namespace["inferred_operator"]("N123AB"), "Unknown")
 
     def test_prometheus_scrapes_the_lan_only_exporter(self):
         prometheus = (
