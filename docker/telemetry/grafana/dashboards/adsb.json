@@ -9,7 +9,7 @@
       "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
       "targets": [{"refId": "A", "expr": "up{job=\"piaware-node\",instance=\"piaware\"}", "legendFormat": "Receiver", "range": true}],
       "fieldConfig": {"defaults": {"unit": "none", "decimals": 0, "min": 0, "max": 1, "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "red"}, {"color": "green", "value": 1}]}, "mappings": [{"type": "value", "options": {"0": {"text": "DOWN", "color": "red"}, "1": {"text": "UP", "color": "green"}}}]}, "overrides": []},
-      "options": {"colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "horizontal", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value_and_name", "wideLayout": true}
+      "options": {"colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "horizontal", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "text": {"titleSize": 13, "valueSize": 28}, "textMode": "value_and_name", "wideLayout": true}
     },
     {
       "id": 2, "title": "Aircraft Visible", "type": "stat",
@@ -17,7 +17,7 @@
       "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
       "targets": [{"refId": "A", "expr": "piaware_aircraft_visible{instance=\"piaware\"}", "legendFormat": "Aircraft", "range": true}],
       "fieldConfig": {"defaults": {"unit": "short", "decimals": 0, "min": 0, "color": {"mode": "continuous-GrYlRd"}}, "overrides": []},
-      "options": {"colorMode": "value", "graphMode": "area", "justifyMode": "center", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value_and_name"}
+      "options": {"colorMode": "value", "graphMode": "area", "justifyMode": "center", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "text": {"titleSize": 13, "valueSize": 28}, "textMode": "value_and_name"}
     },
     {
       "id": 3, "title": "Decoder Report Age", "type": "stat",
@@ -25,7 +25,7 @@
       "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
       "targets": [{"refId": "A", "expr": "piaware_feed_report_age_seconds{instance=\"piaware\"}", "legendFormat": "Report age", "range": true}],
       "fieldConfig": {"defaults": {"unit": "s", "decimals": 1, "min": 0, "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "green"}, {"color": "yellow", "value": 30}, {"color": "red", "value": 60}]}}, "overrides": []},
-      "options": {"colorMode": "background", "graphMode": "area", "justifyMode": "center", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value_and_name"}
+      "options": {"colorMode": "background", "graphMode": "area", "justifyMode": "center", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "text": {"titleSize": 13, "valueSize": 28}, "textMode": "value_and_name"}
     },
     {
       "id": 4, "title": "SDR", "type": "stat",
@@ -33,7 +33,7 @@
       "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
       "targets": [{"refId": "A", "expr": "piaware_sdr_present{instance=\"piaware\"}", "legendFormat": "RTL2832U", "range": true}],
       "fieldConfig": {"defaults": {"unit": "none", "decimals": 0, "min": 0, "max": 1, "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "red"}, {"color": "green", "value": 1}]}, "mappings": [{"type": "value", "options": {"0": {"text": "MISSING", "color": "red"}, "1": {"text": "PRESENT", "color": "green"}}}]}, "overrides": []},
-      "options": {"colorMode": "background", "graphMode": "none", "justifyMode": "center", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value_and_name"}
+      "options": {"colorMode": "background", "graphMode": "none", "justifyMode": "center", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "text": {"titleSize": 13, "valueSize": 28}, "textMode": "value_and_name"}
     },
     {
       "id": 5, "title": "Receiver Services", "type": "stat",
@@ -41,7 +41,7 @@
       "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
       "targets": [{"refId": "A", "expr": "piaware_service_up{instance=\"piaware\"}", "legendFormat": "{{service}}", "range": true}],
       "fieldConfig": {"defaults": {"unit": "none", "decimals": 0, "min": 0, "max": 1, "color": {"mode": "thresholds"}, "thresholds": {"mode": "absolute", "steps": [{"color": "red"}, {"color": "green", "value": 1}]}, "mappings": [{"type": "value", "options": {"0": {"text": "DOWN", "color": "red"}, "1": {"text": "UP", "color": "green"}}}]}, "overrides": []},
-      "options": {"colorMode": "background", "graphMode": "none", "justifyMode": "center", "orientation": "horizontal", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value_and_name", "wideLayout": true}
+      "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "center", "orientation": "horizontal", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "text": {"titleSize": 12, "valueSize": 18}, "textMode": "value_and_name", "wideLayout": true}
     },
     {
       "id": 6, "title": "Aircraft Observed", "type": "timeseries",
@@ -99,32 +99,32 @@
       "gridPos": {"h": 6, "w": 4, "x": 0, "y": 28},
       "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
       "targets": [{"refId": "A", "expr": "max_over_time(piaware_aircraft_visible{instance=\"piaware\"}[$__range])", "legendFormat": "Peak", "instant": true, "range": false}],
-      "fieldConfig": {"defaults": {"unit": "short", "decimals": 0, "min": 0, "color": {"mode": "continuous-GrYlRd"}}, "overrides": []},
-      "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "center", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value_and_name"}
+      "fieldConfig": {"defaults": {"unit": "short", "decimals": 0, "min": 0, "color": {"mode": "fixed", "fixedColor": "green"}}, "overrides": []},
+      "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "center", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "text": {"titleSize": 12, "valueSize": 30}, "textMode": "value_and_name"}
     },
     {
       "id": 13, "title": "Average Aircraft in Selected Range", "type": "stat",
       "gridPos": {"h": 6, "w": 4, "x": 4, "y": 28},
       "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
       "targets": [{"refId": "A", "expr": "avg_over_time(piaware_aircraft_visible{instance=\"piaware\"}[$__range])", "legendFormat": "Average", "instant": true, "range": false}],
-      "fieldConfig": {"defaults": {"unit": "short", "decimals": 1, "min": 0, "color": {"mode": "continuous-GrYlRd"}}, "overrides": []},
-      "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "center", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "textMode": "value_and_name"}
+      "fieldConfig": {"defaults": {"unit": "short", "decimals": 1, "min": 0, "color": {"mode": "fixed", "fixedColor": "green"}}, "overrides": []},
+      "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "center", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "text": {"titleSize": 12, "valueSize": 30}, "textMode": "value_and_name"}
     },
     {
-      "id": 14, "title": "Current Registration Countries", "type": "bargauge",
-      "gridPos": {"h": 10, "w": 8, "x": 8, "y": 28},
+      "id": 14, "title": "Registration Countries (Current)", "type": "stat",
+      "gridPos": {"h": 8, "w": 8, "x": 8, "y": 28},
       "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
       "targets": [{"refId": "A", "expr": "piaware_aircraft_by_registration_country{instance=\"piaware\"}", "legendFormat": "{{country}}", "instant": true, "range": false}],
-      "fieldConfig": {"defaults": {"unit": "short", "decimals": 0, "min": 0, "color": {"mode": "continuous-GrYlRd"}}, "overrides": []},
-      "options": {"displayMode": "gradient", "minVizHeight": 10, "minVizWidth": 0, "namePlacement": "left", "orientation": "horizontal", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "showUnfilled": true, "sizing": "auto", "valueMode": "text"}
+      "fieldConfig": {"defaults": {"unit": "short", "decimals": 0, "min": 0, "color": {"mode": "fixed", "fixedColor": "blue"}}, "overrides": []},
+      "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "center", "orientation": "horizontal", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "text": {"titleSize": 12, "valueSize": 24}, "textMode": "value_and_name", "wideLayout": true}
     },
     {
-      "id": 15, "title": "Current Inferred Operators", "type": "bargauge",
-      "gridPos": {"h": 10, "w": 8, "x": 16, "y": 28},
+      "id": 15, "title": "Inferred Operators (Current)", "type": "stat",
+      "gridPos": {"h": 8, "w": 8, "x": 16, "y": 28},
       "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
       "targets": [{"refId": "A", "expr": "piaware_aircraft_by_operator{instance=\"piaware\"}", "legendFormat": "{{operator}}", "instant": true, "range": false}],
-      "fieldConfig": {"defaults": {"unit": "short", "decimals": 0, "min": 0, "color": {"mode": "continuous-GrYlRd"}}, "overrides": []},
-      "options": {"displayMode": "gradient", "minVizHeight": 10, "minVizWidth": 0, "namePlacement": "left", "orientation": "horizontal", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "showUnfilled": true, "sizing": "auto", "valueMode": "text"}
+      "fieldConfig": {"defaults": {"unit": "short", "decimals": 0, "min": 0, "color": {"mode": "fixed", "fixedColor": "blue"}}, "overrides": []},
+      "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "center", "orientation": "horizontal", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "text": {"titleSize": 11, "valueSize": 22}, "textMode": "value_and_name", "wideLayout": true}
     }
   ],
   "refresh": "30s",

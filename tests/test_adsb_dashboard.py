@@ -18,15 +18,17 @@ class AdsbDashboardTests(unittest.TestCase):
             panel["title"]: panel
             for panel in dashboard["panels"]
             if panel["title"] in {
-                "Current Registration Countries",
-                "Current Inferred Operators",
+                "Registration Countries (Current)",
+                "Inferred Operators (Current)",
             }
         }
         self.assertEqual(len(breakdowns), 2)
         for panel in breakdowns.values():
             self.assertGreaterEqual(panel["gridPos"]["w"], 8)
-            self.assertEqual(panel["options"]["namePlacement"], "left")
-            self.assertEqual(panel["options"]["valueMode"], "text")
+            self.assertEqual(panel["type"], "stat")
+            self.assertEqual(panel["options"]["colorMode"], "value")
+            self.assertEqual(panel["options"]["textMode"], "value_and_name")
+            self.assertLessEqual(panel["options"]["text"]["valueSize"], 24)
 
         encoded = json.dumps(dashboard).lower()
         for metric in (
