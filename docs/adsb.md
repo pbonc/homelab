@@ -169,3 +169,11 @@ The controlled drill in
 [`docs/runbooks/piaware-outage.md`](runbooks/piaware-outage.md) stops only the
 Pi decoder, verifies that the edge-node contract fails visibly, restores it
 through a shell trap, and confirms recovery. It does not stop or modify Brain.
+
+The exercise passed on 2026-07-24. With `dump1090-fa` stopped, the last valid
+aggregate file was preserved as designed. After 78 seconds, `labctl status`
+classified `adsb.piaware.metrics` as stale, reported the Homelab as degraded,
+and returned `OUTAGE_EXIT=1` while every unrelated service remained healthy.
+The trap restored the decoder; all four edge units returned active, fresh
+metrics resumed, and the recovery status returned `RECOVERY_EXIT=0` without
+restarting Prometheus, Grafana, or Brain.

@@ -210,7 +210,7 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [ ] Demonstrate that the same technique is subsequently blocked, detected earlier, or produces a documented accepted limitation
 - [ ] Publish a portfolio-safe architecture diagram and concise outcome metrics without credentials, live target details, or weaponized instructions
 
-## Sprint 9: ADS-B Edge Node
+## Sprint 9: ADS-B Edge Node — Complete
 
 - [x] Record receiver hardware, SDR model, network identity, and power or storage constraints
 - [x] Replace the Homepage ADS-B placeholder with a monitored PiAware card that opens the local SkyAware map in a new tab
@@ -222,7 +222,7 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [x] Add a detailed Grafana dashboard without exposing receiver secrets, aircraft identities, or precise private location data
 - [x] Keep ADS-B in Prometheus and document why collector integration remains deferred until durable storage or a non-Prometheus consumer justifies it
 - [x] Document offline buffering, restart behavior, retention, and troubleshooting
-- [ ] Complete an outage and recovery exercise without affecting the controller node
+- [x] Complete an outage and recovery exercise without affecting the controller node
 
 ## Post-Sprint 9 Hotfix: Interview Talking Point Strip
 

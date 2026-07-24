@@ -130,9 +130,13 @@ class PiAwareObservabilityTests(unittest.TestCase):
         self.assertIn("not backfilled", adsb)
         self.assertIn("90-day or 10-GB", adsb)
         self.assertIn("Prometheus-only operational source", adsb)
+        self.assertIn("The exercise passed on 2026-07-24", adsb)
+        self.assertIn("OUTAGE_EXIT=1", adsb)
+        self.assertIn("RECOVERY_EXIT=0", adsb)
         self.assertIn("trap restore_decoder EXIT HUP INT TERM", drill)
         self.assertIn("'sudo systemctl stop dump1090-fa'", drill)
         self.assertIn("'sudo systemctl start dump1090-fa'", drill)
+        self.assertIn("sleep 75", drill)
         self.assertLess(
             drill.index("'sudo systemctl stop dump1090-fa'"),
             drill.index("'cd ~/git/homelab; python3 -m labctl status'"),

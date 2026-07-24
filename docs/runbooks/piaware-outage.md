@@ -51,7 +51,9 @@ ssh -o BatchMode=yes \
   dar@192.168.1.27 \
   'sudo systemctl stop dump1090-fa'
 
-sleep 20
+# The metrics exporter preserves its last valid file. Wait beyond labctl's
+# 60-second stale threshold so the outage is observable by contract.
+sleep 75
 
 ssh -o BatchMode=yes \
   -i "$PIAWARE_KEY" \
