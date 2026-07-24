@@ -101,6 +101,18 @@ def main() -> int:
     for retired_reference in ("status.json", "setInterval", "innerText"):
         if retired_reference in custom_js:
             errors.append(f"custom.js still contains retired status logic: {retired_reference}")
+    for required_resource in (
+        "homelab-resources",
+        "ADS-B aircraft map",
+        "homelab-hardware/brain-hardware",
+        "docs/backups.md",
+        'link.target = "_blank"',
+        'link.rel = "noopener noreferrer"',
+    ):
+        if required_resource not in custom_js:
+            errors.append(
+                f"custom.js is missing required resource flyout content: {required_resource}"
+            )
 
     makefile = contents[ROOT / "Makefile"]
     if "homepage-status:" in makefile:

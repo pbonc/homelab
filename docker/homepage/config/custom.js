@@ -16,6 +16,38 @@
 	const WEATHER_REFRESH_MS = 300000;
 	const STUDY_URL = "http://192.168.1.23:8020/api/progress";
 	const STUDY_REFRESH_MS = 60000;
+	const RESOURCE_GROUPS = [
+		{
+			name: "Live views",
+			links: [
+				["ADS-B aircraft map", "http://192.168.1.27/skyaware/"],
+				["Local weather", "http://192.168.1.23:3001/d/homelab-weather/local-weather"],
+				["Brain hardware", "http://192.168.1.23:3001/d/homelab-hardware/brain-hardware"],
+				["Platform health", "http://192.168.1.23:3001/d/homelab-platform-health/platform-health"],
+				["Container logs", "http://192.168.1.23:3001/d/homelab-container-logs/container-logs"],
+			],
+		},
+		{
+			name: "Operations",
+			links: [
+				["Study Deck", "http://192.168.1.23:8020"],
+				["Telemetry API", "http://192.168.1.23:8000/docs"],
+				["GitHub Actions", "https://github.com/pbonc/homelab/actions"],
+				["Repository", "https://github.com/pbonc/homelab"],
+			],
+		},
+		{
+			name: "Runbooks & design",
+			links: [
+				["Roadmap", "https://github.com/pbonc/homelab/blob/main/docs/roadmap.md"],
+				["Architecture", "https://github.com/pbonc/homelab/blob/main/docs/architecture.md"],
+				["Network", "https://github.com/pbonc/homelab/blob/main/docs/network.md"],
+				["Observability", "https://github.com/pbonc/homelab/blob/main/docs/observability.md"],
+				["Backups", "https://github.com/pbonc/homelab/blob/main/docs/backups.md"],
+				["Security", "https://github.com/pbonc/homelab/blob/main/docs/security.md"],
+			],
+		},
+	];
 
 	let missingSince = null;
 	let unavailableTimer = null;
@@ -166,6 +198,63 @@
 		}
 	}
 
+	function resourcesFlyout() {
+		let flyout = document.querySelector(".homelab-resources");
+		if (flyout) return flyout;
+
+		const informationWidgets = document.querySelector("#information-widgets");
+		const container = document.querySelector("#inner_wrapper .container");
+		if (!informationWidgets && !container) return null;
+
+		flyout = document.createElement("details");
+		flyout.className = "homelab-resources";
+
+		const summary = document.createElement("summary");
+		summary.textContent = "Homelab links";
+		summary.setAttribute("aria-label", "Open Homelab links");
+		flyout.appendChild(summary);
+
+		const panel = document.createElement("div");
+		panel.className = "homelab-resources-panel";
+		for (const group of RESOURCE_GROUPS) {
+			const section = document.createElement("section");
+			const heading = document.createElement("h2");
+			heading.textContent = group.name;
+			section.appendChild(heading);
+
+			const links = document.createElement("div");
+			links.className = "homelab-resources-links";
+			for (const [label, href] of group.links) {
+				const link = document.createElement("a");
+				link.href = href;
+				link.target = "_blank";
+				link.rel = "noopener noreferrer";
+				link.textContent = label;
+				links.appendChild(link);
+			}
+			section.appendChild(links);
+			panel.appendChild(section);
+		}
+		flyout.appendChild(panel);
+
+		if (informationWidgets) {
+			informationWidgets.insertAdjacentElement("afterend", flyout);
+		} else {
+			container.prepend(flyout);
+		}
+
+		document.addEventListener("click", (event) => {
+			if (flyout.open && !flyout.contains(event.target)) flyout.open = false;
+		});
+		document.addEventListener("keydown", (event) => {
+			if (event.key === "Escape") {
+				flyout.open = false;
+				summary.focus();
+			}
+		});
+		return flyout;
+	}
+
 	function weatherBanner() {
 		let banner = document.querySelector(".local-weather-header");
 		if (banner) return banner;
@@ -232,6 +321,7 @@
 		updateQueued = true;
 		window.requestAnimationFrame(() => {
 			updateQueued = false;
+			resourcesFlyout();
 			weatherBanner();
 			markLifecycleCards();
 			updateBrainHealth();

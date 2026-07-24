@@ -15,7 +15,7 @@
 - [x] Add Glances-backed CPU, memory, and root filesystem metrics to `brain`
 - [x] Classify `brain` as active, warning, critical, or unavailable from live metrics
 - [x] Style planned and future cards as inactive inventory
-- [x] Display the dashboard semantic version (initially `0.1.0`, currently `0.6.2`)
+- [x] Display the dashboard semantic version (initially `0.1.0`, currently `0.8.0`)
 - [x] Retire the unsupported status JSON polling path
 - [x] Add UTF-8, URL, lifecycle, and version validation
 - [x] Add Glances readiness, host-header validation, and restricted CORS configuration
@@ -181,7 +181,8 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [x] Add check-mode and idempotence validation before using automation on a new node
 - [x] Document recovery and manual break-glass steps when automation cannot reach a node
 - [x] Define encrypted off-host backups, recovery-point and recovery-time objectives, and retention for irreplaceable state
-- [ ] Prove a restore into a disposable location and document a clean-Ubuntu rebuild exercise for `brain`
+- [x] Prove every encrypted backup data class restores into a disposable location
+- [ ] Document and execute a clean-Ubuntu rebuild exercise for `brain`
 
 ## Phase 8: Isolated Purple-Team Range
 
