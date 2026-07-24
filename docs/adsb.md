@@ -26,6 +26,7 @@ The Ansible-managed collector publishes only:
 - the cumulative decoder message counter;
 - current registration-country counts inferred from ICAO address allocation;
 - current operator counts inferred from a bounded callsign-prefix mapping;
+- maximum, median, and 95th-percentile reception distance in nautical miles;
 - expected SDR presence;
 - receiver service state; and
 - standard Node Exporter host metrics.
@@ -75,6 +76,11 @@ destination, current location, owner, or operator. Operator counts are inferred
 from recognized three-letter callsign prefixes and intentionally include an
 `Unclassified` bucket. The classifier uses SkyAware's
 locally installed ICAO range table and exports only aggregate counts.
+
+Reception distance is calculated in memory from the locally installed receiver
+position and current aircraft positions. Only aggregate distances and the count
+of positioned aircraft are exported; neither endpoint's coordinates leave the
+receiver.
 
 ## Grafana
 

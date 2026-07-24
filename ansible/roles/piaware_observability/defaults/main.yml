@@ -4,5 +4,6 @@ piaware_node_exporter_address: "{{ ansible_host }}"
 piaware_node_exporter_port: 9100
 piaware_textfile_directory: /var/lib/prometheus/node-exporter
 piaware_aircraft_json: /run/dump1090-fa/aircraft.json
+piaware_receiver_json: /run/dump1090-fa/receiver.json
 piaware_country_ranges: /usr/share/skyaware/html/flags.js
 piaware_metrics_file: "{{ piaware_textfile_directory }}/piaware.prom"

@@ -35,11 +35,18 @@ class PiAwareObservabilityTests(unittest.TestCase):
             self.assertIn(metric, collector)
         self.assertIn("piaware_aircraft_by_registration_country", collector)
         self.assertIn("piaware_aircraft_by_operator", collector)
-        for forbidden in ("feeder_id", "latitude", "longitude"):
+        self.assertIn("piaware_reception_range_max_nautical_miles", collector)
+        self.assertIn("piaware_reception_range_median_nautical_miles", collector)
+        self.assertIn("piaware_reception_range_p95_nautical_miles", collector)
+        for forbidden in ("feeder_id",):
             self.assertNotIn(forbidden, collector.lower())
         self.assertNotIn("{hex=", collector.lower())
         self.assertNotIn("{flight=", collector.lower())
         self.assertNotIn("{callsign=", collector.lower())
+        self.assertNotIn("piaware_receiver_lat", collector.lower())
+        self.assertNotIn("piaware_receiver_lon", collector.lower())
+        self.assertNotIn("piaware_aircraft_lat", collector.lower())
+        self.assertNotIn("piaware_aircraft_lon", collector.lower())
 
     def test_classifier_uses_local_ranges_and_bounded_operator_groups(self):
         collector = (
@@ -97,6 +104,22 @@ class PiAwareObservabilityTests(unittest.TestCase):
         self.assertIn("--country-ranges {{ piaware_country_ranges }}", service)
         self.assertIn("- --country-ranges", tasks)
         self.assertIn('- "{{ piaware_country_ranges }}"', tasks)
+        self.assertIn("--receiver-json {{ piaware_receiver_json }}", service)
+        self.assertIn("- --receiver-json", tasks)
+
+    def test_distance_and_percentile_helpers_are_deterministic(self):
+        collector = (
+            ROLE / "templates" / "piaware-export-metrics.py.j2"
+        ).read_text(encoding="utf-8")
+        namespace = {"__name__": "range_test"}
+        exec(compile(collector, "piaware-export-metrics", "exec"), namespace)
+        self.assertAlmostEqual(
+            namespace["distance_nautical_miles"](0, 0, 0, 1),
+            60.04,
+            places=1,
+        )
+        self.assertEqual(namespace["percentile"]([10, 20, 30], 0.5), 20)
+        self.assertEqual(namespace["percentile"]([], 0.95), 0.0)
 
 
 if __name__ == "__main__":

@@ -46,6 +46,10 @@ class AdsbDashboardTests(unittest.TestCase):
             "avg_over_time",
             "piaware_aircraft_by_registration_country",
             "piaware_aircraft_by_operator",
+            "piaware_reception_range_max_nautical_miles",
+            "piaware_reception_range_p95_nautical_miles",
+            "piaware_reception_range_median_nautical_miles",
+            "piaware_positioned_aircraft",
         ):
             self.assertIn(metric, encoded)
 

@@ -125,6 +125,34 @@
       "targets": [{"refId": "A", "expr": "sort_desc(piaware_aircraft_by_operator{instance=\"piaware\"})", "legendFormat": "{{operator}}", "instant": true, "range": false}],
       "fieldConfig": {"defaults": {"unit": "short", "decimals": 0, "min": 0, "color": {"mode": "fixed", "fixedColor": "blue"}}, "overrides": []},
       "options": {"displayMode": "basic", "minVizHeight": 20, "minVizWidth": 72, "namePlacement": "bottom", "orientation": "vertical", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "showUnfilled": true, "sizing": "manual", "valueMode": "text"}
+    },
+    {
+      "id": 16, "title": "Reception Range", "type": "timeseries",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 36},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [
+        {"refId": "A", "expr": "piaware_reception_range_max_nautical_miles{instance=\"piaware\"}", "legendFormat": "Maximum", "range": true},
+        {"refId": "B", "expr": "piaware_reception_range_p95_nautical_miles{instance=\"piaware\"}", "legendFormat": "95th percentile", "range": true},
+        {"refId": "C", "expr": "piaware_reception_range_median_nautical_miles{instance=\"piaware\"}", "legendFormat": "Median", "range": true}
+      ],
+      "fieldConfig": {"defaults": {"unit": "suffix: nmi", "decimals": 1, "min": 0, "custom": {"drawStyle": "line", "fillOpacity": 15, "lineInterpolation": "smooth", "lineWidth": 2, "showPoints": "never", "spanNulls": true}}, "overrides": []},
+      "options": {"legend": {"calcs": ["lastNotNull", "max"], "displayMode": "table", "placement": "bottom"}, "tooltip": {"mode": "multi", "sort": "desc"}}
+    },
+    {
+      "id": 17, "title": "Peak Range in Selected Range", "type": "stat",
+      "gridPos": {"h": 8, "w": 6, "x": 12, "y": 36},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [{"refId": "A", "expr": "max_over_time(piaware_reception_range_max_nautical_miles{instance=\"piaware\"}[$__range])", "legendFormat": "Peak range", "instant": true, "range": false}],
+      "fieldConfig": {"defaults": {"unit": "suffix: nmi", "decimals": 1, "min": 0, "color": {"mode": "fixed", "fixedColor": "green"}}, "overrides": []},
+      "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "center", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "text": {"titleSize": 12, "valueSize": 30}, "textMode": "value_and_name"}
+    },
+    {
+      "id": 18, "title": "Positioned Aircraft", "type": "stat",
+      "gridPos": {"h": 8, "w": 6, "x": 18, "y": 36},
+      "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
+      "targets": [{"refId": "A", "expr": "piaware_positioned_aircraft{instance=\"piaware\"}", "legendFormat": "With positions", "range": true}],
+      "fieldConfig": {"defaults": {"unit": "short", "decimals": 0, "min": 0, "color": {"mode": "fixed", "fixedColor": "blue"}}, "overrides": []},
+      "options": {"colorMode": "value", "graphMode": "area", "justifyMode": "center", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "text": {"titleSize": 12, "valueSize": 30}, "textMode": "value_and_name"}
     }
   ],
   "refresh": "30s",
