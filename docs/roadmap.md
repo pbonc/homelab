@@ -222,6 +222,17 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [ ] Document offline buffering, restart behavior, retention, and troubleshooting
 - [ ] Complete an outage and recovery exercise without affecting the controller node
 
+## Post-Phase 9 Hotfix: Interview Talking Point Strip
+
+- [ ] Add concise interview talking points to the Study Deck for the recent observability, PiAware, Ansible, backup, and clean-rebuild work
+- [ ] Tag talking points by topic and keep their source material traceable to the deployed lab
+- [ ] Add a Study Deck endpoint that records display history without marking a talking point as studied or answered
+- [ ] Select undisplayed talking points first, then the least recently displayed eligible point
+- [ ] Add light topic-aware variation that avoids immediate repeats and repetitive runs without defeating the least-recently-displayed policy
+- [ ] Add a compact talking-point strip immediately below the Homepage weather strip, backed by the Study Deck endpoint
+- [ ] Preserve the existing Homepage card layout and provide a quiet fallback when Study Deck is unavailable
+- [ ] Test selection fairness, persisted display history, unavailable-service behavior, and responsive Homepage layout
+
 ## Phase 10: Optional Platform Expansion
 
 - [ ] Add Terraform module and state conventions only when a concrete managed provider or reproducible resource exists
