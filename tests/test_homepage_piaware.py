@@ -44,6 +44,19 @@ class HomepagePiAwareTests(unittest.TestCase):
         self.assertIn('setBadge(card, "unavailable", "Unavailable")', custom)
         self.assertIn("refreshPiaware();", custom)
 
+    def test_brain_and_piaware_metric_panels_share_fixed_height(self):
+        css = (
+            ROOT / "docker" / "homepage" / "config" / "custom.css"
+        ).read_text(encoding="utf-8")
+        brain = css.split(
+            ".services-group:nth-child(1) .service-card .service-container {", 1
+        )[1].split("}", 1)[0]
+        hardware = css.split(".piaware-hardware {", 1)[1].split("}", 1)[0]
+        metrics = css.split(".piaware-metrics {", 1)[1].split("}", 1)[0]
+        for panel in (brain, hardware, metrics):
+            self.assertIn("box-sizing: border-box;", panel)
+            self.assertIn("height: 4rem;", panel)
+
 
 if __name__ == "__main__":
     unittest.main()
