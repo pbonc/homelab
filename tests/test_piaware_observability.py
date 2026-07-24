@@ -121,6 +121,30 @@ class PiAwareObservabilityTests(unittest.TestCase):
         self.assertEqual(namespace["percentile"]([10, 20, 30], 0.5), 20)
         self.assertEqual(namespace["percentile"]([], 0.95), 0.0)
 
+    def test_operations_document_the_no_replay_contract_and_safe_drill(self):
+        adsb = (ROOT / "docs" / "adsb.md").read_text(encoding="utf-8")
+        drill = (
+            ROOT / "docs" / "runbooks" / "piaware-outage.md"
+        ).read_text(encoding="utf-8")
+        self.assertIn("Persistent=false", adsb)
+        self.assertIn("not backfilled", adsb)
+        self.assertIn("90-day or 10-GB", adsb)
+        self.assertIn("Prometheus-only operational source", adsb)
+        self.assertIn("trap restore_decoder EXIT HUP INT TERM", drill)
+        self.assertIn("'sudo systemctl stop dump1090-fa'", drill)
+        self.assertIn("'sudo systemctl start dump1090-fa'", drill)
+        self.assertLess(
+            drill.index("'sudo systemctl stop dump1090-fa'"),
+            drill.index("'cd ~/git/homelab; python3 -m labctl status'"),
+        )
+        self.assertLess(
+            drill.index("'cd ~/git/homelab; python3 -m labctl status'"),
+            drill.index("restore_decoder\ntrap - EXIT"),
+        )
+        self.assertIn("RECOVERY_EXIT=0", drill)
+        self.assertNotIn("systemctl stop docker", drill)
+        self.assertNotIn("reboot", drill.lower().split("do not reboot", 1)[0])
+
 
 if __name__ == "__main__":
     unittest.main()

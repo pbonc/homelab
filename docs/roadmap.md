@@ -1,13 +1,13 @@
 # Roadmap
 
-## Phase 0: Foundation — Complete
+## Sprint 0: Foundation — Complete
 
 - [x] Create the repository structure and documentation baseline
 - [x] Establish shared Make targets and `labctl` diagnostics
 - [x] Deploy Homepage with Docker Compose
 - [x] Register a self-hosted GitHub Actions runner on `brain`
 
-## Phase 1: Truthful Dashboard — Complete
+## Sprint 1: Truthful Dashboard — Complete
 
 - [x] Separate infrastructure nodes, deployed services, planned services, and future work
 - [x] Remove placeholder click targets and unused project cards
@@ -21,7 +21,7 @@
 - [x] Add Glances readiness, host-header validation, and restricted CORS configuration
 - [x] Deploy and visually verify the current dashboard on `brain`
 
-## Phase 2: Deployment Contract — Complete
+## Sprint 2: Deployment Contract — Complete
 
 Build one deployment interface that works locally, from GitHub Actions, and later from Jenkins.
 
@@ -34,7 +34,7 @@ Build one deployment interface that works locally, from GitHub Actions, and late
 - [x] Exercise deploy, failed verification, and rollback paths
 - [x] Keep production deployment manually triggered; do not deploy automatically from `main`
 
-### Runtime hardening during Phase 2
+### Runtime hardening during Sprint 2
 
 - [x] Pin Homepage and Glances image versions instead of using mutable `latest` tags
 - [x] Add a real Homepage container healthcheck
@@ -42,7 +42,7 @@ Build one deployment interface that works locally, from GitHub Actions, and late
 - [x] Restore Homepage Docker integration through a least-privilege socket proxy or equivalent
 - [x] Update `labctl status` to recognize the Glances container and deployed release
 
-## Phase 3: Telemetry Platform — Complete
+## Sprint 3: Telemetry Platform — Complete
 
 Build the first version of a generic ingestion, storage, API, and visualization platform. The Ecowitt weather station is the first data source, not a weather-specific architectural boundary.
 
@@ -92,7 +92,7 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [x] Verify live Ecowitt ingestion, restart persistence, API freshness, Grafana dashboards, Homepage cards, and `labctl telemetry`
 - [x] Confirm collector handlers, Grafana dashboards, and Homepage integrations provide clear extension points for the next telemetry source
 
-## Phase 4: Security Visibility — Complete
+## Sprint 4: Security Visibility — Complete
 
 ### 1. Aikido baseline and policy
 
@@ -110,7 +110,7 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [x] Base the card state on open findings rather than closed, ignored, snoozed, or historical findings
 - [x] Verify the API token and detailed findings are never exposed to Homepage clients, logs, or committed configuration
 
-## Phase 5: Runtime Health Contract — Complete
+## Sprint 5: Runtime Health Contract — Complete
 
 ### 1. Runtime status contract
 
@@ -128,14 +128,14 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [x] Add runbooks and incident-response notes
 - [x] Exercise service-down, stale-data, runner-offline, and unsupported-platform scenarios
 
-## Phase 6: Metrics and Observability
+## Sprint 6: Metrics and Observability
 
 ### 1. Metrics, hardware, and availability
 
 - [x] Deploy Prometheus and Node Exporter with constrained access, persistent storage, and documented retention
 - [x] Collect host hardware telemetry for `brain`, including CPU, memory, disks, network interfaces, and available temperature or sensor readings
 - [x] Provision a Grafana hardware dashboard with current health, utilization trends, storage capacity, and sensor history
-- [x] Add availability probes for the Phase 5 critical service inventory and distinguish service failure from stale application data
+- [x] Add availability probes for the Sprint 5 critical service inventory and distinguish service failure from stale application data
 - [x] Define recording rules, thresholds, and alerts only after observing a representative baseline
 
 ### 2. Deployment events
@@ -167,13 +167,13 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [x] Build a lightweight LAN-only study service that keeps question content in Git and personal progress in persistent runtime storage
 - [x] Add short daily review sessions with shuffled choices, answer explanations, confidence ratings, and simple spaced repetition
 - [x] Add an interview mode covering architecture, tradeoffs, failure scenarios, security boundaries, and concise project talking points
-- [x] Seed the deck from completed phases, including deployment rollback, telemetry contracts, Aikido boundaries, runtime health states, Prometheus, Grafana, and outage exercises
+- [x] Seed the deck from completed sprints, including deployment rollback, telemetry contracts, Aikido boundaries, runtime health states, Prometheus, Grafana, and outage exercises
 - [x] Require every technical answer to cite a repository document or deployed configuration so generated or stale claims cannot silently enter the deck
 - [x] Add an equal-height Homepage card showing due-question count and study status, with the full experience opening as a separate page
 - [x] Support progress export, reset, backup, and restore without committing personal history or browser data
 - [x] Verify that notes, quiz responses, and APIs expose no credentials, secret values, private finding details, or unsafe purple-team instructions
 
-## Phase 7: Reproducible Node Automation — Complete
+## Sprint 7: Reproducible Node Automation — Complete
 
 - [x] Define an Ansible inventory and connection model for `brain` and future edge nodes
 - [x] Add a minimal bootstrap role for users, SSH access, time synchronization, base packages, and Docker where required
@@ -184,7 +184,7 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [x] Prove every encrypted backup data class restores into a disposable location
 - [x] Document and execute a clean-Ubuntu rebuild exercise for `brain`
 
-## Phase 8: Isolated Purple-Team Range
+## Sprint 8: Isolated Purple-Team Range
 
 ### 1. Safety boundary and reproducibility
 
@@ -210,21 +210,21 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [ ] Demonstrate that the same technique is subsequently blocked, detected earlier, or produces a documented accepted limitation
 - [ ] Publish a portfolio-safe architecture diagram and concise outcome metrics without credentials, live target details, or weaponized instructions
 
-## Phase 9: ADS-B Edge Node
+## Sprint 9: ADS-B Edge Node
 
 - [x] Record receiver hardware, SDR model, network identity, and power or storage constraints
 - [x] Replace the Homepage ADS-B placeholder with a monitored PiAware card that opens the local SkyAware map in a new tab
-- [ ] Add live PiAware statistics to its Homepage card using the same compact monitored-node layout, equal height, status badge, health colors, and restrained metric presentation as the `brain` card
-- [x] Provision the Raspberry Pi receiver through the Phase 7 automation baseline with a role-oriented hostname
+- [x] Add live PiAware statistics to its Homepage card using the same compact monitored-node layout, equal height, status badge, health colors, and restrained metric presentation as the `brain` card
+- [x] Provision the Raspberry Pi receiver through the Sprint 7 automation baseline with a role-oriented hostname
 - [x] Verify local aircraft decoding and feed freshness before adding remote telemetry
 - [x] Install a constrained metrics exporter and monitor Pi host health, SDR connectivity, receiver processes, and feed freshness
-- [ ] Collect aircraft count, message rate, and reception-range metrics
+- [x] Collect aircraft count, message rate, and reception-range metrics
 - [x] Add a detailed Grafana dashboard without exposing receiver secrets, aircraft identities, or precise private location data
-- [ ] Integrate ADS-B through the generic collector plugin contract if durable storage or non-Prometheus consumers justify it
-- [ ] Document offline buffering, restart behavior, retention, and troubleshooting
+- [x] Keep ADS-B in Prometheus and document why collector integration remains deferred until durable storage or a non-Prometheus consumer justifies it
+- [x] Document offline buffering, restart behavior, retention, and troubleshooting
 - [ ] Complete an outage and recovery exercise without affecting the controller node
 
-## Post-Phase 9 Hotfix: Interview Talking Point Strip
+## Post-Sprint 9 Hotfix: Interview Talking Point Strip
 
 - [ ] Add concise interview talking points to the Study Deck for the recent observability, PiAware, Ansible, backup, and clean-rebuild work
 - [ ] Tag talking points by topic and keep their source material traceable to the deployed lab
@@ -235,7 +235,31 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [ ] Preserve the existing Homepage card layout and provide a quiet fallback when Study Deck is unavailable
 - [ ] Test selection fairness, persisted display history, unavailable-service behavior, and responsive Homepage layout
 
-## Phase 10: Optional Platform Expansion
+## Post-Sprint 9 Hotfix: On-Demand Aikido Status
+
+- [ ] Confirm the current Aikido plan permits the Public REST API endpoints used by the existing read-only status adapter
+- [ ] Document the Public API limit of 20 calls per rolling minute per workspace and count both OAuth token retrieval and issue export against the refresh budget
+- [ ] Re-enable cached server-side Aikido status collection on a conservative six-hour automatic cadence
+- [ ] Add an authenticated-by-network, credential-free LAN refresh endpoint that triggers one status update without exposing Aikido credentials or finding details
+- [ ] Enforce a server-side manual-refresh cooldown, single-flight lock, request timeout, and `429 Retry-After` handling
+- [ ] Keep the last successful result available when refresh fails, clearly distinguishing stale data from unavailable data
+- [ ] Add a compact refresh button and last-checked time to the Homepage Aikido card without changing card height
+- [ ] Disable the button and show quiet in-progress or cooldown feedback while a refresh is running or temporarily unavailable
+- [ ] Test successful refresh, repeated clicks, concurrent refreshes, API-plan denial, rate limiting, timeout, stale-cache fallback, and browser-origin restrictions
+
+## Sprint 10: Family Links Portal
+
+- [ ] Define a small, non-technical link catalog with the intended user before choosing categories or visual design
+- [ ] Choose a memorable LAN-only hostname and document that `mom.links` uses a real public TLD, requiring intentional local DNS handling rather than an assumed private namespace
+- [ ] Serve a simple responsive page with large readable link targets, clear labels, restrained navigation, and no Homelab operational controls
+- [ ] Keep link content human-reviewable in Git while allowing routine updates through a low-friction workflow
+- [ ] Provide a dedicated health check and a Homepage operator link without exposing the Homelab dashboard to the family-facing page
+- [ ] Make the service LAN-only, credential-free for reading, and isolated from secrets, administrative APIs, and infrastructure metadata
+- [ ] Define friendly unavailable-link behavior so one broken destination does not make the portal confusing
+- [ ] Add backup, restore, deployment, rollback, and accessibility checks appropriate to a small static service
+- [ ] Test the page on the devices and browsers its intended user actually uses
+
+## Sprint 11: Optional Platform Expansion
 
 - [ ] Add Terraform module and state conventions only when a concrete managed provider or reproducible resource exists
 - [ ] Introduce K3s and Helm only after capacity measurements and a multi-service operational need justify their overhead

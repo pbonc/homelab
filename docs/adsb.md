@@ -89,3 +89,83 @@ The provisioned **ADS-B Receiver** dashboard is available at
 freshness, aggregate aircraft and message activity, SDR and service state, and
 Pi host capacity. It deliberately has no map, coordinates, feeder identifier,
 aircraft identifiers, callsigns, positions, or tracks.
+
+## Buffering, restart, and retention
+
+This integration reports current operational state; it is not an aircraft
+event archive.
+
+- `dump1090-fa` owns its runtime JSON under `/run`. The files are ephemeral and
+  are recreated after boot.
+- `piaware-metrics.timer` runs every 15 seconds with `Persistent=false`.
+  Missed executions while the Pi is off are not replayed after startup.
+- A successful collection atomically replaces `piaware.prom`. A failed
+  collection preserves the last valid file, allowing the report and generation
+  timestamps to become stale rather than replacing known-good data with a
+  partial sample.
+- Prometheus pulls the current Node Exporter surface. If the Pi, exporter, LAN,
+  or Prometheus is unavailable, samples for that interval are absent and are
+  not backfilled.
+- Prometheus retains collected ADS-B and Pi hardware samples under the shared
+  90-day or 10-GB policy, whichever limit is reached first.
+- PiAware, `dump1090-fa`, Lighttpd, Node Exporter, and the metrics timer are
+  enabled systemd units. A normal Pi restart should restore decoding,
+  collection, and scraping without an operator-triggered replay.
+
+Absence is therefore explicit: gaps mean no sample was collected, and stale
+ages mean the last aggregate report is no longer current.
+
+## Collector integration decision
+
+ADS-B remains a Prometheus-only operational source. The generic Telemetry
+Collector is intentionally not used because the current consumers need
+bounded aggregate gauges and counters, Prometheus already supplies durable
+history, and duplicating the same samples in InfluxDB would add another
+failure path without a demonstrated consumer.
+
+Revisit this boundary only when a non-Prometheus consumer, a durable
+domain-event contract, or retention beyond the Prometheus policy is required.
+Any future plugin must preserve the existing privacy boundary and must not turn
+the telemetry platform into a per-aircraft or location archive.
+
+## Operations and troubleshooting
+
+Check the edge services and most recent collector run:
+
+```bash
+systemctl --no-pager --full status \
+  piaware dump1090-fa lighttpd prometheus-node-exporter \
+  piaware-metrics.timer
+
+systemctl --no-pager --full status piaware-metrics.service
+journalctl --unit piaware-metrics.service --since '-15 minutes' --no-pager
+```
+
+Inspect freshness without exposing aircraft details:
+
+```bash
+curl --fail --silent http://127.0.0.1:9100/metrics |
+  grep -E '^piaware_(feed_report_age_seconds|metrics_generated_timestamp_seconds|service_up|sdr_present)'
+```
+
+If metrics are stale, verify in this order:
+
+1. `dump1090-fa` is active and `/run/dump1090-fa/aircraft.json` has a recent
+   modification time.
+2. `piaware-metrics.timer` is active and its one-shot service has no recent
+   error.
+3. `prometheus-node-exporter` is listening on `192.168.1.27:9100`.
+4. Prometheus reports `up{job="piaware-node"} == 1`.
+5. `python3 -m labctl status` on Brain reports a current collector and decoder
+   report.
+
+Do not delete `piaware.prom` during diagnosis: preserving it makes staleness
+observable. Reapply the Ansible role if unit or exporter configuration has
+drifted.
+
+## Outage and recovery acceptance
+
+The controlled drill in
+[`docs/runbooks/piaware-outage.md`](runbooks/piaware-outage.md) stops only the
+Pi decoder, verifies that the edge-node contract fails visibly, restores it
+through a shell trap, and confirms recovery. It does not stop or modify Brain.
