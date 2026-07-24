@@ -14,6 +14,19 @@ class AdsbDashboardTests(unittest.TestCase):
         self.assertEqual(dashboard["title"], "ADS-B Receiver")
         self.assertFalse(dashboard["editable"])
         self.assertEqual(dashboard["annotations"], {"list": []})
+        breakdowns = {
+            panel["title"]: panel
+            for panel in dashboard["panels"]
+            if panel["title"] in {
+                "Current Registration Countries",
+                "Current Inferred Operators",
+            }
+        }
+        self.assertEqual(len(breakdowns), 2)
+        for panel in breakdowns.values():
+            self.assertGreaterEqual(panel["gridPos"]["w"], 8)
+            self.assertEqual(panel["options"]["namePlacement"], "left")
+            self.assertEqual(panel["options"]["valueMode"], "text")
 
         encoded = json.dumps(dashboard).lower()
         for metric in (
