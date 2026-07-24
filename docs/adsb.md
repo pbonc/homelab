@@ -72,8 +72,8 @@ per-aircraft fields to these metrics.
 
 Country means the aircraft's inferred state of registration, not its departure,
 destination, current location, owner, or operator. Operator counts are inferred
-from recognized three-letter callsign prefixes and intentionally include
-`Other / unrecognized` and `Unknown` buckets. The classifier uses SkyAware's
+from recognized three-letter callsign prefixes and intentionally include an
+`Unclassified` bucket. The classifier uses SkyAware's
 locally installed ICAO range table and exports only aggregate counts.
 
 ## Grafana

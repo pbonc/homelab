@@ -111,20 +111,20 @@
       "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "center", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "text": {"titleSize": 12, "valueSize": 30}, "textMode": "value_and_name"}
     },
     {
-      "id": 14, "title": "Registration Countries (Current)", "type": "stat",
+      "id": 14, "title": "Registration Countries (Current)", "type": "bargauge",
       "gridPos": {"h": 8, "w": 8, "x": 8, "y": 28},
       "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
-      "targets": [{"refId": "A", "expr": "piaware_aircraft_by_registration_country{instance=\"piaware\"}", "legendFormat": "{{country}}", "instant": true, "range": false}],
+      "targets": [{"refId": "A", "expr": "sort_desc(piaware_aircraft_by_registration_country{instance=\"piaware\"})", "legendFormat": "{{country}}", "instant": true, "range": false}],
       "fieldConfig": {"defaults": {"unit": "short", "decimals": 0, "min": 0, "color": {"mode": "fixed", "fixedColor": "blue"}}, "overrides": []},
-      "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "center", "orientation": "horizontal", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "text": {"titleSize": 12, "valueSize": 24}, "textMode": "value_and_name", "wideLayout": true}
+      "options": {"displayMode": "basic", "minVizHeight": 20, "minVizWidth": 72, "namePlacement": "bottom", "orientation": "vertical", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "showUnfilled": true, "sizing": "manual", "valueMode": "text"}
     },
     {
-      "id": 15, "title": "Inferred Operators (Current)", "type": "stat",
+      "id": 15, "title": "Inferred Operators (Current)", "type": "bargauge",
       "gridPos": {"h": 8, "w": 8, "x": 16, "y": 28},
       "datasource": {"type": "prometheus", "uid": "prometheus-homelab"},
-      "targets": [{"refId": "A", "expr": "piaware_aircraft_by_operator{instance=\"piaware\"}", "legendFormat": "{{operator}}", "instant": true, "range": false}],
+      "targets": [{"refId": "A", "expr": "sort_desc(piaware_aircraft_by_operator{instance=\"piaware\"})", "legendFormat": "{{operator}}", "instant": true, "range": false}],
       "fieldConfig": {"defaults": {"unit": "short", "decimals": 0, "min": 0, "color": {"mode": "fixed", "fixedColor": "blue"}}, "overrides": []},
-      "options": {"colorMode": "value", "graphMode": "none", "justifyMode": "center", "orientation": "horizontal", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "text": {"titleSize": 11, "valueSize": 22}, "textMode": "value_and_name", "wideLayout": true}
+      "options": {"displayMode": "basic", "minVizHeight": 20, "minVizWidth": 72, "namePlacement": "bottom", "orientation": "vertical", "reduceOptions": {"calcs": ["lastNotNull"], "fields": "", "values": false}, "showUnfilled": true, "sizing": "manual", "valueMode": "text"}
     }
   ],
   "refresh": "30s",

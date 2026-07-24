@@ -63,9 +63,10 @@ class PiAwareObservabilityTests(unittest.TestCase):
         self.assertEqual(namespace["inferred_operator"]("UAL123 "), "United")
         self.assertEqual(
             namespace["inferred_operator"]("XYZ123"),
-            "Other / unrecognized",
+            "Unclassified",
         )
-        self.assertEqual(namespace["inferred_operator"]("N123AB"), "Unknown")
+        self.assertEqual(namespace["inferred_operator"]("N123AB"), "Unclassified")
+        self.assertEqual(namespace["inferred_operator"](None), "Unclassified")
 
     def test_prometheus_scrapes_the_lan_only_exporter(self):
         prometheus = (

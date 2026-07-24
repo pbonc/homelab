@@ -81,12 +81,12 @@ def registration_country(hex_address, ranges):
 
 def inferred_operator(flight):
     if not isinstance(flight, str):
-        return "Unknown"
+        return "Unclassified"
     normalized = flight.strip().upper()
     match = re.match(r"^([A-Z]{3})\d", normalized)
     if not match:
-        return "Unknown"
-    return OPERATOR_CODES.get(match.group(1), "Other / unrecognized")
+        return "Unclassified"
+    return OPERATOR_CODES.get(match.group(1), "Unclassified")
 
 
 def prometheus_label(value):

@@ -25,10 +25,11 @@ class AdsbDashboardTests(unittest.TestCase):
         self.assertEqual(len(breakdowns), 2)
         for panel in breakdowns.values():
             self.assertGreaterEqual(panel["gridPos"]["w"], 8)
-            self.assertEqual(panel["type"], "stat")
-            self.assertEqual(panel["options"]["colorMode"], "value")
-            self.assertEqual(panel["options"]["textMode"], "value_and_name")
-            self.assertLessEqual(panel["options"]["text"]["valueSize"], 24)
+            self.assertEqual(panel["type"], "bargauge")
+            self.assertEqual(panel["options"]["orientation"], "vertical")
+            self.assertEqual(panel["options"]["namePlacement"], "bottom")
+            self.assertEqual(panel["options"]["sizing"], "manual")
+            self.assertIn("sort_desc(", panel["targets"][0]["expr"])
 
         encoded = json.dumps(dashboard).lower()
         for metric in (
