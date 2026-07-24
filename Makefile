@@ -4,7 +4,7 @@ SHELL := /usr/bin/env bash
 # CI portability note:
 # GitHub Actions, GitLab CI, and Jenkins should call these same Make targets.
 
-.PHONY: help doctor status lint test telemetry-test telemetry-run telemetry-secrets telemetry-config security-test security-secrets security-config observability-config observability-up observability-down study-test study-config study-up study-down ansible-inventory ansible-ping ansible-check ansible-bootstrap-check ansible-bootstrap ansible-vault-create ansible-vault-edit ansible-vault-view backup-init backup-run backup-check backup-snapshots backup-restore-test backup-prune bootstrap docker-up docker-down homepage-validate homepage-deploy homepage-verify homepage-rollback
+.PHONY: help doctor status lint test telemetry-test telemetry-run telemetry-secrets telemetry-config security-test security-secrets security-config observability-config observability-up observability-down study-test study-config study-up study-down ansible-inventory ansible-ping ansible-check ansible-bootstrap-check ansible-bootstrap ansible-vault-create ansible-vault-edit ansible-vault-view rebuild-syntax rebuild-check rebuild-apply rebuild-stage-validate backup-init backup-run backup-check backup-snapshots backup-restore-test backup-prune bootstrap docker-up docker-down homepage-validate homepage-deploy homepage-verify homepage-rollback
 
 help: ## Show available targets
 >@awk 'BEGIN {FS = ":.*##"; printf "\nAvailable targets:\n"} /^[a-zA-Z0-9_.-]+:.*##/ {printf "  %-14s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -94,6 +94,18 @@ ansible-vault-edit: ## Edit the ignored production variable vault interactively
 
 ansible-vault-view: ## View the ignored production variable vault
 >@ANSIBLE_CONFIG="$(CURDIR)/ansible/ansible.cfg" ansible-vault view ansible/inventories/production/group_vars/all/vault.yml
+
+rebuild-syntax: ## Validate the disposable controller rebuild playbook
+>@ANSIBLE_CONFIG="$(CURDIR)/ansible/ansible.cfg" ansible-playbook --syntax-check --inventory ansible/inventories/rebuild/hosts.yml ansible/playbooks/controller-rebuild.yml
+
+rebuild-check: ## Preview the marked disposable controller rebuild target
+>@ANSIBLE_CONFIG="$(CURDIR)/ansible/ansible.cfg" ansible-playbook --check --diff --inventory ansible/inventories/rebuild/hosts.yml ansible/playbooks/controller-rebuild.yml
+
+rebuild-apply: ## Apply the baseline only to the marked disposable rebuild target
+>@ANSIBLE_CONFIG="$(CURDIR)/ansible/ansible.cfg" ansible-playbook --diff --inventory ansible/inventories/rebuild/hosts.yml ansible/playbooks/controller-rebuild.yml
+
+rebuild-stage-validate: ## Reconstruct and validate controller state without starting services
+>@bash scripts/rebuild_stage_validate.sh
 
 backup-init: ## Initialize the encrypted workstation Restic repository once
 >@bash scripts/homelab_backup.sh init

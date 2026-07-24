@@ -15,5 +15,7 @@ homelab_base_packages:
   - vim-tiny
 
 homelab_time_service: systemd-timesyncd
+homelab_manage_time_service: true
 homelab_install_docker: false
 homelab_docker_package: docker.io
+homelab_docker_compose_package: docker-compose-v2

@@ -1,0 +1,26 @@
+---
+- name: Provision a disposable controller rebuild target
+  hosts: rebuild_targets
+  gather_facts: true
+  become: true
+
+  pre_tasks:
+    - name: Inspect the disposable rebuild marker
+      ansible.builtin.stat:
+        path: /etc/homelab-rebuild-lab
+      register: rebuild_marker
+
+    - name: Refuse production or unmarked targets
+      ansible.builtin.assert:
+        that:
+          - "homelab_environment == 'rebuild'"
+          - "inventory_hostname == 'rebuild-lab'"
+          - "ansible_facts['hostname'] != 'brain'"
+          - "(ansible_facts['default_ipv4']['address'] | default('')) != '192.168.1.23'"
+          - "rebuild_marker.stat.exists"
+        fail_msg: >-
+          Controller rebuild automation is restricted to the marked disposable
+          rebuild-lab target and must never run against production brain.
+
+  roles:
+    - role: node_baseline

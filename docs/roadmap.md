@@ -173,7 +173,7 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [x] Support progress export, reset, backup, and restore without committing personal history or browser data
 - [x] Verify that notes, quiz responses, and APIs expose no credentials, secret values, private finding details, or unsafe purple-team instructions
 
-## Phase 7: Reproducible Node Automation
+## Phase 7: Reproducible Node Automation — Complete
 
 - [x] Define an Ansible inventory and connection model for `brain` and future edge nodes
 - [x] Add a minimal bootstrap role for users, SSH access, time synchronization, base packages, and Docker where required
@@ -182,7 +182,7 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [x] Document recovery and manual break-glass steps when automation cannot reach a node
 - [x] Define encrypted off-host backups, recovery-point and recovery-time objectives, and retention for irreplaceable state
 - [x] Prove every encrypted backup data class restores into a disposable location
-- [ ] Document and execute a clean-Ubuntu rebuild exercise for `brain`
+- [x] Document and execute a clean-Ubuntu rebuild exercise for `brain`
 
 ## Phase 8: Isolated Purple-Team Range
 

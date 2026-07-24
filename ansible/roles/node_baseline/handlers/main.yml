@@ -1,5 +1,6 @@
 ---
 - name: Restart time synchronization
+  when: homelab_manage_time_service | bool
   ansible.builtin.service:
     name: "{{ homelab_time_service }}"
     state: restarted

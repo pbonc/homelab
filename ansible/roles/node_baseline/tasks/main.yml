@@ -40,9 +40,11 @@
   notify: Restart time synchronization
 
 - name: Discover installed services
+  when: homelab_manage_time_service | bool
   ansible.builtin.service_facts:
 
 - name: Verify the selected time provider exists
+  when: homelab_manage_time_service | bool
   ansible.builtin.assert:
     that:
       - (homelab_time_service ~ ".service") in ansible_facts["services"]
@@ -51,6 +53,7 @@
       Choose the node's existing provider rather than replacing it implicitly.
 
 - name: Enable time synchronization
+  when: homelab_manage_time_service | bool
   ansible.builtin.service:
     name: "{{ homelab_time_service }}"
     enabled: true
@@ -120,20 +123,47 @@
 - name: Install Docker where explicitly required
   when: homelab_install_docker | bool
   block:
+    - name: Check whether the Docker package already exists
+      ansible.builtin.command:
+        argv:
+          - dpkg-query
+          - --show
+          - --showformat=${Status}
+          - "{{ homelab_docker_package }}"
+      register: homelab_docker_before
+      changed_when: false
+      failed_when: false
+      check_mode: false
+
     - name: Install the Docker package
       ansible.builtin.apt:
-        name: "{{ homelab_docker_package }}"
+        name:
+          - "{{ homelab_docker_package }}"
+          - "{{ homelab_docker_compose_package }}"
         state: present
 
     - name: Enable the Docker service
+      when: not ansible_check_mode or homelab_docker_before.rc == 0
       ansible.builtin.service:
         name: docker
         enabled: true
         state: started
 
     - name: Permit the administrator to use Docker
+      when: not ansible_check_mode or homelab_docker_before.rc == 0
       ansible.builtin.user:
         name: "{{ homelab_admin_user }}"
         groups:
           - docker
         append: true
+
+    - name: Explain first-run Docker check-mode deferral
+      when:
+        - ansible_check_mode
+        - homelab_docker_before.rc != 0
+      ansible.builtin.debug:
+        msg: >-
+          Docker service enablement and group membership are deferred in this
+          preview because {{ homelab_docker_package }} is not installed yet.
+          They will be applied during the real run and validated by the second
+          check-mode run.

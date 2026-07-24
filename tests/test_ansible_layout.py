@@ -77,6 +77,8 @@ class AnsibleLayoutTests(unittest.TestCase):
         self.assertNotIn("state: absent", tasks)
         self.assertIn("validate: /usr/sbin/visudo -cf %s", tasks)
         self.assertIn("homelab_admin_passwordless_sudo: true", defaults)
+        self.assertIn("docker-compose-v2", defaults)
+        self.assertIn("Explain first-run Docker check-mode deferral", tasks)
         self.assertIn("}}ALL\\n\"", tasks)
 
     def test_docker_is_opt_in_for_the_baseline(self):
@@ -146,6 +148,46 @@ class AnsibleLayoutTests(unittest.TestCase):
         self.assertIn("StartWhenAvailable", scheduler)
         self.assertIn("make backup-run", scheduler)
         self.assertIn("Interactive", scheduler)
+
+    def test_controller_rebuild_is_restricted_to_disposable_target(self):
+        inventory = (
+            ROOT / "ansible" / "inventories" / "rebuild" / "hosts.yml"
+        ).read_text(encoding="utf-8")
+        playbook = (
+            ROOT / "ansible" / "playbooks" / "controller-rebuild.yml"
+        ).read_text(encoding="utf-8")
+        runbook = (
+            ROOT / "docs" / "runbooks" / "brain-rebuild.md"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn("rebuild-lab", inventory)
+        self.assertIn("homelab_environment: rebuild", inventory)
+        self.assertIn("homelab_install_docker: true", inventory)
+        self.assertIn("homelab_manage_time_service: false", inventory)
+        self.assertIn("ansible_become_flags: -H -n", inventory)
+        self.assertIn("/etc/homelab-rebuild-lab", playbook)
+        self.assertIn("ansible_facts['hostname'] != 'brain'", playbook)
+        self.assertIn("192.168.1.23", playbook)
+        self.assertIn("wsl --unregister Homelab-Rebuild-Lab", runbook)
+        self.assertIn("Never substitute", runbook)
+        self.assertIn("99-homelab-rebuild-bootstrap", runbook)
+        self.assertIn("visudo -cf", runbook)
+        self.assertIn("Never install this file on", runbook)
+        self.assertNotIn("StrictHostKeyChecking=no", runbook)
+
+        validator = (
+            ROOT / "scripts" / "rebuild_stage_validate.sh"
+        ).read_text(encoding="utf-8")
+        self.assertIn("/etc/homelab-rebuild-lab", validator)
+        self.assertIn('hostname -s)" != "brain"', validator)
+        self.assertIn("192.168.1.23", validator)
+        self.assertIn("docker compose version", validator)
+        self.assertGreaterEqual(validator.count("config --quiet"), 5)
+        self.assertIn("/srv/homelab-rebuild.*", validator)
+        self.assertLess(
+            validator.index('--directory="${repository_root}"'),
+            validator.index("--files-from=-"),
+        )
 
 
 if __name__ == "__main__":
