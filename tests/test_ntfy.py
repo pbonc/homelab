@@ -59,6 +59,8 @@ class NtfyDeploymentTests(unittest.TestCase):
         self.assertIn("HASH_PATTERN", source)
         self.assertIn(r"\$2[aby]\$", source)
         self.assertIn('replace("$", "$$")', source)
+        self.assertIn("pty.openpty()", source)
+        self.assertIn('"--tty"', source)
 
 
 if __name__ == "__main__":

@@ -4,8 +4,11 @@
 from __future__ import annotations
 
 import getpass
+import os
 import re
+import select
 import subprocess
+import time
 from pathlib import Path
 
 
@@ -31,19 +34,64 @@ def prompt_password(label: str) -> str:
 
 
 def hash_password(password: str) -> str:
+    if os.name != "posix":
+        raise SystemExit("[FAIL] Run make ntfy-secrets on the Linux host brain")
+
+    # ntfy intentionally reads passwords from a terminal rather than stdin.
+    # Give the pinned container a private pseudo-terminal and capture its
+    # output without echoing either password or hash to the operator.
+    import pty
+
+    master_fd, slave_fd = pty.openpty()
     try:
-        result = subprocess.run(
-            ["docker", "run", "--rm", IMAGE, "user", "hash"],
-            input=f"{password}\n{password}\n",
-            capture_output=True,
-            check=False,
-            text=True,
+        process = subprocess.Popen(
+            [
+                "docker",
+                "run",
+                "--rm",
+                "--interactive",
+                "--tty",
+                IMAGE,
+                "user",
+                "hash",
+            ],
+            stdin=slave_fd,
+            stdout=slave_fd,
+            stderr=slave_fd,
+            close_fds=True,
         )
     except FileNotFoundError as error:
+        os.close(master_fd)
+        os.close(slave_fd)
         raise SystemExit("[FAIL] Docker is required to hash ntfy passwords") from error
+    finally:
+        if "process" in locals():
+            os.close(slave_fd)
 
-    match = HASH_PATTERN.search(result.stdout + "\n" + result.stderr)
-    if result.returncode != 0 or match is None:
+    output = bytearray()
+    deadline = time.monotonic() + 180
+    try:
+        os.write(master_fd, f"{password}\r{password}\r".encode())
+        while process.poll() is None and time.monotonic() < deadline:
+            readable, _, _ = select.select([master_fd], [], [], 0.25)
+            if readable:
+                try:
+                    output.extend(os.read(master_fd, 4096))
+                except OSError:
+                    break
+        if process.poll() is None:
+            remaining = max(0.0, deadline - time.monotonic())
+            try:
+                process.wait(timeout=min(5.0, remaining))
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait()
+    finally:
+        os.close(master_fd)
+
+    decoded = output.decode("utf-8", errors="replace")
+    match = HASH_PATTERN.search(decoded)
+    if process.returncode != 0 or match is None:
         raise SystemExit(
             "[FAIL] ntfy could not hash the password. Ensure Docker is running "
             "and the pinned image can be pulled."
