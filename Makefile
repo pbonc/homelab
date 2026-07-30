@@ -4,7 +4,7 @@ SHELL := /usr/bin/env bash
 # CI portability note:
 # GitHub Actions, GitLab CI, and Jenkins should call these same Make targets.
 
-.PHONY: help doctor status lint test telemetry-test telemetry-run telemetry-secrets telemetry-config security-test security-secrets security-config observability-config observability-up observability-down study-test study-config study-up study-down ansible-inventory ansible-ping ansible-check ansible-bootstrap-check ansible-bootstrap ansible-piaware-observability-check ansible-piaware-observability ansible-vault-create ansible-vault-edit ansible-vault-view rebuild-syntax rebuild-check rebuild-apply rebuild-stage-validate backup-init backup-run backup-check backup-snapshots backup-restore-test backup-prune bootstrap docker-up docker-down homepage-validate homepage-deploy homepage-verify homepage-rollback
+.PHONY: help doctor status lint test telemetry-test telemetry-run telemetry-secrets telemetry-config security-test security-secrets security-config observability-config observability-up observability-down study-test study-config study-up study-down ntfy-test ntfy-secrets ntfy-config ntfy-up ntfy-down ntfy-test-publish ansible-inventory ansible-ping ansible-check ansible-bootstrap-check ansible-bootstrap ansible-piaware-observability-check ansible-piaware-observability ansible-vault-create ansible-vault-edit ansible-vault-view rebuild-syntax rebuild-check rebuild-apply rebuild-stage-validate backup-init backup-run backup-check backup-snapshots backup-restore-test backup-prune bootstrap docker-up docker-down homepage-validate homepage-deploy homepage-verify homepage-rollback
 
 help: ## Show available targets
 >@awk 'BEGIN {FS = ":.*##"; printf "\nAvailable targets:\n"} /^[a-zA-Z0-9_.-]+:.*##/ {printf "  %-14s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -68,6 +68,24 @@ study-up: ## Build and start the Homelab Study Deck
 
 study-down: ## Stop the Study Deck without deleting progress
 >@docker compose --file docker/study-deck/compose.yaml down
+
+ntfy-test: ## Validate ntfy deployment policy
+>@python3 -m unittest discover -s tests -p "test_ntfy.py" -v
+
+ntfy-secrets: ## Create ignored ntfy users, hashes, and passwords
+>@python3 scripts/ntfy_secrets.py
+
+ntfy-config: ## Validate the resolved ntfy Compose configuration
+>@docker compose --env-file docker/ntfy/.env --file docker/ntfy/compose.yaml config --quiet
+
+ntfy-up: ## Start the authenticated LAN-only ntfy server
+>@docker compose --env-file docker/ntfy/.env --file docker/ntfy/compose.yaml up --detach
+
+ntfy-down: ## Stop ntfy without deleting messages or access control
+>@docker compose --env-file docker/ntfy/.env --file docker/ntfy/compose.yaml down
+
+ntfy-test-publish: ## Send one authenticated test notification
+>@bash scripts/ntfy_test_publish.sh
 
 ansible-inventory: ## Show the effective production Ansible inventory
 >@ANSIBLE_CONFIG="$(CURDIR)/ansible/ansible.cfg" ansible-inventory --graph

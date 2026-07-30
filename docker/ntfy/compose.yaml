@@ -1,0 +1,42 @@
+name: ntfy
+
+services:
+  ntfy:
+    image: binwiederhier/ntfy@sha256:081b53dbb20674fcfe05fdb4eb8af9036a2645ef979543d16f7f80803af467b1 # v2.26.3
+    container_name: ntfy
+    command:
+      - serve
+    ports:
+      - "192.168.1.23:8093:80"
+    environment:
+      TZ: America/Chicago
+      NTFY_AUTH_USERS: ${NTFY_AUTH_USERS:?Run make ntfy-secrets}
+      NTFY_AUTH_ACCESS: ${NTFY_AUTH_ACCESS:?Run make ntfy-secrets}
+    volumes:
+      - ./server.yml:/etc/ntfy/server.yml:ro
+      - ntfy-data:/var/lib/ntfy
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          wget -q --tries=1 http://127.0.0.1:80/v1/health -O - |
+          grep -Eo '"healthy"\s*:\s*true' || exit 1
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    init: true
+    restart: unless-stopped
+    mem_limit: 192m
+    cpus: 0.50
+    pids_limit: 128
+
+volumes:
+  ntfy-data:

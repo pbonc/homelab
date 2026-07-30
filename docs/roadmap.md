@@ -224,6 +224,24 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [x] Document offline buffering, restart behavior, retention, and troubleshooting
 - [x] Complete an outage and recovery exercise without affecting the controller node
 
+## Post-Sprint 9 Hotfix: ntfy Notification Delivery
+
+- [x] Confirm the phone platform and choose a reachability model: iPhone on the trusted home LAN only
+- [x] Document the mobile delivery boundary, including the self-hosted iOS upstream poll-request flow and the requirement that the phone can reach the Homelab server to fetch message content
+- [ ] Deploy a digest-pinned ntfy server on `brain` with a persistent message cache, authentication database, health check, bounded retention, and explicit resource limits
+- [ ] Default to deny-all access, disable public signup, prohibit anonymous publishing, and create separate least-privilege publisher and subscriber credentials
+- [ ] Store ntfy credentials and Web Push keys outside Git; do not rely on an obscure topic name as the security boundary
+- [ ] Add Alertmanager and route existing Prometheus firing and resolved alerts through ntfy's Alertmanager webhook formatter
+- [ ] Define notification grouping, inhibition, severity-to-priority mapping, repeat intervals, quiet behavior, and recovery messages before enabling phone delivery
+- [ ] Start with actionable events: critical service outages, sustained resource pressure, stale telemetry, backup failures, failed deployments, and meaningful security-state changes
+- [ ] Keep routine successes and transient failures out of the phone channel unless an explicit digest or low-priority policy calls for them
+- [ ] Keep notification bodies concise and free of secrets, tokens, private finding details, aircraft identities, and sensitive infrastructure metadata
+- [ ] Add ntfy health, delivery failures, storage use, and Alertmanager status to `labctl`, Prometheus, Grafana, and the observability runbook without creating a notification feedback loop
+- [ ] Add an equal-height ntfy card to Homepage after live phone delivery is verified, linking to its LAN web interface and showing a supported health state without exposing its topic or credentials
+- [ ] Bump the Homepage semantic version and verify the ntfy card, link target, health behavior, responsive layout, and unavailable-state fallback during the manual deployment
+- [ ] Back up and restore only the required ntfy state, document token rotation, and prove a clean rebuild can re-establish subscriptions safely
+- [ ] Exercise firing, grouping, resolution, invalid credentials, ntfy outage, phone-off-LAN behavior, delayed delivery, and recovery without losing the underlying Prometheus alert state
+
 ## Post-Sprint 9 Hotfix: Interview Talking Point Strip
 
 - [ ] Add concise interview talking points to the Study Deck for the recent observability, PiAware, Ansible, backup, and clean-rebuild work

@@ -1,0 +1,15 @@
+base-url: "http://192.168.1.23:8093"
+listen-http: ":80"
+
+cache-file: "/var/lib/ntfy/cache.db"
+cache-duration: "7d"
+auth-file: "/var/lib/ntfy/user.db"
+auth-default-access: "deny-all"
+
+# iOS receives an opaque wake-up poll through ntfy.sh, then fetches the actual
+# message from this LAN-only server. Notification content is not relayed.
+upstream-base-url: "https://ntfy.sh"
+
+enable-login: true
+enable-signup: false
+web-root: "app"

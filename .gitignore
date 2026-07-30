@@ -24,3 +24,7 @@ docker/security-status/secrets/
 
 # Study Deck runtime progress
 docker/study-deck/study.db*
+
+# ntfy runtime credentials and generated configuration
+docker/ntfy/.env
+docker/ntfy/secrets/
