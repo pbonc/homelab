@@ -424,6 +424,23 @@
 		return topology;
 	}
 
+	function wireTopologyCard() {
+		const card = serviceCard("Network Inventory");
+		if (!card || card.dataset.topologyWired === "true") return;
+		card.dataset.topologyWired = "true";
+		card.addEventListener("click", (event) => {
+			if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey) return;
+			event.preventDefault();
+			event.stopPropagation();
+			event.stopImmediatePropagation();
+			const topology = topologyPanel();
+			if (!topology) return;
+			topology.open = true;
+			window.history.replaceState(null, "", "#network-topology");
+			topology.scrollIntoView({ behavior: "smooth", block: "start" });
+		}, { capture: true });
+	}
+
 	function topologyNode(node) {
 		const element = document.createElement("div");
 		element.className = "network-topology-node";
@@ -575,6 +592,7 @@
 			resourcesFlyout();
 			weatherBanner();
 			topologyPanel();
+			wireTopologyCard();
 			markLifecycleCards();
 			updateBrainHealth();
 		});

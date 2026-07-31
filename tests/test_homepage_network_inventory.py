@@ -23,10 +23,13 @@ class HomepageNetworkInventoryTests(unittest.TestCase):
         self.assertIn('topology.id = "network-topology"', custom)
         self.assertIn('window.location.hash === "#network-topology"', custom)
         self.assertIn("topology.open = true", custom)
+        self.assertIn('serviceCard("Network Inventory")', custom)
+        self.assertIn("event.preventDefault()", custom)
+        self.assertIn("wireTopologyCard()", custom)
 
     def test_card_is_part_of_topology_minor_release(self):
         version = (HOMEPAGE / "version.env").read_text(encoding="utf-8")
-        self.assertIn("HOMEPAGE_VAR_DASHBOARD_VERSION=0.11.1", version)
+        self.assertIn("HOMEPAGE_VAR_DASHBOARD_VERSION=0.11.2", version)
 
 
 if __name__ == "__main__":
