@@ -1,0 +1,133 @@
+# Network Inventory and Topology Contract
+
+## Purpose
+
+The network inventory watcher detects devices on the trusted home `/24`,
+persists first-seen and last-seen state, and identifies repeatedly observed
+unknown devices for notification. Its read-only topology API also supplies the
+Homepage network map.
+
+Discovery and presentation are separate concerns. The watcher owns identity,
+state, confirmation, and evidence. The Homepage owns layout and interaction.
+Changing graph libraries must never require migrating scanner state.
+
+## Truth boundary
+
+ARP and bounded host discovery can demonstrate that an address and MAC were
+observed on the local broadcast domain. They cannot prove a physical switch
+port, Wi-Fi access point, cable, or traffic path. The initial topology therefore
+contains:
+
+- declared infrastructure nodes such as the router, `brain`, and `piaware`;
+- one shared trusted-LAN segment;
+- observed clients attached to that segment; and
+- declared service-hosting edges where repository configuration is the source.
+
+Every edge records its source as `declared` or `observed`. The API does not emit
+speculative physical relationships merely to make the visualization attractive.
+
+## Version 1 API
+
+`GET /api/v1/topology` returns:
+
+```json
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-07-31T00:00:00Z",
+  "discovery": {
+    "state": "healthy",
+    "last_completed_at": "2026-07-31T00:00:00Z",
+    "network": "192.168.1.0/24"
+  },
+  "nodes": [
+    {
+      "id": "host-brain",
+      "name": "brain",
+      "kind": "controller",
+      "status": "online",
+      "known": true,
+      "addresses": ["192.168.1.23"],
+      "mac": null,
+      "vendor": null,
+      "first_seen_at": "2026-07-31T00:00:00Z",
+      "last_seen_at": "2026-07-31T00:00:00Z",
+      "source": "declared"
+    }
+  ],
+  "edges": [
+    {
+      "id": "lan-brain",
+      "source_id": "segment-trusted-lan",
+      "target_id": "host-brain",
+      "kind": "membership",
+      "evidence": "declared"
+    }
+  ]
+}
+```
+
+Node identifiers are stable and are not derived from a current IP address.
+Addresses may change without creating a new node. Timestamps are UTC RFC 3339.
+The API is read-only, credential-free on the trusted LAN, and contains no
+router credentials, notification credentials, traffic contents, or cloud vendor
+lookups.
+
+`GET /api/v1/health` reports API and discovery freshness separately. A working
+API with an old scan is `stale`, not healthy and not unavailable.
+
+## Identity and confirmation
+
+The initial durable identity is the normalized MAC address. Known devices map
+that identity to a stable repository-managed name and kind. Unknown devices
+receive an opaque stable node ID and remain unacknowledged until explicitly
+added to the known inventory.
+
+A new-device event requires sightings in at least two completed scans separated
+by a confirmation interval. A single sighting never pages the phone. One
+identity generates one notification until it is acknowledged or expires and is
+later rediscovered under an explicit re-notification policy.
+
+Locally administered MAC addresses are labeled as private/randomized. They use a
+longer confirmation window and conservative notification policy. Ordinary
+departures and address changes update the map but do not create immediate phone
+notifications.
+
+## Persistence
+
+SQLite stores devices, addresses, observations, notification state, and scan
+runs. Writes are transactional. The database survives container recreation and
+is included in encrypted backup and restore tests. Raw scan output is not
+retained after observations are normalized.
+
+The service runs a bounded Nmap host-discovery scan of only
+`192.168.1.0/24` once per minute. It has host networking so ARP discovery
+reflects the controller's LAN, but drops every Linux capability except
+`NET_RAW`. It performs no port scan, DNS lookup, cloud lookup, or traffic
+capture.
+
+When an unknown device crosses its confirmation threshold, the service
+publishes one authenticated message to the existing `homelab-alerts` topic and
+records delivery in SQLite. A failed publish remains pending and is retried
+after the next scan; routine offline transitions do not notify.
+
+The first completed scan is a silent baseline: existing unknown devices appear
+in inventory but never generate a delayed notification merely because the
+watcher was installed. Devices first observed after that baseline follow the
+normal confirmation policy.
+
+## Homepage presentation
+
+The Homepage receives a compact, collapsible topology panel rather than an
+always-expanded canvas that changes card geometry. The collapsed summary shows
+online, offline, and unacknowledged counts. Opening it displays the bounded map;
+a separate full-view link may provide more room.
+
+The renderer must:
+
+- keep a fixed maximum height and never stretch service-card rows;
+- center sparse layouts and remain usable with many clients;
+- distinguish offline, unknown, and stale discovery states without relying on
+  color alone;
+- support keyboard navigation and reduced motion;
+- stop animation after layout stabilization; and
+- show a quiet fallback when the inventory API is unavailable.

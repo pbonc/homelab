@@ -1,0 +1,51 @@
+name: network-inventory
+
+services:
+  network-inventory:
+    build:
+      context: .
+    image: homelab/network-inventory:0.1.0
+    container_name: network-inventory
+    network_mode: host
+    environment:
+      NETWORK_INVENTORY_DATABASE: /data/inventory.db
+      NETWORK_INVENTORY_KNOWN_DEVICES: /app/config/known-devices.json
+      NETWORK_INVENTORY_NETWORK: 192.168.1.0/24
+      NETWORK_INVENTORY_SCAN_INTERVAL_SECONDS: "60"
+      NETWORK_INVENTORY_SCAN_STALE_SECONDS: "300"
+      NETWORK_INVENTORY_OFFLINE_SECONDS: "300"
+      NETWORK_INVENTORY_CONFIRMATION_SECONDS: "300"
+      NETWORK_INVENTORY_PRIVATE_CONFIRMATION_SECONDS: "1800"
+      NETWORK_INVENTORY_NTFY_URL: http://192.168.1.23:8093/homelab-alerts
+      NETWORK_INVENTORY_NTFY_USERNAME: homelab-publisher
+      NETWORK_INVENTORY_NTFY_PASSWORD_FILE: /run/secrets/ntfy_publisher_password
+    volumes:
+      - network-inventory-data:/data
+      - ./config:/app/config:ro
+      - ../ntfy/secrets/publisher_password.txt:/run/secrets/ntfy_publisher_password:ro
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_RAW
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8030/api/v1/health', timeout=3)"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+    mem_limit: 128m
+    cpus: 0.25
+    pids_limit: 64
+
+volumes:
+  network-inventory-data:

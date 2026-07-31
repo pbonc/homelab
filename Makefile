@@ -4,7 +4,7 @@ SHELL := /usr/bin/env bash
 # CI portability note:
 # GitHub Actions, GitLab CI, and Jenkins should call these same Make targets.
 
-.PHONY: help doctor status lint test telemetry-test telemetry-run telemetry-secrets telemetry-config security-test security-secrets security-config observability-config observability-up observability-down alertmanager-test study-test study-config study-up study-down ntfy-test ntfy-secrets ntfy-config ntfy-up ntfy-down ntfy-test-publish ansible-inventory ansible-ping ansible-check ansible-bootstrap-check ansible-bootstrap ansible-piaware-observability-check ansible-piaware-observability ansible-vault-create ansible-vault-edit ansible-vault-view rebuild-syntax rebuild-check rebuild-apply rebuild-stage-validate backup-init backup-run backup-check backup-snapshots backup-restore-test backup-prune bootstrap docker-up docker-down homepage-validate homepage-deploy homepage-verify homepage-rollback
+.PHONY: help doctor status lint test telemetry-test telemetry-run telemetry-secrets telemetry-config security-test security-secrets security-config observability-config observability-up observability-down alertmanager-test study-test study-config study-up study-down network-inventory-test network-inventory-config network-inventory-up network-inventory-down ntfy-test ntfy-secrets ntfy-config ntfy-up ntfy-down ntfy-test-publish ansible-inventory ansible-ping ansible-check ansible-bootstrap-check ansible-bootstrap ansible-piaware-observability-check ansible-piaware-observability ansible-vault-create ansible-vault-edit ansible-vault-view rebuild-syntax rebuild-check rebuild-apply rebuild-stage-validate backup-init backup-run backup-check backup-snapshots backup-restore-test backup-prune bootstrap docker-up docker-down homepage-validate homepage-deploy homepage-verify homepage-rollback
 
 help: ## Show available targets
 >@awk 'BEGIN {FS = ":.*##"; printf "\nAvailable targets:\n"} /^[a-zA-Z0-9_.-]+:.*##/ {printf "  %-14s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -72,6 +72,18 @@ study-up: ## Build and start the Homelab Study Deck
 
 study-down: ## Stop the Study Deck without deleting progress
 >@docker compose --file docker/study-deck/compose.yaml down
+
+network-inventory-test: ## Validate network inventory identity and confirmation behavior
+>@python3 -m unittest discover -s tests -p "test_network_inventory.py" -v
+
+network-inventory-config: ## Validate the network inventory Compose configuration
+>@docker compose --file docker/network-inventory/compose.yaml config --quiet
+
+network-inventory-up: ## Build and start the network inventory API
+>@docker compose --file docker/network-inventory/compose.yaml up --detach --build
+
+network-inventory-down: ## Stop the network inventory API without deleting state
+>@docker compose --file docker/network-inventory/compose.yaml down
 
 ntfy-test: ## Validate ntfy deployment policy
 >@python3 -m unittest discover -s tests -p "test_ntfy.py" -v

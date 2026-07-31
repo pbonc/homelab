@@ -28,6 +28,7 @@ special cases.
 | Telemetry | Telemetry Collector, InfluxDB, Grafana | Ingestion, durable time-series storage, APIs, and dashboards |
 | Security scanning | Aikido GitHub App | Read-only repository scanning and a static Homepage dashboard link |
 | Observability | Prometheus, Node Exporter, Loki, Alloy | Host metrics, availability probes, alerts, and constrained Docker logs |
+| Network inventory | Inventory API, SQLite | Stable LAN device identity, confirmation state, and truthful topology data |
 | Host service | GitHub Actions runner | Manually triggered validation and production deployment jobs |
 
 The Homepage stack is deployed through immutable releases under

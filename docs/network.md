@@ -29,6 +29,7 @@ internet without a deliberate authenticated reverse-proxy and TLS design.
 | 8086 | InfluxDB | `http://192.168.1.23:8086` | Time-series API and administration |
 | 3001 | Grafana | `http://192.168.1.23:3001` | Anonymous Viewer dashboards; authenticated administration |
 | 8020 | Study Deck | `http://192.168.1.23:8020` | LAN-only study notes, quizzes, and local progress |
+| 8030 | Network Inventory | `http://192.168.1.23:8030` | Read-only topology API and discovery freshness |
 | 8093 | ntfy | `http://192.168.1.23:8093` | Authenticated LAN-only notification API and web client |
 | 9090 | Prometheus | `http://192.168.1.23:9090` | Metrics queries and administration on the trusted LAN |
 | 9093 | Alertmanager | `http://192.168.1.23:9093` | Trusted-LAN alert state, grouping, silences, and delivery status |
