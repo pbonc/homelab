@@ -40,7 +40,7 @@ def parse_nmap_xml(payload: str) -> list[Observation]:
 
 def scan(network: str, *, timeout_seconds: int = 50) -> list[Observation]:
     result = subprocess.run(
-        ["nmap", "-sn", "-n", "-oX", "-", network],
+        ["nmap", "--privileged", "-sn", "-n", "-oX", "-", network],
         check=True,
         capture_output=True,
         text=True,

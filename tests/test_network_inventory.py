@@ -16,7 +16,7 @@ sys.path.insert(0, str(SERVICE_ROOT))
 
 from network_inventory.config import KnownInventory, is_private_mac  # noqa: E402
 from network_inventory.notifier import publish_unknown_device  # noqa: E402
-from network_inventory.scanner import parse_nmap_xml  # noqa: E402
+from network_inventory.scanner import parse_nmap_xml, scan  # noqa: E402
 from network_inventory.store import InventoryStore, Observation  # noqa: E402
 
 
@@ -215,6 +215,17 @@ class NetworkInventoryTests(unittest.TestCase):
                 )
             ],
         )
+
+    @patch("network_inventory.scanner.subprocess.run")
+    def test_scan_uses_raw_discovery_without_privileging_the_container(
+        self, run
+    ) -> None:
+        run.return_value.stdout = "<nmaprun/>"
+        self.assertEqual(scan("192.168.1.0/24"), [])
+        command = run.call_args.args[0]
+        self.assertIn("--privileged", command)
+        self.assertIn("-sn", command)
+        self.assertNotIn("-sS", command)
 
     def test_ntfy_publish_uses_basic_auth_and_topic_endpoint(self) -> None:
         class Response:
