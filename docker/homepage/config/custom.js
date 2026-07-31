@@ -428,17 +428,22 @@
 		const card = serviceCard("Network Inventory");
 		if (!card || card.dataset.topologyWired === "true") return;
 		card.dataset.topologyWired = "true";
-		card.addEventListener("click", (event) => {
-			if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey) return;
-			event.preventDefault();
-			event.stopPropagation();
-			event.stopImmediatePropagation();
+		card.setAttribute("role", "button");
+		card.tabIndex = 0;
+		card.setAttribute("aria-label", "Open the Network Map");
+		const openTopology = () => {
 			const topology = topologyPanel();
 			if (!topology) return;
 			topology.open = true;
 			window.history.replaceState(null, "", "#network-topology");
 			topology.scrollIntoView({ behavior: "smooth", block: "start" });
-		}, { capture: true });
+		};
+		card.addEventListener("click", openTopology);
+		card.addEventListener("keydown", (event) => {
+			if (event.key !== "Enter" && event.key !== " ") return;
+			event.preventDefault();
+			openTopology();
+		});
 	}
 
 	function topologyNode(node) {

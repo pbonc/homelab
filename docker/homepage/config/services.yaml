@@ -78,7 +78,6 @@
         description: "Observe | Platform metrics and alerts"
     - Network Inventory:
         icon: mdi-lan
-        href: http://192.168.1.23:3000/#network-topology
         siteMonitor: http://192.168.1.23:8030/api/v1/health
         description: "Observe | LAN discovery and device topology"
     - Loki:

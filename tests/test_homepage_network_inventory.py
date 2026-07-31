@@ -14,7 +14,7 @@ class HomepageNetworkInventoryTests(unittest.TestCase):
         card = services.split("    - Network Inventory:", 1)[1].split(
             "    - Loki:", 1
         )[0]
-        self.assertIn("href: http://192.168.1.23:3000/#network-topology", card)
+        self.assertNotIn("href:", card)
         self.assertIn("siteMonitor: http://192.168.1.23:8030/api/v1/health", card)
         self.assertNotIn("target: _blank", card)
 
@@ -24,12 +24,13 @@ class HomepageNetworkInventoryTests(unittest.TestCase):
         self.assertIn('window.location.hash === "#network-topology"', custom)
         self.assertIn("topology.open = true", custom)
         self.assertIn('serviceCard("Network Inventory")', custom)
-        self.assertIn("event.preventDefault()", custom)
+        self.assertIn('card.setAttribute("role", "button")', custom)
+        self.assertIn('event.key !== "Enter"', custom)
         self.assertIn("wireTopologyCard()", custom)
 
     def test_card_is_part_of_topology_minor_release(self):
         version = (HOMEPAGE / "version.env").read_text(encoding="utf-8")
-        self.assertIn("HOMEPAGE_VAR_DASHBOARD_VERSION=0.11.2", version)
+        self.assertIn("HOMEPAGE_VAR_DASHBOARD_VERSION=0.11.3", version)
 
 
 if __name__ == "__main__":

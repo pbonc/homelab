@@ -31,7 +31,7 @@ class HomepageTopologyTests(unittest.TestCase):
 
     def test_topology_release_is_a_minor_dashboard_version(self):
         version = (HOMEPAGE / "version.env").read_text(encoding="utf-8")
-        self.assertIn("HOMEPAGE_VAR_DASHBOARD_VERSION=0.11.2", version)
+        self.assertIn("HOMEPAGE_VAR_DASHBOARD_VERSION=0.11.3", version)
 
 
 if __name__ == "__main__":

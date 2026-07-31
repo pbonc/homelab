@@ -268,6 +268,16 @@ main,
   border-left: 3px solid #f59e0b;
 }
 
+.service-card[data-topology-wired="true"] {
+  cursor: pointer;
+}
+
+.service-card[data-topology-wired="true"]:focus-visible {
+  border-color: var(--dash-accent);
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.18);
+  outline: none;
+}
+
 .homelab-resources {
   position: relative;
   z-index: 80;
