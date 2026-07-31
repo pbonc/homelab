@@ -89,6 +89,21 @@ class PiAwareObservabilityTests(unittest.TestCase):
         self.assertIn("--collector.textfile.directory=", exporter)
         self.assertNotIn("0.0.0.0", exporter)
 
+    def test_node_exporter_waits_for_reserved_wifi_address(self):
+        tasks = (ROLE / "tasks" / "main.yml").read_text(encoding="utf-8")
+        override = (
+            ROLE / "templates" / "prometheus-node-exporter.network.conf.j2"
+        ).read_text(encoding="utf-8")
+        handlers = (ROLE / "handlers" / "main.yml").read_text(encoding="utf-8")
+        self.assertIn("prometheus-node-exporter.service.d", tasks)
+        self.assertIn("Wants=network-online.target", override)
+        self.assertIn("After=network-online.target", override)
+        self.assertIn("StartLimitIntervalSec=0", override)
+        self.assertIn("RestartSec=10s", override)
+        self.assertIn("piaware_node_exporter_address", override)
+        self.assertIn("ip -4 -o address show", override)
+        self.assertIn("daemon_reload: true", handlers)
+
     def test_timer_refreshes_metrics_without_persisting_missed_runs(self):
         timer = (
             ROLE / "templates" / "piaware-metrics.timer.j2"

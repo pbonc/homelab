@@ -1,0 +1,11 @@
+# Managed by Ansible. The receiver may obtain its reserved Wi-Fi lease after
+# network-online.target, so do not bind Node Exporter until the address exists.
+[Unit]
+Wants=network-online.target
+After=network-online.target
+StartLimitIntervalSec=0
+
+[Service]
+Restart=on-failure
+RestartSec=10s
+ExecStartPre=/bin/sh -c 'for attempt in $(seq 1 60); do ip -4 -o address show | grep -Fq " {{ piaware_node_exporter_address }}/" && exit 0; sleep 2; done; exit 1'

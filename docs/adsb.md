@@ -159,6 +159,12 @@ If metrics are stale, verify in this order:
 5. `python3 -m labctl status` on Brain reports a current collector and decoder
    report.
 
+Node Exporter binds only to the Pi's reserved LAN address. A systemd drop-in
+waits up to two minutes for that address before each start, retries failures at
+ten-second intervals, and disables systemd's rapid-start lockout. This handles
+the observed boot sequence where PiAware obtained its Wi-Fi DHCP lease after
+the packaged exporter had already exhausted its default restart attempts.
+
 Do not delete `piaware.prom` during diagnosis: preserving it makes staleness
 observable. Reapply the Ansible role if unit or exporter configuration has
 drifted.

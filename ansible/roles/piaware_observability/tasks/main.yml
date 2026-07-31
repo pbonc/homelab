@@ -51,6 +51,23 @@
     mode: "0644"
   notify: Restart PiAware Node Exporter
 
+- name: Create the Node Exporter systemd override directory
+  ansible.builtin.file:
+    path: /etc/systemd/system/prometheus-node-exporter.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+
+- name: Wait for the reserved Pi address before starting Node Exporter
+  ansible.builtin.template:
+    src: prometheus-node-exporter.network.conf.j2
+    dest: /etc/systemd/system/prometheus-node-exporter.service.d/10-homelab-network.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Restart PiAware Node Exporter
+
 - name: Install the PiAware metrics service
   ansible.builtin.template:
     src: piaware-metrics.service.j2
