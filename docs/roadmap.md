@@ -231,11 +231,11 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [x] Deploy a digest-pinned ntfy server on `brain` with a persistent message cache, authentication database, health check, bounded retention, and explicit resource limits
 - [x] Default to deny-all access, disable public signup, prohibit anonymous publishing, and create separate least-privilege publisher and subscriber credentials
 - [x] Store ntfy credentials and Web Push keys outside Git; do not rely on an obscure topic name as the security boundary
-- [ ] Add Alertmanager and route existing Prometheus firing and resolved alerts through ntfy's Alertmanager webhook formatter
-- [ ] Define notification grouping, inhibition, severity-to-priority mapping, repeat intervals, quiet behavior, and recovery messages before enabling phone delivery
+- [x] Add Alertmanager and route existing Prometheus firing and resolved alerts through ntfy's Alertmanager webhook formatter
+- [x] Define notification grouping, inhibition, severity-to-priority mapping, repeat intervals, quiet behavior, and recovery messages before enabling phone delivery
 - [ ] Start with actionable events: critical service outages, sustained resource pressure, stale telemetry, backup failures, failed deployments, and meaningful security-state changes
-- [ ] Keep routine successes and transient failures out of the phone channel unless an explicit digest or low-priority policy calls for them
-- [ ] Keep notification bodies concise and free of secrets, tokens, private finding details, aircraft identities, and sensitive infrastructure metadata
+- [x] Keep routine successes and transient failures out of the phone channel unless an explicit digest or low-priority policy calls for them
+- [x] Keep notification bodies concise and free of secrets, tokens, private finding details, aircraft identities, and sensitive infrastructure metadata
 - [ ] Add ntfy health, delivery failures, storage use, and Alertmanager status to `labctl`, Prometheus, Grafana, and the observability runbook without creating a notification feedback loop
 - [ ] Add an equal-height ntfy card to Homepage after live phone delivery is verified, linking to its LAN web interface and showing a supported health state without exposing its topic or credentials
 - [ ] Bump the Homepage semantic version and verify the ntfy card, link target, health behavior, responsive layout, and unavailable-state fallback during the manual deployment

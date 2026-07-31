@@ -166,6 +166,12 @@ The test creates a clearly labeled synthetic alert, waits for its firing
 notification, and then resolves it. The recovery notification can arrive about
 ten seconds after the command finishes. Confirm both messages on the iPhone.
 
+The end-to-end exercise passed on 2026-07-31. Alertmanager accepted the
+synthetic firing alert, authenticated to ntfy using its mounted write-only
+publisher credential, and delivered both firing and resolved notifications to
+the LAN-connected iPhone. The exercise also caught and corrected the original
+publisher-file mode before production alerts were relied upon.
+
 ## Acceptance boundary
 
 The first release is accepted only when:
