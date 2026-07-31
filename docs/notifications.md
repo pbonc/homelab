@@ -104,6 +104,36 @@ make ntfy-test-publish
 Do not paste either password into chat, Git, shell history, documentation, or
 the Homepage configuration.
 
+## Alertmanager delivery policy
+
+Prometheus sends firing and resolved alerts to the digest-pinned Alertmanager
+service. Alertmanager groups by alert name, service, and instance, waits 30
+seconds for related signals, delays changes to an existing group for five
+minutes, and repeats a continuously firing incident at most every four hours.
+The critical root-disk alert inhibits the corresponding lower-threshold warning.
+
+Alertmanager reads the write-only ntfy publisher password from
+`docker/ntfy/secrets/publisher_password.txt` through a read-only container
+mount. Its ignored parent directory is mode `0700`; the mounted publisher file
+is mode `0644` so the non-root Alertmanager process can read it. The separate
+iPhone password and generated environment remain mode `0600`. The password is
+never embedded in Alertmanager configuration. Notifications use ntfy's built-in
+Alertmanager template, contain at most ten alerts per delivery, and include
+resolved messages.
+
+After deploying the observability stack, exercise the complete delivery path
+without stopping a real service:
+
+```bash
+make observability-config
+make observability-up
+make alertmanager-test
+```
+
+The test creates a clearly labeled synthetic alert, waits for its firing
+notification, and then resolves it. The recovery notification can arrive about
+ten seconds after the command finishes. Confirm both messages on the iPhone.
+
 ## Acceptance boundary
 
 The first release is accepted only when:

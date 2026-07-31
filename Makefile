@@ -4,7 +4,7 @@ SHELL := /usr/bin/env bash
 # CI portability note:
 # GitHub Actions, GitLab CI, and Jenkins should call these same Make targets.
 
-.PHONY: help doctor status lint test telemetry-test telemetry-run telemetry-secrets telemetry-config security-test security-secrets security-config observability-config observability-up observability-down study-test study-config study-up study-down ntfy-test ntfy-secrets ntfy-config ntfy-up ntfy-down ntfy-test-publish ansible-inventory ansible-ping ansible-check ansible-bootstrap-check ansible-bootstrap ansible-piaware-observability-check ansible-piaware-observability ansible-vault-create ansible-vault-edit ansible-vault-view rebuild-syntax rebuild-check rebuild-apply rebuild-stage-validate backup-init backup-run backup-check backup-snapshots backup-restore-test backup-prune bootstrap docker-up docker-down homepage-validate homepage-deploy homepage-verify homepage-rollback
+.PHONY: help doctor status lint test telemetry-test telemetry-run telemetry-secrets telemetry-config security-test security-secrets security-config observability-config observability-up observability-down alertmanager-test study-test study-config study-up study-down ntfy-test ntfy-secrets ntfy-config ntfy-up ntfy-down ntfy-test-publish ansible-inventory ansible-ping ansible-check ansible-bootstrap-check ansible-bootstrap ansible-piaware-observability-check ansible-piaware-observability ansible-vault-create ansible-vault-edit ansible-vault-view rebuild-syntax rebuild-check rebuild-apply rebuild-stage-validate backup-init backup-run backup-check backup-snapshots backup-restore-test backup-prune bootstrap docker-up docker-down homepage-validate homepage-deploy homepage-verify homepage-rollback
 
 help: ## Show available targets
 >@awk 'BEGIN {FS = ":.*##"; printf "\nAvailable targets:\n"} /^[a-zA-Z0-9_.-]+:.*##/ {printf "  %-14s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -48,6 +48,7 @@ security-config: ## Validate the resolved security status Compose configuration
 observability-config: ## Validate the Prometheus and Node Exporter Compose configuration
 >@docker compose --file docker/observability/compose.yaml config --quiet
 >@docker compose --file docker/observability/compose.yaml run --rm --no-deps --entrypoint promtool prometheus check config /etc/prometheus/prometheus.yml
+>@docker compose --file docker/observability/compose.yaml run --rm --no-deps --entrypoint amtool alertmanager check-config /etc/alertmanager/alertmanager.yml
 >@docker compose --file docker/observability/compose.yaml run --rm --no-deps loki -verify-config=true -config.file=/etc/loki/config.yml
 >@docker compose --file docker/observability/compose.yaml run --rm --no-deps alloy validate /etc/alloy/config.alloy
 
@@ -56,6 +57,9 @@ observability-up: ## Start Prometheus and Node Exporter
 
 observability-down: ## Stop Prometheus and Node Exporter without deleting metrics
 >@docker compose --file docker/observability/compose.yaml down
+
+alertmanager-test: ## Send a synthetic firing and resolved alert through ntfy
+>@bash scripts/alertmanager_test.sh
 
 study-test: ## Validate Study Deck content and progress behavior
 >@python3 -m unittest discover -s tests -p "test_study_deck.py" -v

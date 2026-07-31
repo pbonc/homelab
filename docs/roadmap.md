@@ -228,9 +228,9 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 
 - [x] Confirm the phone platform and choose a reachability model: iPhone on the trusted home LAN only
 - [x] Document the mobile delivery boundary, including the self-hosted iOS upstream poll-request flow and the requirement that the phone can reach the Homelab server to fetch message content
-- [ ] Deploy a digest-pinned ntfy server on `brain` with a persistent message cache, authentication database, health check, bounded retention, and explicit resource limits
-- [ ] Default to deny-all access, disable public signup, prohibit anonymous publishing, and create separate least-privilege publisher and subscriber credentials
-- [ ] Store ntfy credentials and Web Push keys outside Git; do not rely on an obscure topic name as the security boundary
+- [x] Deploy a digest-pinned ntfy server on `brain` with a persistent message cache, authentication database, health check, bounded retention, and explicit resource limits
+- [x] Default to deny-all access, disable public signup, prohibit anonymous publishing, and create separate least-privilege publisher and subscriber credentials
+- [x] Store ntfy credentials and Web Push keys outside Git; do not rely on an obscure topic name as the security boundary
 - [ ] Add Alertmanager and route existing Prometheus firing and resolved alerts through ntfy's Alertmanager webhook formatter
 - [ ] Define notification grouping, inhibition, severity-to-priority mapping, repeat intervals, quiet behavior, and recovery messages before enabling phone delivery
 - [ ] Start with actionable events: critical service outages, sustained resource pressure, stale telemetry, backup failures, failed deployments, and meaningful security-state changes

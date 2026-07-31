@@ -25,10 +25,45 @@ services:
       - no-new-privileges:true
     restart: unless-stopped
     depends_on:
+      alertmanager:
+        condition: service_healthy
       node-exporter:
         condition: service_started
       blackbox-exporter:
         condition: service_started
+
+  alertmanager:
+    # Alertmanager 0.32.1
+    image: quay.io/prometheus/alertmanager@sha256:51a825c2a40acc3e338fdd00d622e01ec090f72be2b3ea46be0839cd47a4d286
+    container_name: alertmanager
+    command:
+      - --config.file=/etc/alertmanager/alertmanager.yml
+      - --storage.path=/alertmanager
+    ports:
+      - "192.168.1.23:9093:9093"
+    volumes:
+      - ./alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - ../ntfy/secrets/publisher_password.txt:/run/secrets/ntfy_publisher_password:ro
+      - alertmanager-data:/alertmanager
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - wget --quiet --tries=1 --spider http://127.0.0.1:9093/-/ready || exit 1
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+    restart: unless-stopped
+    mem_limit: 192m
+    cpus: 0.50
+    pids_limit: 128
 
   node-exporter:
     # Node Exporter 1.11.1
@@ -177,5 +212,6 @@ services:
 
 volumes:
   prometheus-data:
+  alertmanager-data:
   loki-data:
   alloy-data:

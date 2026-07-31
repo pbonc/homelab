@@ -31,6 +31,7 @@ internet without a deliberate authenticated reverse-proxy and TLS design.
 | 8020 | Study Deck | `http://192.168.1.23:8020` | LAN-only study notes, quizzes, and local progress |
 | 8093 | ntfy | `http://192.168.1.23:8093` | Authenticated LAN-only notification API and web client |
 | 9090 | Prometheus | `http://192.168.1.23:9090` | Metrics queries and administration on the trusted LAN |
+| 9093 | Alertmanager | `http://192.168.1.23:9093` | Trusted-LAN alert state, grouping, silences, and delivery status |
 | 3100 | Loki | `http://192.168.1.23:3100` | Log query API consumed by trusted-LAN Grafana |
 | 80 | SkyAware | `http://192.168.1.27/skyaware/` | PiAware local aircraft map and receiver availability |
 

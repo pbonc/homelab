@@ -99,9 +99,9 @@ def hash_password(password: str) -> str:
     return match.group(0)
 
 
-def write_private(path: Path, value: str) -> None:
+def write_secret(path: Path, value: str, mode: int = 0o600) -> None:
     path.write_text(value + "\n", encoding="utf-8")
-    path.chmod(0o600)
+    path.chmod(mode)
 
 
 def main() -> int:
@@ -121,8 +121,15 @@ def main() -> int:
 
     SECRETS_ROOT.mkdir(mode=0o700, parents=True, exist_ok=True)
     SECRETS_ROOT.chmod(0o700)
-    write_private(SECRETS_ROOT / "publisher_password.txt", publisher_password)
-    write_private(SECRETS_ROOT / "subscriber_password.txt", subscriber_password)
+    # The ignored 0700 parent protects host traversal. Alertmanager is
+    # intentionally non-root and receives only the publisher file through a
+    # read-only bind mount, so that one file must be container-readable.
+    write_secret(
+        SECRETS_ROOT / "publisher_password.txt",
+        publisher_password,
+        mode=0o644,
+    )
+    write_secret(SECRETS_ROOT / "subscriber_password.txt", subscriber_password)
 
     env = (
         f"NTFY_AUTH_USERS=homelab-publisher:{publisher_hash}:user,"
@@ -130,7 +137,7 @@ def main() -> int:
         f"NTFY_AUTH_ACCESS=homelab-publisher:{TOPIC}:wo,"
         f"homelab-iphone:{TOPIC}:ro\n"
     )
-    write_private(env_path, env.rstrip("\n"))
+    write_secret(env_path, env.rstrip("\n"))
 
     print("[PASS] Created ntfy publisher and read-only iPhone subscriber")
     print(f"[PASS] Topic: {TOPIC}")

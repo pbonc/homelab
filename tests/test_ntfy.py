@@ -61,6 +61,7 @@ class NtfyDeploymentTests(unittest.TestCase):
         self.assertIn('replace("$", "$$")', source)
         self.assertIn("pty.openpty()", source)
         self.assertIn('"--tty"', source)
+        self.assertIn("mode=0o644", source)
 
 
 if __name__ == "__main__":
