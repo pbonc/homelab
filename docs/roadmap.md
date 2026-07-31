@@ -246,11 +246,11 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 
 - [x] Add a ten-minute sustained outage threshold for monitored hardware nodes and send recovery notifications when they return
 - [ ] Add an independent observer for `brain`; document that controller-hosted Prometheus, Alertmanager, and ntfy cannot report a complete controller or power outage by themselves
-- [ ] Build a local network inventory watcher with a versioned state model, bounded `/24` discovery, persistent first-seen and last-seen timestamps, and no cloud lookup dependency
-- [ ] Maintain an explicit known-device inventory and notify only after an unknown MAC is observed repeatedly across a confirmation window
-- [ ] Handle private/randomized MAC addresses and Wi-Fi roaming without producing repeated “new device” alerts; keep ordinary departures dashboard-only
-- [ ] Publish a versioned, read-only topology API with stable node identifiers, verified status, explicit known/unknown state, and declared or evidence-backed edges
-- [ ] Represent unverified clients on a shared LAN segment; do not invent switch ports, access-point associations, or physical links from ARP observations
+- [x] Build a local network inventory watcher with a versioned state model, bounded `/24` discovery, persistent first-seen and last-seen timestamps, and no cloud lookup dependency
+- [x] Maintain an explicit known-device inventory and notify only after an unknown MAC is observed repeatedly across a confirmation window
+- [x] Handle private/randomized MAC addresses and Wi-Fi roaming without producing repeated “new device” alerts; keep ordinary departures dashboard-only
+- [x] Publish a versioned, read-only topology API with stable node identifiers, verified status, explicit known/unknown state, and declared or evidence-backed edges
+- [x] Represent unverified clients on a shared LAN segment; do not invent switch ports, access-point associations, or physical links from ARP observations
 - [ ] Adapt the supplied topology frontend into a compact, collapsible Homepage panel with a full-view option, bounded height, responsive layout, keyboard access, and a quiet unavailable state
 - [ ] Keep topology rendering replaceable and driven entirely by the API contract; do not couple scanner persistence to one graph library or browser layout
 - [ ] Add sustained thermal or throttling alerts for `brain` and `piaware`, using measured baselines and hardware-appropriate thresholds

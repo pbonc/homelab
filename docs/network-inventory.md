@@ -111,10 +111,11 @@ publishes one authenticated message to the existing `homelab-alerts` topic and
 records delivery in SQLite. A failed publish remains pending and is retried
 after the next scan; routine offline transitions do not notify.
 
-The first completed scan is a silent baseline: existing unknown devices appear
-in inventory but never generate a delayed notification merely because the
-watcher was installed. Devices first observed after that baseline follow the
-normal confirmation policy.
+The first completed scan containing at least one device is a silent baseline:
+empty or failed startup scans cannot consume it. Existing unknown devices
+appear in inventory but never generate a delayed notification merely because
+the watcher was installed. Devices first observed after that baseline follow
+the normal confirmation policy.
 
 ## Homepage presentation
 

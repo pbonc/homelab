@@ -18,6 +18,8 @@
 	};
 	const WEATHER_URL = "http://192.168.1.23:8000/api/current/weather";
 	const WEATHER_REFRESH_MS = 300000;
+	const TOPOLOGY_URL = "http://192.168.1.23:8030/api/v1/topology";
+	const TOPOLOGY_REFRESH_MS = 60000;
 	const STUDY_URL = "http://192.168.1.23:8020/api/progress";
 	const STUDY_REFRESH_MS = 60000;
 	const PROMETHEUS_URL = "http://192.168.1.23:9090/api/v1/query";
@@ -401,6 +403,133 @@
 		return Number.isFinite(value) ? Number(value).toFixed(digits) : "--";
 	}
 
+	function topologyPanel() {
+		let topology = document.querySelector(".network-topology");
+		if (topology) return topology;
+		const banner = weatherBanner();
+		if (!banner) return null;
+
+		topology = document.createElement("details");
+		topology.className = "network-topology";
+		const summary = document.createElement("summary");
+		summary.setAttribute("aria-label", "Open trusted LAN topology");
+		summary.textContent = "NETWORK MAP  |  Waiting for inventory";
+		const body = document.createElement("div");
+		body.className = "network-topology-body";
+		body.textContent = "Loading network inventory";
+		topology.append(summary, body);
+		banner.insertAdjacentElement("afterend", topology);
+		return topology;
+	}
+
+	function topologyNode(node) {
+		const element = document.createElement("div");
+		element.className = "network-topology-node";
+		element.dataset.status = node.status || "unknown";
+		element.dataset.known = node.known ? "true" : "false";
+		element.tabIndex = 0;
+		element.setAttribute(
+			"aria-label",
+			`${node.name}, ${node.status || "unknown"}, ${node.known ? "known" : "unrecognized"} device`,
+		);
+
+		const name = document.createElement("strong");
+		name.textContent = node.name || "Unknown device";
+		const detail = document.createElement("span");
+		const address = Array.isArray(node.addresses) ? node.addresses[0] : null;
+		detail.textContent = [node.kind, address, node.status].filter(Boolean).join("  \u00b7  ");
+		element.append(name, detail);
+		return element;
+	}
+
+	function renderTopology(topology, payload) {
+		const summary = topology.querySelector("summary");
+		const body = topology.querySelector(".network-topology-body");
+		const nodes = (Array.isArray(payload.nodes) ? payload.nodes : []).filter(
+			(node) => node.id !== "segment-trusted-lan",
+		);
+		const online = nodes.filter((node) => node.status === "online").length;
+		const offline = nodes.filter((node) => node.status === "offline").length;
+		const unknown = nodes.filter((node) => !node.known).length;
+		const discovery = payload.discovery?.state || "unknown";
+		topology.dataset.state = discovery;
+
+		summary.replaceChildren(
+			Object.assign(document.createElement("strong"), { textContent: "NETWORK MAP" }),
+			Object.assign(document.createElement("span"), {
+				className: "network-topology-count network-topology-online",
+				textContent: `${online} online`,
+			}),
+			Object.assign(document.createElement("span"), {
+				className: "network-topology-count network-topology-offline",
+				textContent: `${offline} offline`,
+			}),
+			Object.assign(document.createElement("span"), {
+				className: "network-topology-count network-topology-unknown",
+				textContent: `${unknown} unrecognized`,
+			}),
+			Object.assign(document.createElement("small"), {
+				textContent: discovery === "healthy" ? "Updated now" : `Discovery ${discovery}`,
+			}),
+		);
+
+		const header = document.createElement("div");
+		header.className = "network-topology-toolbar";
+		const explanation = document.createElement("span");
+		explanation.textContent = "Observed membership on the shared trusted LAN";
+		const fullView = document.createElement("button");
+		fullView.type = "button";
+		fullView.textContent = topology.classList.contains("network-topology-full")
+			? "Compact view"
+			: "Full view";
+		fullView.addEventListener("click", () => {
+			topology.classList.toggle("network-topology-full");
+			fullView.textContent = topology.classList.contains("network-topology-full")
+				? "Compact view"
+				: "Full view";
+		});
+		header.append(explanation, fullView);
+
+		const canvas = document.createElement("div");
+		canvas.className = "network-topology-canvas";
+		const segment = document.createElement("div");
+		segment.className = "network-topology-segment";
+		segment.textContent = "Trusted LAN  \u00b7  192.168.1.0/24";
+		const nodeGrid = document.createElement("div");
+		nodeGrid.className = "network-topology-nodes";
+		const order = { gateway: 0, controller: 1, "adsb-edge": 2, unknown: 9 };
+		const visibleNodes = [...nodes].sort(
+			(left, right) =>
+				(order[left.kind] ?? 5) - (order[right.kind] ?? 5) ||
+				Number(right.known) - Number(left.known) ||
+				String(left.name).localeCompare(String(right.name)),
+		);
+		for (const node of visibleNodes) nodeGrid.appendChild(topologyNode(node));
+		canvas.append(segment, nodeGrid);
+		body.replaceChildren(header, canvas);
+	}
+
+	async function refreshTopology() {
+		const topology = topologyPanel();
+		if (topology) {
+			try {
+				const response = await fetch(TOPOLOGY_URL, { cache: "no-store" });
+				if (!response.ok) throw new Error(`HTTP ${response.status}`);
+				const payload = await response.json();
+				if (payload.schema_version !== "1.0.0" || !Array.isArray(payload.nodes)) {
+					throw new Error("unsupported topology response");
+				}
+				renderTopology(topology, payload);
+			} catch (_error) {
+				topology.dataset.state = "unavailable";
+				topology.querySelector("summary").textContent = "NETWORK MAP  |  Inventory unavailable";
+				topology.querySelector(".network-topology-body").textContent =
+					"Network inventory is temporarily unavailable.";
+			}
+		}
+		window.setTimeout(refreshTopology, TOPOLOGY_REFRESH_MS);
+	}
+
 	async function refreshWeather() {
 		const banner = weatherBanner();
 		if (banner) {
@@ -443,6 +572,7 @@
 			updateQueued = false;
 			resourcesFlyout();
 			weatherBanner();
+			topologyPanel();
 			markLifecycleCards();
 			updateBrainHealth();
 		});
@@ -451,6 +581,7 @@
 	function start() {
 		scheduleUpdate();
 		refreshWeather();
+		refreshTopology();
 		refreshStudy();
 		refreshPiaware();
 		new MutationObserver(scheduleUpdate).observe(document.body, { childList: true, subtree: true, characterData: true });

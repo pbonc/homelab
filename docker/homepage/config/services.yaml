@@ -76,6 +76,12 @@
         href: http://192.168.1.23:3001/d/homelab-platform-health/platform-health
         siteMonitor: http://192.168.1.23:9090/-/ready
         description: "Observe | Platform metrics and alerts"
+    - Network Inventory:
+        icon: mdi-lan
+        href: http://192.168.1.23:8030/api/v1/topology
+        target: _blank
+        siteMonitor: http://192.168.1.23:8030/api/v1/health
+        description: "Observe | LAN discovery and device topology"
     - Loki:
         icon: mdi-file-search-outline
         href: http://192.168.1.23:3001/d/homelab-container-logs/container-logs

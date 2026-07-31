@@ -80,6 +80,194 @@ main,
   color: #fde68a;
 }
 
+.network-topology {
+  margin: -4px 2.25rem 14px;
+  border: 1px solid rgba(125, 211, 252, 0.28);
+  border-radius: 12px;
+  background: rgba(5, 13, 26, 0.72);
+  color: var(--dash-text);
+  overflow: hidden;
+}
+
+.network-topology summary {
+  display: flex;
+  min-height: 2.65rem;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.55rem 0.85rem;
+  cursor: pointer;
+  font-size: 0.74rem;
+  list-style: none;
+  user-select: none;
+}
+
+.network-topology summary::-webkit-details-marker {
+  display: none;
+}
+
+.network-topology summary::before {
+  content: "›";
+  color: var(--dash-accent);
+  font-size: 1.15rem;
+  font-weight: 700;
+  transition: transform 140ms ease;
+}
+
+.network-topology[open] summary::before {
+  transform: rotate(90deg);
+}
+
+.network-topology summary strong {
+  color: var(--dash-accent-soft);
+  font-size: 0.76rem;
+  letter-spacing: 0.06em;
+}
+
+.network-topology summary small {
+  margin-left: auto;
+  color: #94a3b8;
+  font-size: 0.68rem;
+}
+
+.network-topology-count {
+  padding: 0.16rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(51, 65, 85, 0.56);
+  white-space: nowrap;
+}
+
+.network-topology-online {
+  color: #86efac;
+}
+
+.network-topology-offline {
+  color: #fda4af;
+}
+
+.network-topology-unknown {
+  color: #fde68a;
+}
+
+.network-topology[data-state="failed"],
+.network-topology[data-state="stale"],
+.network-topology[data-state="unavailable"] {
+  border-color: rgba(245, 158, 11, 0.68);
+}
+
+.network-topology-body {
+  max-height: 22rem;
+  padding: 0 0.85rem 0.85rem;
+  overflow: auto;
+}
+
+.network-topology-full .network-topology-body {
+  max-height: min(70vh, 48rem);
+}
+
+.network-topology-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.55rem 0;
+  border-top: 1px solid rgba(125, 211, 252, 0.12);
+  color: #94a3b8;
+  font-size: 0.7rem;
+}
+
+.network-topology-toolbar button {
+  padding: 0.3rem 0.6rem;
+  border: 1px solid rgba(125, 211, 252, 0.34);
+  border-radius: 999px;
+  background: rgba(15, 36, 61, 0.9);
+  color: #bae6fd;
+  cursor: pointer;
+  font: inherit;
+}
+
+.network-topology-toolbar button:focus-visible,
+.network-topology-node:focus-visible,
+.network-topology summary:focus-visible {
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.18);
+  outline: 1px solid var(--dash-accent);
+}
+
+.network-topology-canvas {
+  position: relative;
+  padding-top: 0.4rem;
+}
+
+.network-topology-segment {
+  position: relative;
+  width: min(28rem, 85%);
+  margin: 0 auto 1.25rem;
+  padding: 0.48rem 0.75rem;
+  border: 1px solid rgba(34, 211, 238, 0.54);
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(8, 145, 178, 0.28), rgba(30, 64, 175, 0.22));
+  color: #cffafe;
+  font-size: 0.72rem;
+  font-weight: 650;
+  text-align: center;
+}
+
+.network-topology-segment::after {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  width: 1px;
+  height: 1.25rem;
+  background: rgba(125, 211, 252, 0.34);
+  content: "";
+}
+
+.network-topology-nodes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  gap: 0.55rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid rgba(125, 211, 252, 0.25);
+}
+
+.network-topology-node {
+  display: grid;
+  min-width: 0;
+  gap: 0.14rem;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid rgba(100, 116, 139, 0.42);
+  border-radius: 8px;
+  background: rgba(15, 28, 48, 0.88);
+}
+
+.network-topology-node strong {
+  overflow: hidden;
+  color: #e2e8f0;
+  font-size: 0.75rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.network-topology-node span {
+  overflow: hidden;
+  color: #94a3b8;
+  font-size: 0.64rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.network-topology-node[data-status="online"] {
+  border-left: 3px solid #22c55e;
+}
+
+.network-topology-node[data-status="offline"] {
+  border-left: 3px solid #f43f5e;
+}
+
+.network-topology-node[data-known="false"] {
+  border-color: rgba(245, 158, 11, 0.68);
+  border-left: 3px solid #f59e0b;
+}
+
 .homelab-resources {
   position: relative;
   z-index: 80;
@@ -619,6 +807,28 @@ footer,
     margin: 0 0.65rem 12px;
     padding: 10px 12px;
     font-size: 0.78rem;
+  }
+
+  .network-topology {
+    margin: -2px 0.65rem 12px;
+  }
+
+  .network-topology summary {
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .network-topology summary small {
+    width: 100%;
+    margin-left: 1.95rem;
+  }
+
+  .network-topology-toolbar {
+    align-items: flex-start;
+  }
+
+  .network-topology-nodes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   main,

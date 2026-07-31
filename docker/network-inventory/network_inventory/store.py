@@ -130,7 +130,7 @@ class InventoryStore:
         newly_confirmed = 0
         with self._connect() as connection:
             baseline = (
-                connection.execute("SELECT COUNT(*) FROM scan_runs").fetchone()[0]
+                connection.execute("SELECT COUNT(*) FROM devices").fetchone()[0]
                 == 0
             )
             connection.execute(

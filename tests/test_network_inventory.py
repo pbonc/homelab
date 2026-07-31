@@ -66,7 +66,10 @@ class NetworkInventoryTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             store = self.make_store(directory)
             start = datetime(2026, 7, 31, 12, 0, tzinfo=timezone.utc)
-            store.record_scan([], completed_at=start)
+            store.record_scan(
+                [Observation("02:00:00:00:00:23", "192.168.1.23")],
+                completed_at=start,
+            )
             unknown = Observation("00:11:22:33:44:55", "192.168.1.50")
             first = store.record_scan(
                 [unknown], completed_at=start + timedelta(seconds=1)
@@ -92,7 +95,10 @@ class NetworkInventoryTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             store = self.make_store(directory)
             start = datetime(2026, 7, 31, 12, 0, tzinfo=timezone.utc)
-            store.record_scan([], completed_at=start)
+            store.record_scan(
+                [Observation("02:00:00:00:00:23", "192.168.1.23")],
+                completed_at=start,
+            )
             private = Observation("02:11:22:33:44:55", "192.168.1.51")
             self.assertTrue(is_private_mac(private.mac))
             store.record_scan(
@@ -110,7 +116,10 @@ class NetworkInventoryTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             store = self.make_store(directory)
             start = datetime(2026, 7, 31, 12, 0, tzinfo=timezone.utc)
-            store.record_scan([], completed_at=start)
+            store.record_scan(
+                [Observation("02:00:00:00:00:23", "192.168.1.23")],
+                completed_at=start,
+            )
             unknown = Observation("00:11:22:33:44:55", "192.168.1.50")
             store.record_scan(
                 [unknown], completed_at=start + timedelta(seconds=1)
@@ -131,7 +140,10 @@ class NetworkInventoryTests(unittest.TestCase):
             store = self.make_store(directory)
             start = datetime(2026, 7, 31, 12, 0, tzinfo=timezone.utc)
             existing = Observation("00:11:22:33:44:55", "192.168.1.50")
-            store.record_scan([existing], completed_at=start)
+            store.record_scan([], completed_at=start)
+            store.record_scan(
+                [existing], completed_at=start + timedelta(minutes=1)
+            )
             store.record_scan(
                 [existing], completed_at=start + timedelta(minutes=6)
             )
