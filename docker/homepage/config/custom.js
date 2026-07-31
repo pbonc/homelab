@@ -434,8 +434,9 @@
 		const openTopology = () => {
 			const topology = topologyPanel();
 			if (!topology) return;
-			topology.open = true;
+			topology.setAttribute("open", "");
 			window.history.replaceState(null, "", "#network-topology");
+			refreshTopology(false);
 			topology.scrollIntoView({ behavior: "smooth", block: "start" });
 		};
 		card.addEventListener("click", openTopology);
@@ -533,7 +534,7 @@
 		body.replaceChildren(header, canvas);
 	}
 
-	async function refreshTopology() {
+	async function refreshTopology(scheduleNext = true) {
 		const topology = topologyPanel();
 		if (topology) {
 			try {
@@ -551,7 +552,7 @@
 					"Network inventory is temporarily unavailable.";
 			}
 		}
-		window.setTimeout(refreshTopology, TOPOLOGY_REFRESH_MS);
+		if (scheduleNext) window.setTimeout(refreshTopology, TOPOLOGY_REFRESH_MS);
 	}
 
 	async function refreshWeather() {

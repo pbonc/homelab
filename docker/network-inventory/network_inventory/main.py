@@ -46,6 +46,10 @@ def build_store() -> InventoryStore:
 
 
 store = build_store()
+HOMEPAGE_ORIGINS = {
+    "http://192.168.1.23:3000",
+    "http://brain:3000",
+}
 
 
 def headers(scope: dict[str, Any], body: bytes) -> list[tuple[bytes, bytes]]:
@@ -56,7 +60,7 @@ def headers(scope: dict[str, Any], body: bytes) -> list[tuple[bytes, bytes]]:
     ]
     request_headers = {key.lower(): value for key, value in scope.get("headers", [])}
     origin = request_headers.get(b"origin", b"").decode("latin-1")
-    if origin == "http://192.168.1.23:3000":
+    if origin in HOMEPAGE_ORIGINS:
         result.extend(
             [
                 (b"access-control-allow-origin", origin.encode("ascii")),

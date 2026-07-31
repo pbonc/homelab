@@ -155,9 +155,15 @@ main,
 }
 
 .network-topology-body {
+  display: none;
   max-height: 22rem;
   padding: 0 0.85rem 0.85rem;
   overflow: auto;
+}
+
+.network-topology[open] .network-topology-body {
+  display: block;
+  min-height: 9rem;
 }
 
 .network-topology-full .network-topology-body {

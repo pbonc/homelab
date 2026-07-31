@@ -62,6 +62,14 @@ class NetworkInventoryTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "duplicate"):
                 KnownInventory(path)
 
+    def test_api_allows_both_trusted_homepage_origins(self) -> None:
+        main = (
+            SERVICE_ROOT / "network_inventory" / "main.py"
+        ).read_text(encoding="utf-8")
+        self.assertIn('"http://192.168.1.23:3000"', main)
+        self.assertIn('"http://brain:3000"', main)
+        self.assertIn("origin in HOMEPAGE_ORIGINS", main)
+
     def test_unknown_device_requires_two_separated_scans(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             store = self.make_store(directory)
