@@ -28,9 +28,6 @@ services:
       - /tmp:size=16m,mode=1777
     cap_drop:
       - ALL
-    cap_add:
-      - NET_ADMIN
-      - NET_RAW
     security_opt:
       - no-new-privileges:true
     healthcheck:

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import subprocess
 import xml.etree.ElementTree as ET
+import ipaddress
+from pathlib import Path
 
 from .store import Observation
 
@@ -38,9 +40,37 @@ def parse_nmap_xml(payload: str) -> list[Observation]:
     return observations
 
 
-def scan(network: str, *, timeout_seconds: int = 50) -> list[Observation]:
+def parse_arp_table(payload: str, network: str) -> list[Observation]:
+    subnet = ipaddress.ip_network(network, strict=True)
+    observations: list[Observation] = []
+    for line in payload.splitlines()[1:]:
+        fields = line.split()
+        if len(fields) < 6:
+            continue
+        address, _hardware_type, flags, mac, _mask, _device = fields[:6]
+        try:
+            parsed_address = ipaddress.ip_address(address)
+            complete = int(flags, 16) & 0x2
+        except ValueError:
+            continue
+        if (
+            parsed_address not in subnet
+            or not complete
+            or mac == "00:00:00:00:00:00"
+        ):
+            continue
+        observations.append(Observation(mac=mac, address=address))
+    return observations
+
+
+def scan(
+    network: str,
+    *,
+    timeout_seconds: int = 50,
+    arp_path: Path = Path("/proc/net/arp"),
+) -> list[Observation]:
     result = subprocess.run(
-        ["nmap", "--privileged", "-sn", "-n", "-oX", "-", network],
+        ["nmap", "--unprivileged", "-sn", "-n", "-oX", "-", network],
         check=False,
         capture_output=True,
         text=True,
@@ -49,4 +79,4 @@ def scan(network: str, *, timeout_seconds: int = 50) -> list[Observation]:
     if result.returncode != 0:
         detail = result.stderr.strip() or "no error detail"
         raise RuntimeError(f"nmap exited {result.returncode}: {detail}")
-    return parse_nmap_xml(result.stdout)
+    return parse_arp_table(arp_path.read_text(encoding="ascii"), network)

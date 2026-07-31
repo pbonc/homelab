@@ -16,7 +16,7 @@ sys.path.insert(0, str(SERVICE_ROOT))
 
 from network_inventory.config import KnownInventory, is_private_mac  # noqa: E402
 from network_inventory.notifier import publish_unknown_device  # noqa: E402
-from network_inventory.scanner import parse_nmap_xml, scan  # noqa: E402
+from network_inventory.scanner import parse_arp_table, parse_nmap_xml, scan  # noqa: E402
 from network_inventory.store import InventoryStore, Observation  # noqa: E402
 
 
@@ -223,16 +223,26 @@ class NetworkInventoryTests(unittest.TestCase):
         )
 
     @patch("network_inventory.scanner.subprocess.run")
-    def test_scan_uses_raw_discovery_without_privileging_the_container(
+    def test_scan_uses_unprivileged_sweep_and_neighbor_table(
         self, run
     ) -> None:
-        run.return_value.returncode = 0
-        run.return_value.stdout = "<nmaprun/>"
-        self.assertEqual(scan("192.168.1.0/24"), [])
-        command = run.call_args.args[0]
-        self.assertIn("--privileged", command)
-        self.assertIn("-sn", command)
-        self.assertNotIn("-sS", command)
+        with tempfile.TemporaryDirectory() as directory:
+            arp_path = Path(directory) / "arp"
+            arp_path.write_text(
+                "IP address HW type Flags HW address Mask Device\n"
+                "192.168.1.27 0x1 0x2 00:11:22:33:44:55 * enp3s0\n",
+                encoding="ascii",
+            )
+            run.return_value.returncode = 0
+            run.return_value.stdout = "<nmaprun/>"
+            self.assertEqual(
+                scan("192.168.1.0/24", arp_path=arp_path),
+                [Observation("00:11:22:33:44:55", "192.168.1.27")],
+            )
+            command = run.call_args.args[0]
+            self.assertIn("--unprivileged", command)
+            self.assertIn("-sn", command)
+            self.assertNotIn("-sS", command)
 
     @patch("network_inventory.scanner.subprocess.run")
     def test_scan_error_preserves_nmap_diagnostic(self, run) -> None:
@@ -240,6 +250,18 @@ class NetworkInventoryTests(unittest.TestCase):
         run.return_value.stderr = "dnet: Failed to open device eth0"
         with self.assertRaisesRegex(RuntimeError, "Failed to open device eth0"):
             scan("192.168.1.0/24")
+
+    def test_arp_parser_ignores_incomplete_and_out_of_scope_neighbors(self) -> None:
+        payload = (
+            "IP address HW type Flags HW address Mask Device\n"
+            "192.168.1.10 0x1 0x2 00:11:22:33:44:55 * enp3s0\n"
+            "192.168.1.11 0x1 0x0 00:00:00:00:00:00 * enp3s0\n"
+            "10.0.0.2 0x1 0x2 00:aa:bb:cc:dd:ee * docker0\n"
+        )
+        self.assertEqual(
+            parse_arp_table(payload, "192.168.1.0/24"),
+            [Observation("00:11:22:33:44:55", "192.168.1.10")],
+        )
 
     def test_ntfy_publish_uses_basic_auth_and_topic_endpoint(self) -> None:
         class Response:

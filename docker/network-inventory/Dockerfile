@@ -6,8 +6,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app
 
 RUN apt-get update \
-    && apt-get install --yes --no-install-recommends libcap2-bin nmap \
-    && setcap cap_net_admin,cap_net_raw+eip /usr/bin/nmap \
+    && apt-get install --yes --no-install-recommends nmap \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .

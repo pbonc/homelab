@@ -99,13 +99,12 @@ runs. Writes are transactional. The database survives container recreation and
 is included in encrypted backup and restore tests. Raw scan output is not
 retained after observations are normalized.
 
-The service runs a bounded Nmap host-discovery scan of only
-`192.168.1.0/24` once per minute. It has host networking so ARP discovery
-reflects the controller's LAN, but drops every Linux capability except
-`NET_RAW` and `NET_ADMIN`. Those capabilities are attached only to the Nmap
-executable, and Nmap's `--privileged` process flag tells it to use them. The
-container remains non-root and is not run with Docker's privileged mode. It
-performs no port scan, DNS lookup, cloud lookup, or traffic capture.
+The service runs a bounded, unprivileged Nmap host-discovery sweep of only
+`192.168.1.0/24` once per minute, then reads Brain's resulting kernel ARP table.
+Host networking makes that neighbor table reflect the controller's LAN. The
+container remains non-root, drops every Linux capability, and is not run with
+Docker's privileged mode. It performs no port scan, DNS lookup, cloud lookup,
+or traffic capture.
 
 When an unknown device crosses its confirmation threshold, the service
 publishes one authenticated message to the existing `homelab-alerts` topic and
