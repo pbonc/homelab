@@ -242,6 +242,21 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [ ] Back up and restore only the required ntfy state, document token rotation, and prove a clean rebuild can re-establish subscriptions safely
 - [ ] Exercise firing, grouping, resolution, invalid credentials, ntfy outage, phone-off-LAN behavior, delayed delivery, and recovery without losing the underlying Prometheus alert state
 
+### Notification Expansion
+
+- [x] Add a ten-minute sustained outage threshold for monitored hardware nodes and send recovery notifications when they return
+- [ ] Add an independent observer for `brain`; document that controller-hosted Prometheus, Alertmanager, and ntfy cannot report a complete controller or power outage by themselves
+- [ ] Build a local network inventory watcher with a versioned state model, bounded `/24` discovery, persistent first-seen and last-seen timestamps, and no cloud lookup dependency
+- [ ] Maintain an explicit known-device inventory and notify only after an unknown MAC is observed repeatedly across a confirmation window
+- [ ] Handle private/randomized MAC addresses and Wi-Fi roaming without producing repeated “new device” alerts; keep ordinary departures dashboard-only
+- [ ] Add sustained thermal or throttling alerts for `brain` and `piaware`, using measured baselines and hardware-appropriate thresholds
+- [ ] Alert when encrypted backups fail or exceed their expected freshness window, then send one recovery after the next verified backup
+- [ ] Route established weather and ADS-B stale conditions through Alertmanager without exposing readings, aircraft identities, or receiver location
+- [ ] Notify on failed deployments and meaningful Aikido severity transitions while keeping routine successes and finding details out of phone messages
+- [ ] Consider a quiet daily digest for updates and routine successes only after immediate alerts prove low-noise
+- [ ] Add network-inventory and notification-delivery status to Grafana, `labctl`, the Homepage, backup scope, and restore testing
+- [ ] Exercise duplicate suppression, randomized addresses, watcher restart, unknown-device acknowledgement, hardware outage, controller blind spot, and recovery
+
 ## Post-Sprint 9 Hotfix: Interview Talking Point Strip
 
 - [ ] Add concise interview talking points to the Study Deck for the recent observability, PiAware, Ansible, backup, and clean-rebuild work

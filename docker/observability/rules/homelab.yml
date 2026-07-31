@@ -35,13 +35,23 @@ groups:
           runbook: docs/runbooks/observability-alerts.md#homepage-or-service-unavailable
 
       - alert: PrometheusTargetDown
-        expr: up == 0
+        expr: up{job!~"node|piaware-node"} == 0
         for: 5m
         labels:
           severity: warning
         annotations:
           summary: "Prometheus target {{ $labels.job }} / {{ $labels.instance }} is down"
           runbook: docs/runbooks/observability-alerts.md#prometheus-target-down
+
+      - alert: HardwareNodeUnavailable
+        expr: up{job=~"node|piaware-node"} == 0
+        for: 10m
+        labels:
+          severity: critical
+          category: hardware
+        annotations:
+          summary: "Hardware node {{ $labels.instance }} has been unreachable for ten minutes"
+          runbook: docs/runbooks/observability-alerts.md#hardware-node-unavailable
 
       - alert: BrainCpuHigh
         expr: instance:node_cpu_utilization:ratio{instance="brain"} > 0.85

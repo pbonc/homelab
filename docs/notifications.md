@@ -65,6 +65,38 @@ short transient failures, and informational state changes stay out of the phone
 channel. Alertmanager grouping, inhibition, and repeat intervals prevent one
 incident from producing a stream of duplicate messages.
 
+## Expanded event policy
+
+Hardware-node loss is actionable only after ten continuous minutes. Prometheus
+applies that threshold to the Brain and PiAware Node Exporter targets and sends
+a recovery when the target returns. A complete Brain outage is a special blind
+spot: Brain currently hosts Prometheus, Alertmanager, and ntfy, so it cannot
+deliver its own outage notification. Closing that gap requires a small
+independent observer on PiAware or another always-on node; pretending the
+controller can self-page while powered off would provide false confidence.
+
+New-device detection will use a local inventory watcher rather than raw
+one-off ARP events. A device must be observed repeatedly before it is considered
+new, and notifications will include only a locally assigned name when known,
+address, MAC address, and offline vendor label. Randomized client MAC addresses
+and brief Wi-Fi roaming must not create notification storms. Device departures
+remain dashboard-only by default; known infrastructure disappearing is handled
+by the sustained hardware alerts.
+
+The recommended next low-noise notifications are:
+
+- sustained high CPU temperature or thermal throttling;
+- critical filesystem pressure and storage-device health changes;
+- stale or failed encrypted backups;
+- stale weather and ADS-B ingestion after their established grace periods;
+- failed deployments with a recovery or subsequent successful deployment;
+- meaningful Aikido severity changes without vulnerability details; and
+- future certificate-expiration warnings once internal TLS exists.
+
+Routine package updates, successful scheduled jobs, normal device departures,
+individual aircraft, and short resource spikes do not belong in the immediate
+phone channel. They can become a daily digest later if a digest proves useful.
+
 ## First deployment
 
 On `brain`, create two ignored credentials and validate the Compose model:

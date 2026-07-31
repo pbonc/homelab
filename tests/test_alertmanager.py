@@ -62,6 +62,17 @@ class AlertmanagerTests(unittest.TestCase):
         self.assertNotIn("systemctl stop", script)
         self.assertNotIn("docker stop", script)
 
+    def test_hardware_outage_requires_ten_continuous_minutes(self) -> None:
+        rules = (OBSERVABILITY / "rules" / "homelab.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("alert: HardwareNodeUnavailable", rules)
+        self.assertIn('up{job=~"node|piaware-node"} == 0', rules)
+        hardware = rules.split("alert: HardwareNodeUnavailable", 1)[1]
+        self.assertIn("for: 10m", hardware.split("- alert:", 1)[0])
+        generic = rules.split("alert: PrometheusTargetDown", 1)[1]
+        self.assertIn('up{job!~"node|piaware-node"} == 0', generic)
+
 
 if __name__ == "__main__":
     unittest.main()
