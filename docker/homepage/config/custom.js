@@ -411,6 +411,7 @@
 
 		topology = document.createElement("details");
 		topology.className = "network-topology";
+		topology.id = "network-topology";
 		const summary = document.createElement("summary");
 		summary.setAttribute("aria-label", "Open trusted LAN topology");
 		summary.textContent = "NETWORK MAP  |  Waiting for inventory";
@@ -419,6 +420,7 @@
 		body.textContent = "Loading network inventory";
 		topology.append(summary, body);
 		banner.insertAdjacentElement("afterend", topology);
+		if (window.location.hash === "#network-topology") topology.open = true;
 		return topology;
 	}
 
@@ -584,6 +586,13 @@
 		refreshTopology();
 		refreshStudy();
 		refreshPiaware();
+		window.addEventListener("hashchange", () => {
+			const topology = topologyPanel();
+			if (window.location.hash === "#network-topology" && topology) {
+				topology.open = true;
+				topology.scrollIntoView({ behavior: "smooth", block: "start" });
+			}
+		});
 		new MutationObserver(scheduleUpdate).observe(document.body, { childList: true, subtree: true, characterData: true });
 	}
 
