@@ -18,21 +18,15 @@ class HomepageNetworkInventoryTests(unittest.TestCase):
         self.assertIn("siteMonitor: http://192.168.1.23:8030/api/v1/health", card)
         self.assertNotIn("target: _blank", card)
 
-    def test_card_target_opens_the_embedded_topology(self):
+    def test_card_does_not_mutate_homepage_layout(self):
         custom = (HOMEPAGE / "config" / "custom.js").read_text(encoding="utf-8")
-        self.assertIn('topology.id = "network-topology"', custom)
-        self.assertIn('window.location.hash === "#network-topology"', custom)
-        self.assertIn("topology.open = true", custom)
-        self.assertIn('serviceCard("Network Inventory")', custom)
-        self.assertIn('card.setAttribute("role", "button")', custom)
-        self.assertIn('event.key !== "Enter"', custom)
-        self.assertIn('topology.setAttribute("open", "")', custom)
-        self.assertIn("refreshTopology(false)", custom)
-        self.assertIn("wireTopologyCard()", custom)
+        self.assertNotIn("topologyPanel", custom)
+        self.assertNotIn("wireTopologyCard", custom)
+        self.assertNotIn("network-topology", custom)
 
     def test_card_is_part_of_topology_minor_release(self):
         version = (HOMEPAGE / "version.env").read_text(encoding="utf-8")
-        self.assertIn("HOMEPAGE_VAR_DASHBOARD_VERSION=0.11.4", version)
+        self.assertIn("HOMEPAGE_VAR_DASHBOARD_VERSION=0.11.5", version)
 
 
 if __name__ == "__main__":
