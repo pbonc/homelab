@@ -65,6 +65,10 @@ def scan_forever(stop: threading.Event) -> None:
                         )
         except Exception:
             LOG.exception("network scan failed")
+            try:
+                store.record_scan_failure(completed_at=datetime.now(timezone.utc))
+            except Exception:
+                LOG.exception("could not record failed scan state")
         elapsed = time.monotonic() - started
         stop.wait(max(1, interval - elapsed))
 

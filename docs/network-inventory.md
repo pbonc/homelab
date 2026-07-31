@@ -102,10 +102,10 @@ retained after observations are normalized.
 The service runs a bounded Nmap host-discovery scan of only
 `192.168.1.0/24` once per minute. It has host networking so ARP discovery
 reflects the controller's LAN, but drops every Linux capability except
-`NET_RAW`. Nmap's `--privileged` process flag tells it to use that explicitly
-granted raw-socket capability; the container remains non-root and is not run
-with Docker's privileged mode. It performs no port scan, DNS lookup, cloud
-lookup, or traffic capture.
+`NET_RAW` and `NET_ADMIN`. Those capabilities are attached only to the Nmap
+executable, and Nmap's `--privileged` process flag tells it to use them. The
+container remains non-root and is not run with Docker's privileged mode. It
+performs no port scan, DNS lookup, cloud lookup, or traffic capture.
 
 When an unknown device crosses its confirmation threshold, the service
 publishes one authenticated message to the existing `homelab-alerts` topic and

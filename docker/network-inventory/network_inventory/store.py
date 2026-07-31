@@ -213,6 +213,15 @@ class InventoryStore:
             "newly_confirmed": newly_confirmed,
         }
 
+    def record_scan_failure(self, *, completed_at: datetime) -> None:
+        with self._connect() as connection:
+            connection.execute(
+                """INSERT INTO scan_runs
+                   (completed_at, network, state, observation_count)
+                   VALUES (?, ?, 'failed', 0)""",
+                (utc_text(completed_at), self.network),
+            )
+
     def pending_notifications(self) -> list[dict[str, str | bool | None]]:
         with self._connect() as connection:
             rows = connection.execute(
@@ -260,7 +269,11 @@ class InventoryStore:
             }
         age = max(0, int((now - parse_utc(latest["completed_at"])).total_seconds()))
         return {
-            "status": "stale" if age > self.stale_seconds else "healthy",
+            "status": (
+                "failed"
+                if latest["state"] == "failed"
+                else ("stale" if age > self.stale_seconds else "healthy")
+            ),
             "last_completed_at": latest["completed_at"],
             "age_seconds": age,
             "network": latest["network"],

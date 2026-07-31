@@ -41,9 +41,12 @@ def parse_nmap_xml(payload: str) -> list[Observation]:
 def scan(network: str, *, timeout_seconds: int = 50) -> list[Observation]:
     result = subprocess.run(
         ["nmap", "--privileged", "-sn", "-n", "-oX", "-", network],
-        check=True,
+        check=False,
         capture_output=True,
         text=True,
         timeout=timeout_seconds,
     )
+    if result.returncode != 0:
+        detail = result.stderr.strip() or "no error detail"
+        raise RuntimeError(f"nmap exited {result.returncode}: {detail}")
     return parse_nmap_xml(result.stdout)

@@ -188,6 +188,12 @@ class NetworkInventoryTests(unittest.TestCase):
             self.assertEqual(
                 store.health(now + timedelta(minutes=6))["status"], "stale"
             )
+            store.record_scan_failure(
+                completed_at=now + timedelta(minutes=7)
+            )
+            self.assertEqual(
+                store.health(now + timedelta(minutes=7))["status"], "failed"
+            )
 
     def test_nmap_parser_ignores_hosts_without_a_mac(self) -> None:
         payload = """<?xml version="1.0"?>
@@ -220,12 +226,20 @@ class NetworkInventoryTests(unittest.TestCase):
     def test_scan_uses_raw_discovery_without_privileging_the_container(
         self, run
     ) -> None:
+        run.return_value.returncode = 0
         run.return_value.stdout = "<nmaprun/>"
         self.assertEqual(scan("192.168.1.0/24"), [])
         command = run.call_args.args[0]
         self.assertIn("--privileged", command)
         self.assertIn("-sn", command)
         self.assertNotIn("-sS", command)
+
+    @patch("network_inventory.scanner.subprocess.run")
+    def test_scan_error_preserves_nmap_diagnostic(self, run) -> None:
+        run.return_value.returncode = 1
+        run.return_value.stderr = "dnet: Failed to open device eth0"
+        with self.assertRaisesRegex(RuntimeError, "Failed to open device eth0"):
+            scan("192.168.1.0/24")
 
     def test_ntfy_publish_uses_basic_auth_and_topic_endpoint(self) -> None:
         class Response:
