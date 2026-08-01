@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import json
+import asyncio
+import importlib
+import os
 import sys
 import tempfile
 import unittest
@@ -331,6 +334,28 @@ class NetworkInventoryTests(unittest.TestCase):
         self.assertIn("/api/v1/topology", script)
         self.assertIn("localStorage", script)
         self.assertIn("Copy known-device JSON", script)
+
+    def test_json_response_emits_exactly_one_body(self) -> None:
+        with tempfile.TemporaryDirectory() as directory, patch.dict(
+            os.environ,
+            {"NETWORK_INVENTORY_DATABASE": str(Path(directory) / "inventory.db")},
+        ):
+            main = importlib.import_module("network_inventory.main")
+            messages = []
+
+            async def send(message):
+                messages.append(message)
+
+            asyncio.run(
+                main.send_json(
+                    send, {"method": "GET", "headers": []}, 200, {"ok": True}
+                )
+            )
+            bodies = [
+                item for item in messages if item["type"] == "http.response.body"
+            ]
+            self.assertEqual(len(bodies), 1)
+            self.assertEqual(json.loads(bodies[0]["body"]), {"ok": True})
 
 
 if __name__ == "__main__":

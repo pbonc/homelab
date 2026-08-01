@@ -87,6 +87,12 @@ async def send_json(
             "headers": headers(scope, body),
         }
     )
+    await send(
+        {
+            "type": "http.response.body",
+            "body": b"" if scope.get("method") == "HEAD" else body,
+        }
+    )
 
 
 async def send_file(
@@ -105,12 +111,6 @@ async def send_file(
     ]
     await send(
         {"type": "http.response.start", "status": 200, "headers": response_headers}
-    )
-    await send(
-        {
-            "type": "http.response.body",
-            "body": b"" if scope.get("method") == "HEAD" else body,
-        }
     )
     await send(
         {
