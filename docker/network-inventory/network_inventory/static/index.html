@@ -29,7 +29,7 @@
         <div><p class="eyebrow">TOPOLOGY</p><h2>Shared LAN membership</h2></div>
         <button id="refresh" type="button">Refresh</button>
       </div>
-      <p class="truth-note">These links mean “observed on this LAN.” They do not claim a physical switch port or Wi-Fi access point.</p>
+      <p class="truth-note">Wired and Wi-Fi are declared facts or your browser-local classifications. Unclassified devices remain Unknown; ARP alone cannot determine the connection medium.</p>
       <div class="lan">Trusted LAN <span>192.168.1.0/24</span></div>
       <div id="topology" class="topology" aria-live="polite"></div>
     </section>
@@ -39,10 +39,10 @@
         <div><p class="eyebrow">IDENTIFICATION WORKBENCH</p><h2>Unidentified devices</h2></div>
         <label class="filter">Filter <input id="filter" type="search" placeholder="IP, MAC, or label"></label>
       </div>
-      <p class="truth-note">Working labels stay only in this browser. Copy the generated JSON into the repository’s known-device inventory after verification.</p>
+      <p class="truth-note">Labels and connection classifications are saved only when you press Apply and remain in this browser. Vendor is derived from Nmap’s local OUI database. OS fingerprinting and port scans are intentionally disabled.</p>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Status</th><th>Current IP</th><th>MAC</th><th>Working label</th><th>Observed</th><th>Action</th></tr></thead>
+          <thead><tr><th>Status</th><th>Current IP</th><th>MAC</th><th>Clues</th><th>Working label</th><th>Connection</th><th>Observed</th><th>Action</th></tr></thead>
           <tbody id="unknown-table"></tbody>
         </table>
       </div>

@@ -5,6 +5,7 @@
       "id": "gateway-router",
       "name": "router",
       "kind": "gateway",
+      "connection": "ethernet",
       "address": "192.168.1.1",
       "mac": null
     },
@@ -12,6 +13,7 @@
       "id": "host-brain",
       "name": "brain",
       "kind": "controller",
+      "connection": "ethernet",
       "address": "192.168.1.23",
       "mac": null
     },
@@ -19,6 +21,7 @@
       "id": "host-piaware",
       "name": "piaware",
       "kind": "adsb-edge",
+      "connection": "wifi",
       "address": "192.168.1.27",
       "mac": null
     }

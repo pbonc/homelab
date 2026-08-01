@@ -63,11 +63,21 @@ def parse_arp_table(payload: str, network: str) -> list[Observation]:
     return observations
 
 
+def parse_oui_vendors(payload: str) -> dict[str, str]:
+    vendors = {}
+    for line in payload.splitlines():
+        prefix, separator, vendor = line.partition(" ")
+        if separator and len(prefix) == 6 and vendor.strip():
+            vendors[prefix.upper()] = vendor.strip()
+    return vendors
+
+
 def scan(
     network: str,
     *,
     timeout_seconds: int = 50,
     arp_path: Path = Path("/proc/net/arp"),
+    vendor_path: Path = Path("/usr/share/nmap/nmap-mac-prefixes"),
 ) -> list[Observation]:
     result = subprocess.run(
         ["nmap", "--unprivileged", "-sn", "-n", "-oX", "-", network],
@@ -79,4 +89,16 @@ def scan(
     if result.returncode != 0:
         detail = result.stderr.strip() or "no error detail"
         raise RuntimeError(f"nmap exited {result.returncode}: {detail}")
-    return parse_arp_table(arp_path.read_text(encoding="ascii"), network)
+    observations = parse_arp_table(arp_path.read_text(encoding="ascii"), network)
+    vendors = parse_oui_vendors(
+        vendor_path.read_text(encoding="utf-8", errors="replace")
+    )
+    return [
+        Observation(
+            mac=item.mac,
+            address=item.address,
+            hostname=item.hostname,
+            vendor=vendors.get(item.mac.replace(":", "").upper()[:6]),
+        )
+        for item in observations
+    ]

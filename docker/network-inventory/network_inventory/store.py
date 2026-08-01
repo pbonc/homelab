@@ -332,6 +332,7 @@ class InventoryStore:
                             device.mac and is_private_mac(device.mac)
                         ),
                         "confirmed": True,
+                        "connection": device.connection,
                     }
                 )
         for row in rows:
@@ -361,6 +362,7 @@ class InventoryStore:
                     "source": "observed",
                     "private_address": bool(row["private_address"]),
                     "confirmed": known is not None or row["confirmed_at"] is not None,
+                    "connection": known.connection if known else "unknown",
                 }
             )
         edges = [

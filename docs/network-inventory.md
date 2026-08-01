@@ -127,9 +127,18 @@ layout.
 The lab shows summary counts, evidence-backed shared-LAN membership, and a
 focused table of unidentified devices with current IP, MAC address, first seen,
 last seen, status, and private/randomized-MAC indication. Operator working
-labels remain in that browser's local storage and are never promoted to trusted
-server state automatically. After verifying an identity, the operator can copy
-a proposed JSON record into the repository-managed known-device inventory.
+labels and connection classifications remain in that browser's local storage
+and are saved only through an explicit Apply action. They are never promoted to
+trusted server state automatically. After verifying an identity, the operator
+can copy a proposed JSON record into the repository-managed known-device
+inventory.
+
+Ethernet and Wi-Fi groupings are either declared in the known-device inventory
+or classified by the operator. ARP cannot determine the connection medium, so
+unclassified devices remain explicitly unknown. Manufacturer clues come from
+Nmap's packaged local OUI database without a cloud lookup. Active OS
+fingerprinting and port scanning remain disabled; adding either would require a
+separate security and accuracy decision.
 
 The UI polls the versioned topology API every 30 seconds. It uses no graph
 library, external assets, cloud service, or administrative credentials.

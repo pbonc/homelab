@@ -19,7 +19,12 @@ sys.path.insert(0, str(SERVICE_ROOT))
 
 from network_inventory.config import KnownInventory, is_private_mac  # noqa: E402
 from network_inventory.notifier import publish_unknown_device  # noqa: E402
-from network_inventory.scanner import parse_arp_table, parse_nmap_xml, scan  # noqa: E402
+from network_inventory.scanner import (  # noqa: E402
+    parse_arp_table,
+    parse_nmap_xml,
+    parse_oui_vendors,
+    scan,
+)
 from network_inventory.store import InventoryStore, Observation  # noqa: E402
 
 
@@ -256,11 +261,23 @@ class NetworkInventoryTests(unittest.TestCase):
                 "192.168.1.27 0x1 0x2 00:11:22:33:44:55 * enp3s0\n",
                 encoding="ascii",
             )
+            vendor_path = Path(directory) / "nmap-mac-prefixes"
+            vendor_path.write_text("001122 Example Devices\n", encoding="utf-8")
             run.return_value.returncode = 0
             run.return_value.stdout = "<nmaprun/>"
             self.assertEqual(
-                scan("192.168.1.0/24", arp_path=arp_path),
-                [Observation("00:11:22:33:44:55", "192.168.1.27")],
+                scan(
+                    "192.168.1.0/24",
+                    arp_path=arp_path,
+                    vendor_path=vendor_path,
+                ),
+                [
+                    Observation(
+                        "00:11:22:33:44:55",
+                        "192.168.1.27",
+                        vendor="Example Devices",
+                    )
+                ],
             )
             command = run.call_args.args[0]
             self.assertIn("--unprivileged", command)
@@ -284,6 +301,12 @@ class NetworkInventoryTests(unittest.TestCase):
         self.assertEqual(
             parse_arp_table(payload, "192.168.1.0/24"),
             [Observation("00:11:22:33:44:55", "192.168.1.10")],
+        )
+
+    def test_local_oui_parser_does_not_require_cloud_lookup(self) -> None:
+        self.assertEqual(
+            parse_oui_vendors("001122 Example Devices\nAABBCC Another Vendor\n"),
+            {"001122": "Example Devices", "AABBCC": "Another Vendor"},
         )
 
     def test_ntfy_publish_uses_basic_auth_and_topic_endpoint(self) -> None:
@@ -334,6 +357,10 @@ class NetworkInventoryTests(unittest.TestCase):
         self.assertIn("/api/v1/topology", script)
         self.assertIn("localStorage", script)
         self.assertIn("Copy known-device JSON", script)
+        self.assertIn('apply.textContent = "Apply"', script)
+        self.assertIn("network-inventory-connections", script)
+        self.assertIn("Wired / Ethernet", script)
+        self.assertIn("Wi-Fi", script)
 
     def test_json_response_emits_exactly_one_body(self) -> None:
         with tempfile.TemporaryDirectory() as directory, patch.dict(

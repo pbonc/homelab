@@ -18,6 +18,7 @@ ALLOWED_KINDS = {
     "printer",
     "unknown",
 }
+ALLOWED_CONNECTIONS = {"ethernet", "wifi", "unknown"}
 
 
 def normalize_mac(value: str) -> str:
@@ -39,6 +40,7 @@ class KnownDevice:
     kind: str
     address: str | None
     mac: str | None
+    connection: str
 
 
 class KnownInventory:
@@ -55,6 +57,9 @@ class KnownInventory:
             kind = str(item["kind"])
             if kind not in ALLOWED_KINDS:
                 raise ValueError(f"unsupported device kind: {kind}")
+            connection = str(item.get("connection", "unknown"))
+            if connection not in ALLOWED_CONNECTIONS:
+                raise ValueError(f"unsupported connection type: {connection}")
             devices.append(
                 KnownDevice(
                     id=str(item["id"]),
@@ -62,6 +67,7 @@ class KnownInventory:
                     kind=kind,
                     address=address,
                     mac=mac,
+                    connection=connection,
                 )
             )
         ids = [device.id for device in devices]
