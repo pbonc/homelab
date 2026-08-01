@@ -206,6 +206,24 @@ class NetworkInventoryTests(unittest.TestCase):
                 )
             )
 
+    def test_identification_is_persistent_and_removes_unknown_status(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            store = self.make_store(directory)
+            now = datetime(2026, 7, 31, 12, 0, tzinfo=timezone.utc)
+            mac = "00:11:22:33:44:55"
+            store.record_scan([Observation(mac, "192.168.1.50")], completed_at=now)
+            store.identify_device(
+                mac, name="Kitchen display", connection_type="wifi",
+                identified_at=now,
+            )
+            node = next(item for item in store.topology(now)["nodes"] if item["mac"] == mac)
+            self.assertTrue(node["known"])
+            self.assertEqual(node["name"], "Kitchen display")
+            self.assertEqual(node["connection"], "wifi")
+            reopened = self.make_store(directory)
+            node = next(item for item in reopened.topology(now)["nodes"] if item["mac"] == mac)
+            self.assertTrue(node["known"])
+
     def test_health_distinguishes_initializing_stale_and_healthy(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             store = self.make_store(directory)
@@ -356,13 +374,13 @@ class NetworkInventoryTests(unittest.TestCase):
         self.assertIn("Unidentified devices", index)
         self.assertIn("/api/v1/topology", script)
         self.assertIn("localStorage", script)
-        self.assertIn("Copy known-device JSON", script)
-        self.assertIn('apply.textContent = "Apply"', script)
+        self.assertIn('/api/v1/devices/identify', script)
+        self.assertIn('apply.textContent = "Identify"', script)
         self.assertIn("network-inventory-connections", script)
         self.assertIn("Wired / Ethernet", script)
         self.assertIn("Wi-Fi", script)
         self.assertIn("ipNumber(left) - ipNumber(right)", script)
-        self.assertIn("known-devices.json", index)
+        self.assertIn("stored persistently", index)
 
     def test_json_response_emits_exactly_one_body(self) -> None:
         with tempfile.TemporaryDirectory() as directory, patch.dict(

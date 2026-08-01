@@ -65,8 +65,8 @@ def headers(scope: dict[str, Any], body: bytes) -> list[tuple[bytes, bytes]]:
         result.extend(
             [
                 (b"access-control-allow-origin", origin.encode("ascii")),
-                (b"access-control-allow-methods", b"GET, HEAD, OPTIONS"),
-                (b"access-control-allow-headers", b"Accept"),
+                (b"access-control-allow-methods", b"GET, HEAD, POST, OPTIONS"),
+                (b"access-control-allow-headers", b"Accept, Content-Type"),
                 (b"vary", b"Origin"),
             ]
         )
@@ -137,6 +137,27 @@ async def app(scope: dict[str, Any], receive: Any, send: Any) -> None:
     path = scope.get("path", "")
     if method == "OPTIONS":
         await send_json(send, scope, 200, {"status": "ok"})
+    elif method == "POST" and path == "/api/v1/devices/identify":
+        body = bytearray()
+        while True:
+            message = await receive()
+            body.extend(message.get("body", b""))
+            if len(body) > 4096:
+                await send_json(send, scope, 413, {"error": "payload_too_large"})
+                return
+            if not message.get("more_body", False):
+                break
+        try:
+            payload = json.loads(body)
+            store.identify_device(
+                str(payload["mac"]), name=str(payload["name"]),
+                connection_type=str(payload.get("connection", "unknown")),
+                identified_at=datetime.now(timezone.utc),
+            )
+        except (KeyError, TypeError, ValueError, json.JSONDecodeError) as error:
+            await send_json(send, scope, 400, {"error": "invalid_identity", "detail": str(error)})
+            return
+        await send_json(send, scope, 200, {"status": "identified"})
     elif method not in {"GET", "HEAD"}:
         await send_json(send, scope, 405, {"error": "method_not_allowed"})
     elif path == "/":

@@ -23,8 +23,17 @@ button { padding:7px 11px; cursor:pointer; } button:hover,button:focus-visible {
 .node { padding:11px; border:1px solid var(--line); border-left:4px solid var(--green); border-radius:8px; background:#0a1727; }
 .node.offline { border-left-color:var(--red); } .node.unidentified { border-color:#755b22; border-left-color:var(--amber); }
 .node strong,.node span { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; } .node span { color:var(--muted); font-size:.76rem; }
-.table-wrap { overflow:auto; } table { width:100%; border-collapse:collapse; } th,td { padding:10px 8px; border-bottom:1px solid #203950; text-align:left; white-space:nowrap; }
+.table-wrap { overflow-x:hidden; } table { width:100%; table-layout:fixed; border-collapse:collapse; } th,td { padding:8px 6px; border-bottom:1px solid #203950; text-align:left; overflow:hidden; text-overflow:ellipsis; }
 th { color:var(--muted); font-size:.72rem; text-transform:uppercase; } td { font-size:.84rem; } td input { min-width:150px; }
+.table-wrap th:nth-child(1),.table-wrap td:nth-child(1) { width:7%; }
+.table-wrap th:nth-child(2),.table-wrap td:nth-child(2) { width:10%; }
+.table-wrap th:nth-child(3),.table-wrap td:nth-child(3) { width:15%; }
+.table-wrap th:nth-child(4),.table-wrap td:nth-child(4) { width:18%; }
+.table-wrap th:nth-child(5),.table-wrap td:nth-child(5) { width:17%; }
+.table-wrap th:nth-child(6),.table-wrap td:nth-child(6) { width:11%; }
+.table-wrap th:nth-child(7),.table-wrap td:nth-child(7) { width:14%; }
+.table-wrap th:nth-child(8),.table-wrap td:nth-child(8) { width:8%; }
+.table-wrap input,.table-wrap select { width:100%; min-width:0; box-sizing:border-box; }
 .status { color:var(--green); } .status.offline { color:var(--red); } .private { color:var(--amber); font-size:.72rem; }
 .empty { margin:18px 0 0; color:var(--muted); text-align:center; }
 @media (max-width:700px) { header,.section-heading { align-items:flex-start; flex-direction:column; } .stats { grid-template-columns:repeat(2,1fr); } .filter,input { width:100%; } }

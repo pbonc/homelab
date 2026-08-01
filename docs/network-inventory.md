@@ -125,19 +125,15 @@ Inventory card rather than injecting custom elements into Homepage's internal
 layout.
 
 The lab shows summary counts, evidence-backed shared-LAN membership, and a
-focused table of unidentified devices with current IP, MAC address, first seen,
-last seen, status, and private/randomized-MAC indication. Operator working
-labels and connection classifications remain in that browser's local storage
-and are saved only through an explicit Apply action. They are never promoted to
-trusted server state automatically. After verifying an identity, the operator
-can copy a proposed JSON record into the repository-managed known-device
-inventory.
+focused table of unidentified devices with current IP, MAC address, last seen,
+status, and private/randomized-MAC indication.
 
-The unidentified-device table is sorted by numeric IPv4 address. An Apply
-operation improves only the local investigation view. Moving a device from
-unidentified to identified is intentionally a GitOps change: copy its proposed
-record into `docker/network-inventory/config/known-devices.json`, review and
-commit it, then redeploy Network Inventory.
+The unidentified-device table is sorted by numeric IPv4 address. Enter a name
+and connection classification and select **Identify** to persist the identity
+in the service's SQLite data volume. The device immediately leaves the
+unidentified list. Repository-managed known devices remain the reproducible
+source for infrastructure declared before it is discovered; interactive client
+identities survive ordinary container rebuilds through the named data volume.
 
 Ethernet and Wi-Fi groupings are either declared in the known-device inventory
 or classified by the operator. ARP cannot determine the connection medium, so

@@ -55,19 +55,6 @@
     }));
   }
 
-  async function copyKnown(node) {
-    const name = labels[node.id] || "replace-with-device-name";
-    const value = JSON.stringify({
-      id: `device-${name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`,
-      name,
-      kind: "client",
-      connection: connection(node),
-      address: address(node),
-      mac: node.mac,
-    }, null, 2);
-    await navigator.clipboard.writeText(value);
-  }
-
   function renderUnknown() {
     const needle = state.filter.toLowerCase();
     const unknown = state.nodes.filter((node) => !node.known && [
@@ -99,23 +86,33 @@
       }
       connectionCell.append(select);
       const observed = document.createElement("td");
-      observed.textContent = `${when(node.first_seen_at)} → ${when(node.last_seen_at)}`;
+      observed.textContent = when(node.last_seen_at);
       const action = document.createElement("td");
       const apply = document.createElement("button");
-      apply.textContent = "Apply";
-      apply.addEventListener("click", () => {
-        labels[node.id] = input.value.trim();
-        connections[node.id] = select.value;
-        localStorage.setItem("network-inventory-labels", JSON.stringify(labels));
-        localStorage.setItem("network-inventory-connections", JSON.stringify(connections));
-        apply.textContent = "Saved";
-        window.setTimeout(() => { apply.textContent = "Apply"; }, 1200);
-        renderTopology();
+      apply.textContent = "Identify";
+      apply.addEventListener("click", async () => {
+        const name = input.value.trim();
+        if (!name) { input.focus(); return; }
+        apply.disabled = true;
+        apply.textContent = "Saving…";
+        try {
+          const response = await fetch("/api/v1/devices/identify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ mac: node.mac, name, connection: select.value }),
+          });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          delete labels[node.id]; delete connections[node.id];
+          localStorage.setItem("network-inventory-labels", JSON.stringify(labels));
+          localStorage.setItem("network-inventory-connections", JSON.stringify(connections));
+          await load();
+        } catch (error) {
+          apply.disabled = false;
+          apply.textContent = "Retry";
+          window.alert(`Identification failed: ${error.message}`);
+        }
       });
-      const copy = document.createElement("button");
-      copy.textContent = "Copy known-device JSON";
-      copy.addEventListener("click", () => copyKnown(node));
-      action.append(apply, document.createTextNode(" "), copy);
+      action.append(apply);
       row.append(status, ip, mac, clues, labelCell, connectionCell, observed, action);
       return row;
     }));

@@ -111,7 +111,34 @@ class InventoryStore:
                     PRIMARY KEY (mac, address),
                     FOREIGN KEY (mac) REFERENCES devices(mac) ON DELETE CASCADE
                 );
+                CREATE TABLE IF NOT EXISTS identified_devices (
+                    mac TEXT PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    kind TEXT NOT NULL DEFAULT 'client',
+                    connection TEXT NOT NULL DEFAULT 'unknown',
+                    identified_at TEXT NOT NULL,
+                    FOREIGN KEY (mac) REFERENCES devices(mac) ON DELETE CASCADE
+                );
                 """
+            )
+
+    def identify_device(self, mac: str, *, name: str, connection_type: str,
+                        identified_at: datetime) -> None:
+        normalized_mac = normalize_mac(mac)
+        clean_name = name.strip()
+        if not clean_name or len(clean_name) > 80:
+            raise ValueError("name must contain 1 to 80 characters")
+        if connection_type not in {"ethernet", "wifi", "unknown"}:
+            raise ValueError("connection must be ethernet, wifi, or unknown")
+        with self._connect() as connection:
+            if connection.execute("SELECT 1 FROM devices WHERE mac=?", (normalized_mac,)).fetchone() is None:
+                raise ValueError("observed device was not found")
+            connection.execute(
+                """INSERT INTO identified_devices (mac, name, kind, connection, identified_at)
+                   VALUES (?, ?, 'client', ?, ?)
+                   ON CONFLICT(mac) DO UPDATE SET name=excluded.name,
+                     connection=excluded.connection, identified_at=excluded.identified_at""",
+                (normalized_mac, clean_name, connection_type, utc_text(identified_at)),
             )
 
     def record_scan(
@@ -291,6 +318,9 @@ class InventoryStore:
             addresses = connection.execute(
                 "SELECT * FROM addresses ORDER BY mac, last_seen_at DESC"
             ).fetchall()
+            identified = {row["mac"]: row for row in connection.execute(
+                "SELECT * FROM identified_devices"
+            )}
         by_mac: dict[str, list[str]] = {}
         for row in addresses:
             by_mac.setdefault(row["mac"], []).append(row["address"])
@@ -346,14 +376,15 @@ class InventoryStore:
                     ),
                     None,
                 )
+            local_identity = identified.get(row["mac"])
             age = (now - parse_utc(row["last_seen_at"])).total_seconds()
             nodes.append(
                 {
                     "id": row["node_id"],
-                    "name": known.name if known else (row["hostname"] or "Unknown device"),
-                    "kind": known.kind if known else "unknown",
+                    "name": known.name if known else (local_identity["name"] if local_identity else (row["hostname"] or "Unknown device")),
+                    "kind": known.kind if known else (local_identity["kind"] if local_identity else "unknown"),
                     "status": "online" if age <= self.offline_seconds else "offline",
-                    "known": known is not None,
+                    "known": known is not None or local_identity is not None,
                     "addresses": by_mac.get(row["mac"], []),
                     "mac": row["mac"],
                     "vendor": row["vendor"],
@@ -361,8 +392,8 @@ class InventoryStore:
                     "last_seen_at": row["last_seen_at"],
                     "source": "observed",
                     "private_address": bool(row["private_address"]),
-                    "confirmed": known is not None or row["confirmed_at"] is not None,
-                    "connection": known.connection if known else "unknown",
+                    "confirmed": known is not None or local_identity is not None or row["confirmed_at"] is not None,
+                    "connection": known.connection if known else (local_identity["connection"] if local_identity else "unknown"),
                 }
             )
         edges = [
