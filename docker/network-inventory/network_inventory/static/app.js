@@ -6,6 +6,9 @@
   const address = (node) => node.addresses?.[0] || "—";
   const when = (value) => value ? new Date(value).toLocaleString() : "Never";
   const connection = (node) => connections[node.id] || node.connection || "unknown";
+  const ipNumber = (node) => address(node).split(".").reduce(
+    (value, octet) => (value * 256) + (Number(octet) || 0), 0,
+  );
 
   function renderSummary(discovery) {
     const devices = state.nodes.filter((node) => node.kind !== "network");
@@ -69,7 +72,8 @@
     const needle = state.filter.toLowerCase();
     const unknown = state.nodes.filter((node) => !node.known && [
       address(node), node.mac, node.vendor, node.hostname, labels[node.id],
-    ].filter(Boolean).join(" ").toLowerCase().includes(needle));
+    ].filter(Boolean).join(" ").toLowerCase().includes(needle))
+      .sort((left, right) => ipNumber(left) - ipNumber(right));
     const body = byId("unknown-table");
     body.replaceChildren(...unknown.map((node) => {
       const row = document.createElement("tr");

@@ -361,6 +361,8 @@ class NetworkInventoryTests(unittest.TestCase):
         self.assertIn("network-inventory-connections", script)
         self.assertIn("Wired / Ethernet", script)
         self.assertIn("Wi-Fi", script)
+        self.assertIn("ipNumber(left) - ipNumber(right)", script)
+        self.assertIn("known-devices.json", index)
 
     def test_json_response_emits_exactly_one_body(self) -> None:
         with tempfile.TemporaryDirectory() as directory, patch.dict(

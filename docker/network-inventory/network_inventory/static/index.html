@@ -39,7 +39,7 @@
         <div><p class="eyebrow">IDENTIFICATION WORKBENCH</p><h2>Unidentified devices</h2></div>
         <label class="filter">Filter <input id="filter" type="search" placeholder="IP, MAC, or label"></label>
       </div>
-      <p class="truth-note">Labels and connection classifications are saved only when you press Apply and remain in this browser. Vendor is derived from Nmap’s local OUI database. OS fingerprinting and port scans are intentionally disabled.</p>
+      <p class="truth-note">Labels and connection classifications are saved only when you press Apply and remain in this browser. To make an identity authoritative, copy its JSON into <code>docker/network-inventory/config/known-devices.json</code>, commit it, and redeploy this service. Vendor is derived from Nmap’s local OUI database. OS fingerprinting and port scans are intentionally disabled.</p>
       <div class="table-wrap">
         <table>
           <thead><tr><th>Status</th><th>Current IP</th><th>MAC</th><th>Clues</th><th>Working label</th><th>Connection</th><th>Observed</th><th>Action</th></tr></thead>

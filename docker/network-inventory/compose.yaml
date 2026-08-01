@@ -4,7 +4,7 @@ services:
   network-inventory:
     build:
       context: .
-    image: homelab/network-inventory:0.3.0
+    image: homelab/network-inventory:0.3.1
     container_name: network-inventory
     network_mode: host
     environment:

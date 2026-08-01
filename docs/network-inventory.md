@@ -133,6 +133,12 @@ trusted server state automatically. After verifying an identity, the operator
 can copy a proposed JSON record into the repository-managed known-device
 inventory.
 
+The unidentified-device table is sorted by numeric IPv4 address. An Apply
+operation improves only the local investigation view. Moving a device from
+unidentified to identified is intentionally a GitOps change: copy its proposed
+record into `docker/network-inventory/config/known-devices.json`, review and
+commit it, then redeploy Network Inventory.
+
 Ethernet and Wi-Fi groupings are either declared in the known-device inventory
 or classified by the operator. ARP cannot determine the connection medium, so
 unclassified devices remain explicitly unknown. Manufacturer clues come from
