@@ -18,13 +18,15 @@ def publish_unknown_device(
         f"{username}:{password}".encode("utf-8")
     ).decode("ascii")
     qualifiers = []
+    if device.get("address"):
+        qualifiers.append(f"IP {device['address']}")
     if device.get("hostname"):
         qualifiers.append(f"hostname {device['hostname']}")
     if device.get("vendor"):
         qualifiers.append(f"vendor {device['vendor']}")
     if device.get("private_address"):
         qualifiers.append("private/randomized MAC")
-    detail = "; ".join(qualifiers) if qualifiers else "no hostname or vendor reported"
+    detail = "; ".join(qualifiers) if qualifiers else "no IP, hostname, or vendor reported"
     message = (
         f"{device['mac']} was repeatedly observed on the trusted LAN; {detail}."
     )

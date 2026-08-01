@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Network Inventory Lab</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <p class="eyebrow">HOMELAB / TRUSTED LAN</p>
+        <h1>Network Inventory Lab</h1>
+        <p class="intro">Observed devices and evidence-backed membership on the shared LAN.</p>
+      </div>
+      <div id="discovery" class="discovery">Loading inventory…</div>
+    </header>
+
+    <section class="stats" aria-label="Inventory summary">
+      <article><strong id="online-count">—</strong><span>Online</span></article>
+      <article><strong id="offline-count">—</strong><span>Offline</span></article>
+      <article><strong id="unknown-count">—</strong><span>Unidentified</span></article>
+      <article><strong id="private-count">—</strong><span>Private MACs</span></article>
+    </section>
+
+    <section class="panel">
+      <div class="section-heading">
+        <div><p class="eyebrow">TOPOLOGY</p><h2>Shared LAN membership</h2></div>
+        <button id="refresh" type="button">Refresh</button>
+      </div>
+      <p class="truth-note">These links mean “observed on this LAN.” They do not claim a physical switch port or Wi-Fi access point.</p>
+      <div class="lan">Trusted LAN <span>192.168.1.0/24</span></div>
+      <div id="topology" class="topology" aria-live="polite"></div>
+    </section>
+
+    <section class="panel">
+      <div class="section-heading">
+        <div><p class="eyebrow">IDENTIFICATION WORKBENCH</p><h2>Unidentified devices</h2></div>
+        <label class="filter">Filter <input id="filter" type="search" placeholder="IP, MAC, or label"></label>
+      </div>
+      <p class="truth-note">Working labels stay only in this browser. Copy the generated JSON into the repository’s known-device inventory after verification.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Status</th><th>Current IP</th><th>MAC</th><th>Working label</th><th>Observed</th><th>Action</th></tr></thead>
+          <tbody id="unknown-table"></tbody>
+        </table>
+      </div>
+      <p id="empty" class="empty" hidden>No unidentified devices match this filter.</p>
+    </section>
+  </main>
+  <script src="/static/app.js" defer></script>
+</body>
+</html>

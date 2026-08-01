@@ -50,6 +50,7 @@ HOMEPAGE_ORIGINS = {
     "http://192.168.1.23:3000",
     "http://brain:3000",
 }
+STATIC_ROOT = APP_ROOT / "network_inventory" / "static"
 
 
 def headers(scope: dict[str, Any], body: bytes) -> list[tuple[bytes, bytes]]:
@@ -86,6 +87,31 @@ async def send_json(
             "headers": headers(scope, body),
         }
     )
+
+
+async def send_file(
+    send: Any,
+    scope: dict[str, Any],
+    path: Path,
+    content_type: bytes,
+) -> None:
+    body = path.read_bytes()
+    response_headers = [
+        (b"content-type", content_type),
+        (b"content-length", str(len(body)).encode("ascii")),
+        (b"cache-control", b"no-cache"),
+        (b"x-content-type-options", b"nosniff"),
+        (b"content-security-policy", b"default-src 'self'; connect-src 'self'"),
+    ]
+    await send(
+        {"type": "http.response.start", "status": 200, "headers": response_headers}
+    )
+    await send(
+        {
+            "type": "http.response.body",
+            "body": b"" if scope.get("method") == "HEAD" else body,
+        }
+    )
     await send(
         {
             "type": "http.response.body",
@@ -113,6 +139,12 @@ async def app(scope: dict[str, Any], receive: Any, send: Any) -> None:
         await send_json(send, scope, 200, {"status": "ok"})
     elif method not in {"GET", "HEAD"}:
         await send_json(send, scope, 405, {"error": "method_not_allowed"})
+    elif path == "/":
+        await send_file(send, scope, STATIC_ROOT / "index.html", b"text/html; charset=utf-8")
+    elif path == "/static/app.js":
+        await send_file(send, scope, STATIC_ROOT / "app.js", b"text/javascript; charset=utf-8")
+    elif path == "/static/styles.css":
+        await send_file(send, scope, STATIC_ROOT / "styles.css", b"text/css; charset=utf-8")
     elif path == "/api/v1/health":
         payload = store.health(datetime.now(timezone.utc))
         payload["version"] = __version__

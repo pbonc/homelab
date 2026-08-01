@@ -225,8 +225,12 @@ class InventoryStore:
     def pending_notifications(self) -> list[dict[str, str | bool | None]]:
         with self._connect() as connection:
             rows = connection.execute(
-                """SELECT mac, node_id, hostname, vendor, private_address,
-                          first_seen_at, last_seen_at
+                """SELECT devices.mac, devices.node_id, devices.hostname,
+                          devices.vendor, devices.private_address,
+                          devices.first_seen_at, devices.last_seen_at,
+                          (SELECT address FROM addresses
+                           WHERE addresses.mac = devices.mac
+                           ORDER BY last_seen_at DESC LIMIT 1) AS address
                    FROM devices
                    WHERE confirmed_at IS NOT NULL
                      AND notification_sent_at IS NULL
@@ -238,6 +242,7 @@ class InventoryStore:
                 "node_id": row["node_id"],
                 "hostname": row["hostname"],
                 "vendor": row["vendor"],
+                "address": row["address"],
                 "private_address": bool(row["private_address"]),
                 "first_seen_at": row["first_seen_at"],
                 "last_seen_at": row["last_seen_at"],

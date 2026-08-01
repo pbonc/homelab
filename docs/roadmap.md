@@ -251,7 +251,7 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [x] Handle private/randomized MAC addresses and Wi-Fi roaming without producing repeated “new device” alerts; keep ordinary departures dashboard-only
 - [x] Publish a versioned, read-only topology API with stable node identifiers, verified status, explicit known/unknown state, and declared or evidence-backed edges
 - [x] Represent unverified clients on a shared LAN segment; do not invent switch ports, access-point associations, or physical links from ARP observations
-- [ ] Adapt the supplied topology frontend into a compact, collapsible Homepage panel with a full-view option, bounded height, responsive layout, keyboard access, and a quiet unavailable state
+- [ ] Deploy a standalone Network Inventory Lab linked from Homepage, with evidence-backed topology, unidentified-device investigation, browser-local working labels, and a quiet unavailable state
 - [ ] Keep topology rendering replaceable and driven entirely by the API contract; do not couple scanner persistence to one graph library or browser layout
 - [ ] Add sustained thermal or throttling alerts for `brain` and `piaware`, using measured baselines and hardware-appropriate thresholds
 - [ ] Alert when encrypted backups fail or exceed their expected freshness window, then send one recovery after the next verified backup

@@ -304,6 +304,7 @@ class NetworkInventoryTests(unittest.TestCase):
                     {
                         "mac": "00:11:22:33:44:55",
                         "node_id": "device-example",
+                        "address": "192.168.1.50",
                         "hostname": "tablet",
                         "vendor": "Example",
                         "private_address": False,
@@ -319,6 +320,17 @@ class NetworkInventoryTests(unittest.TestCase):
             self.assertEqual(request.full_url, "http://192.168.1.23:8093/homelab-alerts")
             self.assertEqual(request.get_header("Authorization"), f"Basic {expected}")
             self.assertIn(b"tablet", request.data)
+            self.assertIn(b"192.168.1.50", request.data)
+
+    def test_standalone_lab_contains_topology_and_identification_tools(self) -> None:
+        static = SERVICE_ROOT / "network_inventory" / "static"
+        index = (static / "index.html").read_text(encoding="utf-8")
+        script = (static / "app.js").read_text(encoding="utf-8")
+        self.assertIn("Network Inventory Lab", index)
+        self.assertIn("Unidentified devices", index)
+        self.assertIn("/api/v1/topology", script)
+        self.assertIn("localStorage", script)
+        self.assertIn("Copy known-device JSON", script)
 
 
 if __name__ == "__main__":

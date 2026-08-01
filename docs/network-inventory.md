@@ -117,19 +117,19 @@ appear in inventory but never generate a delayed notification merely because
 the watcher was installed. Devices first observed after that baseline follow
 the normal confirmation policy.
 
-## Homepage presentation
+## Network Inventory Lab
 
-The Homepage receives a compact, collapsible topology panel rather than an
-always-expanded canvas that changes card geometry. The collapsed summary shows
-online, offline, and unacknowledged counts. Opening it displays the bounded map;
-a separate full-view link may provide more room.
+The service hosts a standalone, credential-free LAN interface at
+`http://192.168.1.23:8030/`. Homepage links to it from the monitored Network
+Inventory card rather than injecting custom elements into Homepage's internal
+layout.
 
-The renderer must:
+The lab shows summary counts, evidence-backed shared-LAN membership, and a
+focused table of unidentified devices with current IP, MAC address, first seen,
+last seen, status, and private/randomized-MAC indication. Operator working
+labels remain in that browser's local storage and are never promoted to trusted
+server state automatically. After verifying an identity, the operator can copy
+a proposed JSON record into the repository-managed known-device inventory.
 
-- keep a fixed maximum height and never stretch service-card rows;
-- center sparse layouts and remain usable with many clients;
-- distinguish offline, unknown, and stale discovery states without relying on
-  color alone;
-- support keyboard navigation and reduced motion;
-- stop animation after layout stabilization; and
-- show a quiet fallback when the inventory API is unavailable.
+The UI polls the versioned topology API every 30 seconds. It uses no graph
+library, external assets, cloud service, or administrative credentials.

@@ -14,7 +14,7 @@ class HomepageNetworkInventoryTests(unittest.TestCase):
         card = services.split("    - Network Inventory:", 1)[1].split(
             "    - Loki:", 1
         )[0]
-        self.assertIn("href: http://192.168.1.23:8030/api/v1/topology", card)
+        self.assertIn("href: http://192.168.1.23:8030/", card)
         self.assertIn("siteMonitor: http://192.168.1.23:8030/api/v1/health", card)
         self.assertIn("target: _blank", card)
 
@@ -26,7 +26,7 @@ class HomepageNetworkInventoryTests(unittest.TestCase):
 
     def test_card_is_part_of_topology_minor_release(self):
         version = (HOMEPAGE / "version.env").read_text(encoding="utf-8")
-        self.assertIn("HOMEPAGE_VAR_DASHBOARD_VERSION=0.11.6", version)
+        self.assertIn("HOMEPAGE_VAR_DASHBOARD_VERSION=0.11.7", version)
 
 
 if __name__ == "__main__":
