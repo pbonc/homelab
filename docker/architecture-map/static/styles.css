@@ -1,0 +1,50 @@
+:root {
+  color-scheme: dark;
+  --bg:#07111f; --surface:#0c1b2c; --surface-2:#10243a; --line:#28445f;
+  --text:#e6f1fb; --muted:#91a8bc; --cyan:#37c8e6; --green:#62d991;
+  --amber:#e8bd62; --violet:#a99cf5; --flow:#5cb9d4;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:radial-gradient(circle at 50% -20%,#163657 0,var(--bg) 46%); color:var(--text); font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; }
+main { width:min(1500px,calc(100% - 32px)); margin:auto; padding:28px 0 48px; }
+header { display:flex; justify-content:space-between; align-items:flex-end; gap:24px; margin-bottom:22px; }
+h1,h2,h3,p { margin-top:0; } h1 { margin-bottom:8px; font-size:clamp(2rem,4vw,3.6rem); letter-spacing:-.045em; } h2 { margin-bottom:7px; }
+.eyebrow { margin-bottom:7px; color:var(--cyan); font-size:.74rem; font-weight:700; letter-spacing:.13em; }
+.lede,.detail p { margin-bottom:0; color:var(--muted); }
+.legend { display:flex; flex-wrap:wrap; gap:14px; color:var(--muted); font-size:.78rem; }
+.legend span { display:flex; align-items:center; gap:6px; } .legend i { width:10px; height:10px; border-radius:3px; background:var(--cyan); }
+.legend i.process { background:var(--green); border-radius:50%; } .legend i.store { background:var(--violet); border-radius:0 0 5px 5px; }
+nav { display:flex; flex-wrap:wrap; gap:7px; margin-bottom:14px; }
+button { color:inherit; font:inherit; }
+.filter { border:1px solid var(--line); border-radius:999px; padding:7px 11px; background:var(--surface); cursor:pointer; font-size:.78rem; text-transform:capitalize; }
+.filter:hover,.filter:focus-visible,.filter.active { border-color:var(--cyan); background:#10314a; outline:none; }
+.diagram { position:relative; min-height:610px; padding:15px; border:1px solid var(--line); border-radius:14px; background:rgba(7,17,31,.84); overflow:hidden; }
+#connections { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+.boundaries { position:relative; z-index:1; display:grid; grid-template-columns:1fr 1fr 1.7fr 1.2fr; gap:12px; height:100%; }
+.boundary { min-width:0; padding:12px; border:1px solid rgba(40,68,95,.7); border-radius:10px; background:rgba(12,27,44,.76); }
+.boundary h3 { color:var(--muted); font-size:.72rem; letter-spacing:.09em; text-transform:uppercase; }
+.nodes { display:grid; gap:8px; }
+.node { width:100%; min-height:54px; padding:9px 10px; border:1px solid var(--line); border-left:4px solid var(--green); border-radius:8px; background:var(--surface-2); text-align:left; cursor:pointer; transition:opacity .15s,border-color .15s,transform .15s; }
+.node[data-type="entity"] { border-left-color:var(--cyan); }
+.node[data-type="store"] { border-left-color:var(--violet); }
+.node:hover,.node:focus-visible,.node.selected { border-color:var(--amber); outline:none; transform:translateY(-1px); }
+.node.dim { opacity:.24; } .node strong,.node small { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.node small { margin-top:3px; color:var(--muted); font-size:.68rem; }
+.detail { display:grid; grid-template-columns:minmax(260px,.8fr) 2fr; gap:24px; margin-top:14px; padding:18px; border:1px solid var(--line); border-radius:12px; background:var(--surface); }
+.detail-copy code { color:var(--amber); }
+.flow-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; align-content:start; }
+.flow { padding:9px 11px; border-left:3px solid var(--flow); background:var(--surface-2); font-size:.79rem; }
+.flow.telemetry,.flow.study { border-left-color:var(--green); }
+.flow.deployment,.flow.inventory { border-left-color:var(--amber); }
+.flow.adsb,.flow.logging { border-left-color:var(--violet); }
+.flow.notification { border-left-color:#ec7f9f; }
+.flow strong,.flow span { display:block; } .flow span { margin-top:3px; color:var(--muted); font-size:.7rem; }
+.accessible-flows { margin-top:14px; color:var(--muted); font-size:.8rem; } .accessible-flows li { margin:5px 0; }
+.error { padding:24px; color:#ff9a9a; }
+@media (max-width:1000px) {
+  .diagram { overflow:visible; } .boundaries { grid-template-columns:repeat(2,1fr); } #connections { display:none; }
+}
+@media (max-width:650px) {
+  main { width:min(100% - 20px,1500px); padding-top:18px; } header { align-items:flex-start; flex-direction:column; }
+  .boundaries,.detail,.flow-list { grid-template-columns:1fr; } .diagram { min-height:auto; padding:9px; }
+}

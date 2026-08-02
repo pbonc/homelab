@@ -26,7 +26,7 @@ class HomepageNetworkInventoryTests(unittest.TestCase):
 
     def test_card_is_part_of_topology_minor_release(self):
         version = (HOMEPAGE / "version.env").read_text(encoding="utf-8")
-        self.assertIn("HOMEPAGE_VAR_DASHBOARD_VERSION=0.11.7", version)
+        self.assertIn("HOMEPAGE_VAR_DASHBOARD_VERSION=0.12.0", version)
 
 
 if __name__ == "__main__":

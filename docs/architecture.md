@@ -29,12 +29,24 @@ special cases.
 | Security scanning | Aikido GitHub App | Read-only repository scanning and a static Homepage dashboard link |
 | Observability | Prometheus, Node Exporter, Loki, Alloy | Host metrics, availability probes, alerts, and constrained Docker logs |
 | Network inventory | Inventory API, SQLite | Stable LAN device identity, confirmation state, and truthful topology data |
+| Architecture map | Static explorer, versioned JSON model | Interactive system data flows, boundaries, protocols, and component responsibilities |
 | Host service | GitHub Actions runner | Manually triggered validation and production deployment jobs |
 
 The Homepage stack is deployed through immutable releases under
 `/srv/homelab/homepage`. Telemetry and observability currently run from their
 repository Compose definitions on `brain`; the security-status adapter is
 dormant.
+
+## Interactive data-flow model
+
+The LAN-only Architecture Map at `http://192.168.1.23:8040` renders the
+repository-managed model in `docker/architecture-map/model/architecture.json`.
+It separates external systems, the PiAware edge, controller processes, and
+persistent stores. Flow categories can be filtered, and selecting a component
+isolates its immediate inputs and outputs with the protocol and payload purpose.
+
+The model is documentation rather than service discovery: changes are reviewed
+in Git and must not infer undocumented trust, physical, or credential flows.
 
 ### Planned nodes
 

@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Homelab Architecture Map</title>
+  <meta name="description" content="Interactive, evidence-backed data-flow diagram for the Homelab platform.">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <p class="eyebrow">HOMELAB / ARCHITECTURE</p>
+        <h1>Data Flow Explorer</h1>
+        <p class="lede">Follow what enters the lab, where it is processed, what persists, and how results leave.</p>
+      </div>
+      <div class="legend" aria-label="Node types">
+        <span><i class="entity"></i>External</span>
+        <span><i class="process"></i>Process</span>
+        <span><i class="store"></i>Data store</span>
+      </div>
+    </header>
+
+    <nav id="filters" aria-label="Flow filters"></nav>
+
+    <section class="diagram" aria-label="Interactive data-flow diagram">
+      <canvas id="connections" aria-hidden="true"></canvas>
+      <div id="boundaries" class="boundaries"></div>
+    </section>
+
+    <section id="detail" class="detail" aria-live="polite">
+      <div class="detail-copy">
+        <p class="eyebrow">SELECT A COMPONENT</p>
+        <h2>Trace a data path</h2>
+        <p>Choose any component to isolate its immediate inputs and outputs.</p>
+      </div>
+      <div id="flow-list" class="flow-list"></div>
+    </section>
+
+    <details class="accessible-flows">
+      <summary>Text list of visible data flows</summary>
+      <ul id="text-flows"></ul>
+    </details>
+  </main>
+  <script src="/app.js" defer></script>
+</body>
+</html>

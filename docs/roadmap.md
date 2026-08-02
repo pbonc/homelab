@@ -261,6 +261,15 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [ ] Add network-inventory and notification-delivery status to Grafana, `labctl`, the Homepage, backup scope, and restore testing
 - [ ] Exercise duplicate suppression, randomized addresses, watcher restart, unknown-device acknowledgement, hardware outage, controller blind spot, and recovery
 
+## Post-Sprint 9 Hotfix: Interactive Architecture DFD
+
+- [x] Define a versioned, repository-managed model of deployed external entities, edge and controller processes, persistent stores, and directional flows
+- [x] Build a LAN-only interactive explorer with flow-category filtering and component-level input/output tracing
+- [x] Show trust boundaries, protocols, endpoints, and concise responsibilities without exposing credentials or inventing undocumented flows
+- [x] Add an equal-height Architecture Map card to Homepage and bump the dashboard semantic version
+- [ ] Deploy the service on `brain`, verify its health and Homepage link, and review the rendered flows against the live system
+- [ ] Require future service changes to update the data-flow model when they introduce or alter a meaningful flow
+
 ## Post-Sprint 9 Hotfix: Interview Talking Point Strip
 
 - [ ] Add concise interview talking points to the Study Deck for the recent observability, PiAware, Ansible, backup, and clean-rebuild work

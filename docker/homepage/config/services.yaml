@@ -82,6 +82,12 @@
         target: _blank
         siteMonitor: http://192.168.1.23:8030/api/v1/health
         description: "Observe | LAN discovery and device topology"
+    - Architecture Map:
+        icon: mdi-graph-outline
+        href: http://192.168.1.23:8040/
+        target: _blank
+        siteMonitor: http://192.168.1.23:8040/api/health
+        description: "Explore | Interactive system data flows"
     - Loki:
         icon: mdi-file-search-outline
         href: http://192.168.1.23:3001/d/homelab-container-logs/container-logs
