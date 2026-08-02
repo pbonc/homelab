@@ -7,6 +7,8 @@
   const filteredFlows = () => state.model.flows.filter((flow) =>
     (state.category === "all" || flow.category === state.category) &&
     (!state.selected || flow.from === state.selected || flow.to === state.selected));
+  const overviewFlows = () => filteredFlows().filter((flow) =>
+    nodeById(flow.from).boundary !== nodeById(flow.to).boundary);
   const traceNode = () => state.selected || state.hovered;
 
   function renderFilters() {
@@ -20,7 +22,7 @@
   }
 
   function renderBoundaries() {
-    const active = new Set(filteredFlows().flatMap((flow) => [flow.from, flow.to]));
+    const active = new Set(overviewFlows().flatMap((flow) => [flow.from, flow.to]));
     const boundaries = [...state.model.boundaries].sort((a,b) => a.order - b.order);
     byId("boundaries").replaceChildren(...boundaries.map((boundary) => {
       const section = document.createElement("section"); section.className = "boundary";
@@ -112,7 +114,7 @@
     const box=diagram.getBoundingClientRect(); canvas.width=box.width*ratio; canvas.height=box.height*ratio;
     const context=canvas.getContext("2d"); context.scale(ratio,ratio);
     const traced=traceNode();
-    filteredFlows().forEach((flow) => {
+    overviewFlows().forEach((flow,index) => {
       const from=diagram.querySelector(`[data-node="${flow.from}"]`); const to=diagram.querySelector(`[data-node="${flow.to}"]`); if(!from||!to) return;
       const a=from.getBoundingClientRect(), b=to.getBoundingClientRect();
       const forward=b.left >= a.right;
@@ -121,10 +123,11 @@
       const active=!traced || flow.from===traced || flow.to===traced;
       const width=traced ? (active ? 3.6 : .8) : 2.1;
       const alpha=traced ? (active ? .96 : .07) : .70;
-      const bend=Math.max(32,Math.abs(x2-x1)*.44);
+      const laneOffset=((index % 7)-3)*2.5;
+      const laneX=(x1+x2)/2+laneOffset;
       const curve=() => {
         context.beginPath(); context.moveTo(x1,y1);
-        context.bezierCurveTo(x1+(forward?bend:-bend),y1,x2+(forward?-bend:bend),y2,x2,y2);
+        context.lineTo(laneX,y1); context.lineTo(laneX,y2); context.lineTo(x2,y2);
       };
       context.globalAlpha=active ? alpha : .07;
       context.strokeStyle="#07111f"; context.lineWidth=width+3; curve(); context.stroke();

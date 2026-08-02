@@ -37,6 +37,8 @@ class ArchitectureMapTests(unittest.TestCase):
         self.assertIn("state.hovered", script)
         self.assertIn("updateTrace", script)
         self.assertIn("renderFocus", script)
+        self.assertIn("overviewFlows", script)
+        self.assertIn("context.lineTo(laneX,y2)", script)
         self.assertIn("inboundArrow", script)
         self.assertIn("outboundArrow", script)
         self.assertIn('selectedHeading.textContent="Selected"', script)
