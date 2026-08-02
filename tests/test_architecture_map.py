@@ -36,6 +36,8 @@ class ArchitectureMapTests(unittest.TestCase):
         self.assertIn("state.selected", script)
         self.assertIn("state.hovered", script)
         self.assertIn("updateTrace", script)
+        self.assertIn("renderFocus", script)
+        self.assertIn('id="focus-view"', index)
         self.assertIn('/api/model', script)
 
     def test_compose_is_lan_bound_and_constrained(self) -> None:

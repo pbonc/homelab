@@ -44,6 +44,36 @@
     }));
   }
 
+  function traceCard(flow, direction) {
+    const peer=nodeById(direction === "input" ? flow.from : flow.to);
+    const item=document.createElement("article"); item.className=`trace-card ${direction === "output" ? "output" : "input"}`;
+    const name=document.createElement("strong"); name.textContent=peer.name;
+    const detail=document.createElement("span"); detail.textContent=`${flow.label} · ${flow.protocol}`;
+    item.append(name,detail); return item;
+  }
+
+  function renderFocus() {
+    const focus=byId("focus-view");
+    if (!state.selected) { focus.hidden=true; byId("boundaries").hidden=false; byId("connections").hidden=false; return; }
+    const node=nodeById(state.selected); const flows=filteredFlows();
+    const inputs=flows.filter((flow) => flow.to === node.id);
+    const outputs=flows.filter((flow) => flow.from === node.id);
+    const toolbar=document.createElement("div"); toolbar.className="focus-toolbar";
+    const note=document.createElement("p"); note.textContent=`Focused trace · ${inputs.length} inputs · ${outputs.length} outputs`;
+    const back=document.createElement("button"); back.type="button"; back.className="back"; back.textContent="← Full map";
+    back.addEventListener("click", () => { state.selected=null; render(); }); toolbar.append(note,back);
+    const lanes=document.createElement("div"); lanes.className="trace-lanes";
+    const incoming=document.createElement("section"); incoming.className="trace-lane"; incoming.innerHTML="<h3>Inputs</h3>";
+    if(inputs.length) incoming.append(...inputs.map((flow) => traceCard(flow,"input"))); else incoming.append(Object.assign(document.createElement("p"),{className:"trace-empty",textContent:"No inputs in this filter"}));
+    const center=document.createElement("article"); center.className="trace-center";
+    const centerName=document.createElement("strong"); centerName.textContent=node.name;
+    const centerDetail=document.createElement("span"); centerDetail.textContent=`${node.type} · ${node.endpoint}`; center.append(centerName,centerDetail);
+    const outgoing=document.createElement("section"); outgoing.className="trace-lane"; outgoing.innerHTML="<h3>Outputs</h3>";
+    if(outputs.length) outgoing.append(...outputs.map((flow) => traceCard(flow,"output"))); else outgoing.append(Object.assign(document.createElement("p"),{className:"trace-empty",textContent:"No outputs in this filter"}));
+    lanes.append(incoming,center,outgoing); focus.replaceChildren(toolbar,lanes);
+    focus.hidden=false; byId("boundaries").hidden=true; byId("connections").hidden=true;
+  }
+
   function updateTrace() {
     const traced=traceNode();
     document.querySelectorAll(".node").forEach((button) => {
@@ -100,7 +130,7 @@
     context.globalAlpha=1;
   }
 
-  function render() { renderFilters(); renderBoundaries(); renderDetail(); requestAnimationFrame(drawConnections); }
+  function render() { renderFilters(); renderBoundaries(); renderFocus(); renderDetail(); if(!state.selected) requestAnimationFrame(drawConnections); }
   fetch("/api/model", {cache:"no-store"}).then((response) => { if(!response.ok) throw new Error(`HTTP ${response.status}`); return response.json(); })
     .then((model) => { state.model=model; render(); }).catch((error) => {
       const message=document.createElement("p"); message.className="error"; message.textContent=`Architecture model unavailable: ${error.message}`;
