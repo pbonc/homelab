@@ -37,6 +37,8 @@ class ArchitectureMapTests(unittest.TestCase):
         self.assertIn("state.hovered", script)
         self.assertIn("updateTrace", script)
         self.assertIn("renderFocus", script)
+        self.assertIn("inboundArrow", script)
+        self.assertIn("outboundArrow", script)
         self.assertIn('id="focus-view"', index)
         self.assertIn('/api/model', script)
 

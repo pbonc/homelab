@@ -70,7 +70,9 @@
     const centerDetail=document.createElement("span"); centerDetail.textContent=`${node.type} · ${node.endpoint}`; center.append(centerName,centerDetail);
     const outgoing=document.createElement("section"); outgoing.className="trace-lane"; outgoing.innerHTML="<h3>Outputs</h3>";
     if(outputs.length) outgoing.append(...outputs.map((flow) => traceCard(flow,"output"))); else outgoing.append(Object.assign(document.createElement("p"),{className:"trace-empty",textContent:"No outputs in this filter"}));
-    lanes.append(incoming,center,outgoing); focus.replaceChildren(toolbar,lanes);
+    const inboundArrow=document.createElement("div"); inboundArrow.className="trace-arrow inbound"; inboundArrow.setAttribute("aria-hidden","true");
+    const outboundArrow=document.createElement("div"); outboundArrow.className="trace-arrow outbound"; outboundArrow.setAttribute("aria-hidden","true");
+    lanes.append(incoming,inboundArrow,center,outboundArrow,outgoing); focus.replaceChildren(toolbar,lanes);
     focus.hidden=false; byId("boundaries").hidden=true; byId("connections").hidden=true;
   }
 
