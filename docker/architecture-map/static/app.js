@@ -54,7 +54,8 @@
 
   function renderFocus() {
     const focus=byId("focus-view");
-    if (!state.selected) { focus.hidden=true; byId("boundaries").hidden=false; byId("connections").hidden=false; return; }
+    const diagram=focus.parentElement;
+    if (!state.selected) { focus.hidden=true; byId("boundaries").hidden=false; byId("connections").hidden=false; diagram.classList.remove("focused"); return; }
     const node=nodeById(state.selected); const flows=filteredFlows();
     const inputs=flows.filter((flow) => flow.to === node.id);
     const outputs=flows.filter((flow) => flow.from === node.id);
@@ -65,15 +66,17 @@
     const lanes=document.createElement("div"); lanes.className="trace-lanes";
     const incoming=document.createElement("section"); incoming.className="trace-lane"; incoming.innerHTML="<h3>Inputs</h3>";
     if(inputs.length) incoming.append(...inputs.map((flow) => traceCard(flow,"input"))); else incoming.append(Object.assign(document.createElement("p"),{className:"trace-empty",textContent:"No inputs in this filter"}));
+    const selectedLane=document.createElement("section"); selectedLane.className="trace-lane";
+    const selectedHeading=document.createElement("h3"); selectedHeading.textContent="Selected";
     const center=document.createElement("article"); center.className="trace-center";
     const centerName=document.createElement("strong"); centerName.textContent=node.name;
-    const centerDetail=document.createElement("span"); centerDetail.textContent=`${node.type} · ${node.endpoint}`; center.append(centerName,centerDetail);
+    const centerDetail=document.createElement("span"); centerDetail.textContent=`${node.type} · ${node.endpoint}`; center.append(centerName,centerDetail); selectedLane.append(selectedHeading,center);
     const outgoing=document.createElement("section"); outgoing.className="trace-lane"; outgoing.innerHTML="<h3>Outputs</h3>";
     if(outputs.length) outgoing.append(...outputs.map((flow) => traceCard(flow,"output"))); else outgoing.append(Object.assign(document.createElement("p"),{className:"trace-empty",textContent:"No outputs in this filter"}));
     const inboundArrow=document.createElement("div"); inboundArrow.className="trace-arrow inbound"; inboundArrow.setAttribute("aria-hidden","true");
     const outboundArrow=document.createElement("div"); outboundArrow.className="trace-arrow outbound"; outboundArrow.setAttribute("aria-hidden","true");
-    lanes.append(incoming,inboundArrow,center,outboundArrow,outgoing); focus.replaceChildren(toolbar,lanes);
-    focus.hidden=false; byId("boundaries").hidden=true; byId("connections").hidden=true;
+    lanes.append(incoming,inboundArrow,selectedLane,outboundArrow,outgoing); focus.replaceChildren(toolbar,lanes);
+    focus.hidden=false; byId("boundaries").hidden=true; byId("connections").hidden=true; diagram.classList.add("focused");
   }
 
   function updateTrace() {

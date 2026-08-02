@@ -39,6 +39,8 @@ class ArchitectureMapTests(unittest.TestCase):
         self.assertIn("renderFocus", script)
         self.assertIn("inboundArrow", script)
         self.assertIn("outboundArrow", script)
+        self.assertIn('selectedHeading.textContent="Selected"', script)
+        self.assertIn("[hidden] { display:none !important; }", (APP / "static" / "styles.css").read_text(encoding="utf-8"))
         self.assertIn('id="focus-view"', index)
         self.assertIn('/api/model', script)
 
