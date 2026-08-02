@@ -27,7 +27,7 @@ button { color:inherit; font:inherit; }
 .node { width:100%; min-height:54px; padding:9px 10px; border:1px solid var(--line); border-left:4px solid var(--green); border-radius:8px; background:var(--surface-2); text-align:left; cursor:pointer; transition:opacity .15s,border-color .15s,transform .15s; }
 .node[data-type="entity"] { border-left-color:var(--cyan); }
 .node[data-type="store"] { border-left-color:var(--violet); }
-.node:hover,.node:focus-visible,.node.selected { border-color:var(--amber); outline:none; transform:translateY(-1px); }
+.node:hover,.node:focus-visible,.node.selected,.node.tracing { border-color:var(--amber); outline:none; transform:translateY(-1px); box-shadow:0 0 0 1px rgba(232,189,98,.28),0 0 16px rgba(55,200,230,.16); }
 .node.dim { opacity:.24; } .node strong,.node small { display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .node small { margin-top:3px; color:var(--muted); font-size:.68rem; }
 .detail { display:grid; grid-template-columns:minmax(260px,.8fr) 2fr; gap:24px; margin-top:14px; padding:18px; border:1px solid var(--line); border-radius:12px; background:var(--surface); }
