@@ -30,6 +30,7 @@ special cases.
 | Observability | Prometheus, Node Exporter, Loki, Alloy | Host metrics, availability probes, alerts, and constrained Docker logs |
 | Network inventory | Inventory API, SQLite | Stable LAN device identity, confirmation state, and truthful topology data |
 | Architecture map | Static explorer, versioned JSON model | Interactive system data flows, boundaries, protocols, and component responsibilities |
+| Purple-team range | Juice Shop, loopback gateway, disposable attacker profile | Isolated security exercises against lab-owned targets |
 | Host service | GitHub Actions runner | Manually triggered validation and production deployment jobs |
 
 The Homepage stack is deployed through immutable releases under
@@ -59,12 +60,13 @@ remain outside the monitoring contract.
 
 - `atlas`: future GPU-capable node with no current workload or address
 
-### Staged purple-team range
+### Purple-team range
 
-The repository contains a not-yet-deployed first range slice with Juice Shop
-and a disposable attacker profile on an internal Docker network. Its target
-port is loopback-only, and production/internet isolation must pass the runtime
-acceptance test before the range becomes part of the deployed topology.
+The first range slice runs Juice Shop and a disposable attacker profile on an
+internal Docker network. A constrained reverse proxy provides loopback-only
+browser ingress without attaching the vulnerable target to an egress-capable
+network. Runtime acceptance proves attacker-to-target connectivity and denies
+attacker access to production and the internet.
 
 ## Data and control flows
 

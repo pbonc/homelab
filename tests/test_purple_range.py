@@ -18,19 +18,20 @@ class PurpleRangePolicyTests(unittest.TestCase):
 
     def test_images_are_digest_pinned(self) -> None:
         images = re.findall(r"^\s+image:\s+(\S+)", self.compose, re.MULTILINE)
-        self.assertEqual(2, len(images))
+        self.assertEqual(3, len(images))
         for image in images:
             self.assertRegex(image, r"^[^@]+@sha256:[0-9a-f]{64}$")
 
     def test_target_is_loopback_only(self) -> None:
-        self.assertIn('"127.0.0.1:3008:3000"', self.compose)
+        self.assertIn('"127.0.0.1:3008:8080"', self.compose)
         self.assertNotIn("0.0.0.0", self.compose)
-        self.assertNotIn('"192.168.1.23:3008:3000"', self.compose)
+        self.assertNotIn('"192.168.1.23:3008:8080"', self.compose)
 
     def test_range_network_is_internal_and_standalone(self) -> None:
         self.assertIn("internal: true", self.compose)
         self.assertNotIn("external: true", self.compose)
-        self.assertEqual(2, self.compose.count("- target-range"))
+        self.assertEqual(3, self.compose.count("- target-range"))
+        self.assertEqual(1, self.compose.count("- range-ingress"))
 
     def test_attacker_is_explicit_disposable_profile(self) -> None:
         attacker = self.compose.split("  attacker:", 1)[1]
@@ -40,10 +41,10 @@ class PurpleRangePolicyTests(unittest.TestCase):
         self.assertIn("read_only: true", attacker)
 
     def test_services_drop_capabilities_and_are_bounded(self) -> None:
-        self.assertEqual(2, self.compose.count("cap_drop:"))
-        self.assertEqual(2, self.compose.count("no-new-privileges:true"))
-        self.assertEqual(2, self.compose.count("mem_limit:"))
-        self.assertEqual(2, self.compose.count("pids_limit:"))
+        self.assertEqual(3, self.compose.count("cap_drop:"))
+        self.assertEqual(3, self.compose.count("no-new-privileges:true"))
+        self.assertEqual(3, self.compose.count("mem_limit:"))
+        self.assertEqual(3, self.compose.count("pids_limit:"))
 
     def test_no_sensitive_mounts_or_privileged_modes(self) -> None:
         forbidden = ("privileged: true", "/var/run/docker.sock", "/srv/", "secrets:")
@@ -52,6 +53,7 @@ class PurpleRangePolicyTests(unittest.TestCase):
 
     def test_verifier_has_positive_and_negative_assertions(self) -> None:
         self.assertIn("http://juice-shop:3000/", self.verify)
+        self.assertIn("http://127.0.0.1:3008/", self.verify)
         self.assertIn("http://192.168.1.23:3000/", self.verify)
         self.assertIn("http://1.1.1.1/", self.verify)
         self.assertIn("[FAIL] Attacker reached a production service", self.verify)

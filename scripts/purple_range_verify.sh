@@ -28,6 +28,9 @@ echo "[range] Proving attacker-to-target connectivity"
 "${compose[@]}" --profile attacker run --rm --no-deps attacker \
   -ec 'curl --fail --silent --show-error --max-time 5 http://juice-shop:3000/ >/dev/null'
 
+echo "[range] Proving loopback-only browser ingress through the gateway"
+curl --fail --silent --show-error --max-time 5 http://127.0.0.1:3008/ >/dev/null
+
 echo "[range] Proving the attacker cannot reach the controller LAN address"
 if "${compose[@]}" --profile attacker run --rm --no-deps attacker \
   -ec 'curl --fail --silent --max-time 3 http://192.168.1.23:3000/ >/dev/null'; then

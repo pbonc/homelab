@@ -4,7 +4,7 @@ SHELL := /usr/bin/env bash
 # CI portability note:
 # GitHub Actions, GitLab CI, and Jenkins should call these same Make targets.
 
-.PHONY: help doctor status lint test telemetry-test telemetry-run telemetry-secrets telemetry-config security-test security-secrets security-config observability-config observability-up observability-down alertmanager-test study-test study-config study-up study-down network-inventory-test network-inventory-config network-inventory-up network-inventory-down architecture-map-test architecture-map-config architecture-map-up architecture-map-down ntfy-test ntfy-secrets ntfy-config ntfy-up ntfy-down ntfy-test-publish purple-range-test purple-range-config purple-range-up purple-range-down purple-range-shell purple-range-verify purple-range-reset ansible-inventory ansible-ping ansible-check ansible-bootstrap-check ansible-bootstrap ansible-piaware-observability-check ansible-piaware-observability ansible-vault-create ansible-vault-edit ansible-vault-view rebuild-syntax rebuild-check rebuild-apply rebuild-stage-validate backup-init backup-run backup-check backup-snapshots backup-restore-test backup-prune bootstrap docker-up docker-down homepage-validate homepage-deploy homepage-verify homepage-rollback
+.PHONY: help doctor status lint test telemetry-test telemetry-run telemetry-secrets telemetry-config security-test security-secrets security-config observability-config observability-up observability-down alertmanager-test study-test study-config study-up study-down network-inventory-test network-inventory-config network-inventory-up network-inventory-down architecture-map-test architecture-map-config architecture-map-up architecture-map-down ntfy-test ntfy-secrets ntfy-config ntfy-up ntfy-down ntfy-test-publish purple-range-test purple-range-config purple-range-up purple-range-down purple-range-shell purple-range-verify purple-range-reset quiz-scenario ansible-inventory ansible-ping ansible-check ansible-bootstrap-check ansible-bootstrap ansible-piaware-observability-check ansible-piaware-observability ansible-vault-create ansible-vault-edit ansible-vault-view rebuild-syntax rebuild-check rebuild-apply rebuild-stage-validate backup-init backup-run backup-check backup-snapshots backup-restore-test backup-prune bootstrap docker-up docker-down homepage-validate homepage-deploy homepage-verify homepage-rollback
 
 help: ## Show available targets
 >@awk 'BEGIN {FS = ":.*##"; printf "\nAvailable targets:\n"} /^[a-zA-Z0-9_.-]+:.*##/ {printf "  %-14s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -122,7 +122,7 @@ purple-range-config: ## Validate the isolated range Compose configuration
 >@docker compose --file docker/purple-range/compose.yaml config --quiet
 
 purple-range-up: ## Start the loopback-only Juice Shop target
->@docker compose --file docker/purple-range/compose.yaml up --detach --wait juice-shop
+>@docker compose --file docker/purple-range/compose.yaml up --detach --wait range-gateway
 
 purple-range-down: ## Stop and remove disposable range containers
 >@docker compose --file docker/purple-range/compose.yaml --profile attacker down --remove-orphans
@@ -135,7 +135,10 @@ purple-range-verify: ## Prove target reachability and deny production/internet p
 
 purple-range-reset: ## Recreate the disposable target from its pinned image
 >@docker compose --file docker/purple-range/compose.yaml --profile attacker down --remove-orphans
->@docker compose --file docker/purple-range/compose.yaml up --detach --wait --force-recreate juice-shop
+>@docker compose --file docker/purple-range/compose.yaml up --detach --wait --force-recreate range-gateway
+
+quiz-scenario: ## Generate a randomized /27 quiz manifest (use ARGS for exclusions or seed)
+>@python3 scripts/quiz_scenario.py $(ARGS)
 
 ansible-inventory: ## Show the effective production Ansible inventory
 >@ANSIBLE_CONFIG="$(CURDIR)/ansible/ansible.cfg" ansible-inventory --graph

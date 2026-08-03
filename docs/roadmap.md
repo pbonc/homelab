@@ -189,10 +189,10 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 ### 1. Safety boundary and reproducibility
 
 - [x] Define a threat model and an explicit authorization boundary covering only lab-owned targets
-- [ ] Place vulnerable targets on a dedicated network or VLAN with default-deny access to production services, no internet exposure, and restricted outbound access
-- [ ] Provision and destroy the range reproducibly; never reuse production credentials, secrets, volumes, or trusted service accounts
-- [ ] Add an ephemeral attacker workstation or container that can reach only the authorized target network
-- [ ] Verify isolation with positive target-connectivity tests and negative production-connectivity tests
+- [x] Place vulnerable targets on a dedicated network or VLAN with default-deny access to production services, no internet exposure, and restricted outbound access
+- [x] Provision and destroy the range reproducibly; never reuse production credentials, secrets, volumes, or trusted service accounts
+- [x] Add an ephemeral attacker workstation or container that can reach only the authorized target network
+- [x] Verify isolation with positive target-connectivity tests and negative production-connectivity tests
 
 ### 2. Targets and detection
 
@@ -209,6 +209,48 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [ ] Write a sanitized incident report with timeline, root cause, detection gaps, remediation, and follow-up actions
 - [ ] Demonstrate that the same technique is subsequently blocked, detected earlier, or produces a documented accepted limitation
 - [ ] Publish a portfolio-safe architecture diagram and concise outcome metrics without credentials, live target details, or weaponized instructions
+
+### 4. Vulnerability quiz range
+
+#### Phase A: Contracts and notification boundary
+
+- [x] Define a versioned internal scenario manifest with a deterministic seed, authorized CIDR, target answer key, decoys, and `notification_policy="never"`
+- [x] Allocate a random `/27` only from the dedicated quiz pool and reject overlap with declared LAN, production, and existing Docker networks
+- [x] Add an Alertmanager discard route for `notification_policy="never"` before any ntfy receiver and retain host-resource notifications
+- [ ] Discover live Docker networks at scenario creation and fail closed when their subnets cannot be inspected
+- [ ] Prove with a live synthetic alert that range lifecycle events are discarded while an equivalent production alert still reaches ntfy
+
+#### Phase B: Guided baseline and quiz catalog
+
+- [x] Keep Juice Shop as the guided reference target with loopback-only browser access and no production or internet route
+- [ ] Define a reviewed quiz-template contract with vulnerability class, safe synthetic data, success evidence, root cause, mitigation, and related Juice Shop lesson
+- [ ] Build the first three bounded templates: SQL injection, broken object-level authorization (IDOR), and stored XSS
+- [ ] Include secure behavior and plausible dead ends so input fields do not automatically reveal the answer
+- [ ] Add deterministic vulnerable and fixed-mode tests for every template
+
+#### Phase C: Discovery rounds
+
+- [ ] Build a digest-pinned attacker image with `nmap`, `curl`, and basic DNS or HTTP inspection tools; keep it disposable and off by default
+- [ ] Place one quiz target and three to eight harmless decoys at seeded random addresses inside the authorized `/27`
+- [ ] Reveal only the authorized CIDR, engagement mode, time limit, and optional credentials; keep the answer key server-side
+- [ ] Provide browser access through a constrained range gateway without exposing arbitrary LAN proxying or target identity
+- [ ] Verify positive discovery and target access plus negative production, LAN, Docker-host, and internet connectivity on every generated round
+
+#### Phase D: Quiz experience and scoring
+
+- [ ] Add guided, gray-box, and black-box round modes with increasing information scarcity
+- [ ] Accept a structured finding containing vulnerability class, affected endpoint, bounded evidence, impact, and remediation
+- [ ] Reveal the expected answer, root cause, mitigation, Juice Shop cross-reference, and missed defensive evidence only after submission or surrender
+- [ ] Track local progress, time-to-discovery, false positives, hints, and repeated concepts without committing personal history
+- [ ] Reset every round to clean synthetic state and prevent prior addresses, answers, or credentials from leaking into the next seed
+
+#### Phase E: Detection and portfolio evidence
+
+- [ ] Label all range telemetry `environment="purple_range"`, `expected_vulnerable="true"`, and `notification_policy="never"`
+- [ ] Exclude quiz lifecycle, expected findings, resets, and container churn from ntfy while preserving genuine `brain` resource-pressure alerts
+- [ ] Correlate bounded application logs, exercise timestamps, Suricata evidence, and selected Falco events in a dedicated Grafana view
+- [ ] Keep payloads, flags, answer keys, and exploit details out of Homepage, ntfy, and production security summaries
+- [ ] Produce sanitized post-round reports and comparative metrics showing discovery, detection, containment, reset, and control improvement
 
 ## Sprint 9: ADS-B Edge Node — Complete
 

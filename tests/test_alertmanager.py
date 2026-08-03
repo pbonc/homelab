@@ -73,6 +73,15 @@ class AlertmanagerTests(unittest.TestCase):
         generic = rules.split("alert: PrometheusTargetDown", 1)[1]
         self.assertIn('up{job!~"node|piaware-node"} == 0', generic)
 
+    def test_purple_range_alerts_are_discarded_before_ntfy(self) -> None:
+        routes = self.alertmanager.split("routes:", 1)[1].split("receivers:", 1)[0]
+        discard = routes.index("receiver: discard")
+        ntfy_test = routes.index("receiver: ntfy-test")
+        self.assertLess(discard, ntfy_test)
+        self.assertIn('notification_policy="never"', routes)
+        self.assertIn("- name: discard", self.alertmanager)
+        self.assertNotIn("webhook_configs:", self.alertmanager.split("- name: discard", 1)[1].split("- name: ntfy", 1)[0])
+
 
 if __name__ == "__main__":
     unittest.main()

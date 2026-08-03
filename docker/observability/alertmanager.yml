@@ -11,6 +11,9 @@ route:
   group_interval: 5m
   repeat_interval: 4h
   routes:
+    - receiver: discard
+      matchers:
+        - notification_policy="never"
     - receiver: ntfy-test
       matchers:
         - alertname="HomelabNotificationTest"
@@ -19,6 +22,8 @@ route:
       repeat_interval: 1h
 
 receivers:
+  - name: discard
+
   - name: ntfy
     webhook_configs:
       - url: "http://192.168.1.23:8093/homelab-alerts?template=alertmanager"
