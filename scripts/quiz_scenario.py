@@ -11,6 +11,11 @@ from collections.abc import Iterable
 
 SCHEMA_VERSION = "1.0.0"
 QUIZ_TYPES = ("idor", "sql_injection", "stored_xss")
+QUIZ_TEMPLATES = {
+    "idor": "expense-idor",
+    "sql_injection": "inventory-sqli",
+    "stored_xss": "guestbook-stored-xss",
+}
 RANGE_POOL = ipaddress.ip_network("172.29.0.0/16")
 SCENARIO_PREFIX = 27
 
@@ -70,6 +75,7 @@ def generate_scenario(
         "target": {
             "address": str(target_address),
             "quiz_type": quiz_type,
+            "template_id": QUIZ_TEMPLATES[quiz_type],
         },
         "decoys": decoys,
     }

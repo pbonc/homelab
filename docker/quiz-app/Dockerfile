@@ -1,0 +1,14 @@
+FROM python@sha256:0aecac02dc3d4c5dbb024b753af084cafe41f5416e02193f1ce345d671ec966e
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+WORKDIR /app
+COPY quiz_app ./quiz_app
+COPY templates ./templates
+
+RUN useradd --create-home --uid 10007 quiz-app
+USER quiz-app
+
+EXPOSE 8080
+CMD ["python", "-m", "quiz_app"]

@@ -1,0 +1,1 @@
+"""Synthetic vulnerability quiz application."""

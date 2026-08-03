@@ -1,0 +1,40 @@
+name: vulnerability-quiz-app
+
+services:
+  expense-portal:
+    build:
+      context: .
+    image: homelab/vulnerability-quiz-app:0.1.0
+    environment:
+      QUIZ_MODE: ${QUIZ_MODE:-vulnerable}
+    read_only: true
+    tmpfs:
+      - /tmp:size=8m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/api/health', timeout=3)"
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    restart: "no"
+    mem_limit: 64m
+    cpus: 0.20
+    pids_limit: 48
+    labels:
+      environment: purple_range
+      expected_vulnerable: "true"
+      notification_policy: never
+    networks:
+      - quiz-target
+
+networks:
+  quiz-target:
+    internal: true

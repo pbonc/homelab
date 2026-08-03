@@ -141,6 +141,28 @@ make quiz-scenario ARGS="--exclude 192.168.1.0/24 --exclude 172.24.0.0/16"
 The internal manifest contains the answer key and must not be served through
 Homepage, included in exercise logs, or committed as generated runtime state.
 
+### First quiz template: expense IDOR
+
+`docker/quiz-app/` contains the first reviewed template, **Acme Expense
+Portal**. It authenticates two synthetic employees and exposes their synthetic
+expense records through numeric API identifiers. In `vulnerable` mode, the
+lookup verifies authentication but deliberately omits object ownership. In
+`fixed` mode, the same lookup enforces ownership and returns the same `404`
+shape for unauthorized and absent objects.
+
+The pod has no published host port, outbound network requirement, persistent
+volume, production data, file upload, or command-execution feature. Both modes
+are tested through the real HTTP handler. The internal answer key lives in
+`docker/quiz-app/templates/expense-idor.json`; future student briefs must not
+expose that file or the scenario manifest's `target` object.
+
+Validate the template without deploying a round:
+
+```bash
+make quiz-app-test
+make quiz-app-config
+```
+
 ### Notification boundary
 
 Every quiz workload and derived alert must carry

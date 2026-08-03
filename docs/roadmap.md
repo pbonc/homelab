@@ -223,7 +223,7 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 #### Phase B: Guided baseline and quiz catalog
 
 - [x] Keep Juice Shop as the guided reference target with loopback-only browser access and no production or internet route
-- [ ] Define a reviewed quiz-template contract with vulnerability class, safe synthetic data, success evidence, root cause, mitigation, and related Juice Shop lesson
+- [x] Define a reviewed quiz-template contract with vulnerability class, safe synthetic data, success evidence, root cause, mitigation, and related Juice Shop lesson
 - [ ] Build the first three bounded templates: SQL injection, broken object-level authorization (IDOR), and stored XSS
 - [ ] Include secure behavior and plausible dead ends so input fields do not automatically reveal the answer
 - [ ] Add deterministic vulnerable and fixed-mode tests for every template

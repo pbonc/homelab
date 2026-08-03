@@ -57,6 +57,20 @@ class QuizScenarioTests(unittest.TestCase):
         )
         enum = schema["properties"]["target"]["properties"]["quiz_type"]["enum"]
         self.assertEqual(sorted(quiz_scenario.QUIZ_TYPES), sorted(enum))
+        template_enum = schema["properties"]["target"]["properties"]["template_id"][
+            "enum"
+        ]
+        self.assertEqual(
+            sorted(quiz_scenario.QUIZ_TEMPLATES.values()), sorted(template_enum)
+        )
+
+    def test_answer_key_maps_class_to_named_template(self) -> None:
+        for seed in range(30):
+            target = quiz_scenario.generate_scenario(seed)["target"]
+            self.assertEqual(
+                quiz_scenario.QUIZ_TEMPLATES[target["quiz_type"]],
+                target["template_id"],
+            )
 
     def test_allocator_fails_closed_when_pool_is_excluded(self) -> None:
         with self.assertRaisesRegex(ValueError, "no non-overlapping"):
