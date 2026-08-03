@@ -188,7 +188,7 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 
 ### 1. Safety boundary and reproducibility
 
-- [ ] Define a threat model and an explicit authorization boundary covering only lab-owned targets
+- [x] Define a threat model and an explicit authorization boundary covering only lab-owned targets
 - [ ] Place vulnerable targets on a dedicated network or VLAN with default-deny access to production services, no internet exposure, and restricted outbound access
 - [ ] Provision and destroy the range reproducibly; never reuse production credentials, secrets, volumes, or trusted service accounts
 - [ ] Add an ephemeral attacker workstation or container that can reach only the authorized target network
@@ -281,17 +281,30 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [ ] Preserve the existing Homepage card layout and provide a quiet fallback when Study Deck is unavailable
 - [ ] Test selection fairness, persisted display history, unavailable-service behavior, and responsive Homepage layout
 
-## Post-Sprint 9 Hotfix: On-Demand Aikido Status
+## Post-Sprint 9 Hotfix: Threat Assessment and Aikido Controls
 
 - [ ] Confirm the current Aikido plan permits the Public REST API endpoints used by the existing read-only status adapter
-- [ ] Document the Public API limit of 20 calls per rolling minute per workspace and count both OAuth token retrieval and issue export against the refresh budget
-- [ ] Re-enable cached server-side Aikido status collection on a conservative six-hour automatic cadence
-- [ ] Add an authenticated-by-network, credential-free LAN refresh endpoint that triggers one status update without exposing Aikido credentials or finding details
-- [ ] Enforce a server-side manual-refresh cooldown, single-flight lock, request timeout, and `429 Retry-After` handling
+- [ ] Document that Aikido already performs nightly full scans for connected repositories; distinguish starting a scan from fetching the latest findings in UI labels, APIs, logs, and runbooks
+- [ ] Document the Public API limit of 20 calls per rolling minute per workspace and budget token retrieval, issue export, optional scan initiation, and scan-status polling separately
+- [ ] Re-enable cached server-side Aikido finding collection on a quiet daily cadence after the expected nightly scan window
+- [ ] Add a credential-free LAN `Refresh findings` endpoint that updates the cached summary without starting another scan or exposing Aikido credentials and finding details
+- [ ] Add a separate operator-only `Scan now` action only if plan entitlement and measured need justify it; scope it to the `homelab` repository and require explicit confirmation
+- [ ] Enforce a server-side manual-refresh cooldown, single-flight lock, token reuse until expiry, request timeout, daily call budget, and `429 Retry-After` handling
 - [ ] Keep the last successful result available when refresh fails, clearly distinguishing stale data from unavailable data
-- [ ] Add a compact refresh button and last-checked time to the Homepage Aikido card without changing card height
+- [ ] Add a compact refresh button and last-checked time to the Homepage Aikido card without changing card height; keep scan initiation out of the card's normal click path
 - [ ] Disable the button and show quiet in-progress or cooldown feedback while a refresh is running or temporarily unavailable
-- [ ] Test successful refresh, repeated clicks, concurrent refreshes, API-plan denial, rate limiting, timeout, stale-cache fallback, and browser-origin restrictions
+- [ ] Test successful refresh, repeated clicks, concurrent refreshes, API-plan denial, rate limiting, timeout, stale-cache fallback, call-budget exhaustion, and browser-origin restrictions
+
+### Threat assessment explorer
+
+- [ ] Add a versioned, human-reviewable threat model whose assets and attack surfaces reference existing Architecture Map component and flow identifiers
+- [ ] Record each threat's scenario, affected boundary, likelihood, impact, existing controls, detection path, residual risk, owner, status, evidence, and next review date
+- [ ] Seed the model with credential theft, exposed LAN services, compromised dependencies or images, unauthorized deployment, telemetry tampering, denial of service, backup loss, and edge-node compromise
+- [ ] Add `Threats` and `Attack paths` views to the Architecture Map, with severity and mitigation filters plus component-level drill-down instead of drawing every possible path on the overview simultaneously
+- [ ] Correlate Aikido severity totals and scan freshness with the assessment, but keep vulnerability details and actionable exploit instructions out of the Homepage and architecture APIs
+- [ ] Produce a concise assessment summary showing highest residual risks, control gaps, stale evidence, and recommended next actions; label rules-based conclusions separately from scanner findings
+- [ ] Require explicit authorization boundaries for active validation and defer exploit execution to the isolated purple-team range
+- [ ] Add schema, cross-reference, redaction, risk-ranking, stale-review, and unavailable-Aikido tests
 
 ## Sprint 10: Family Links Portal
 

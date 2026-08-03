@@ -23,22 +23,31 @@ This repository is designed so GitHub Actions, GitLab CI, and Jenkins call the s
 
 ## Current State
 
-`brain` is currently the only running homelab system. It hosts:
+The homelab currently has two running nodes:
+
+- `brain`, the controller and primary workload node
+- `piaware`, a Raspberry Pi ADS-B receiver and monitored edge node
+
+`brain` hosts:
 
 - Docker and Docker Compose
 - Homepage at `http://192.168.1.23:3000`
 - Glances host metrics displayed on the `brain` card
 - A self-hosted GitHub Actions runner
 - Repository diagnostics through `labctl`
+- Prometheus, Loki, Alloy, Alertmanager, and ntfy observability services
+- The Study Deck, Network Inventory API, and Architecture Map
 
 Homepage and Glances use digest-pinned images. Homepage has an explicit healthcheck, restricted host-header allowlist, and read-only Docker integration through an internal socket proxy.
 
 The telemetry platform ingests live Ecowitt weather data into InfluxDB and
 provides Grafana dashboards plus a current-weather Homepage summary. A
-server-side Aikido adapter exposes aggregate workspace security status without
-exposing credentials or finding details. An ADS-B receiver on a Raspberry Pi
-remains planned. Other dashboard cards are intentionally non-clickable until
-their services are deployed.
+server-side Aikido adapter source preserves the aggregate security-status
+integration without exposing credentials or finding details; live polling is
+dormant while API access remains plan-restricted. The `piaware` edge node
+provides aggregate receiver and host metrics to Prometheus without exporting
+aircraft identities or private location data. Planned dashboard cards remain
+non-clickable until their services are deployed.
 
 ## Quick Start
 
@@ -53,12 +62,21 @@ Homepage releases use the shared deployment contract documented in [`docs/deploy
 
 See the folders in the project root and detailed documentation in `docs/`.
 
-## Next Milestones
+## Current Roadmap Focus
 
-- Complete the Phase 5 runtime health contract and operational exercises
-- Add Prometheus-backed hardware telemetry and Grafana dashboards
-- Record deployment events as durable Grafana annotations
-- Establish reproducible Ansible node provisioning before adding the ADS-B edge node
+- Finish the remaining Sprint 6 outage exercises and continuous-security work
+- Complete post-Sprint 9 notification, network-inventory, and Architecture Map rollout
+- Add the threat-assessment explorer and refreshed Aikido controls
+- Build Sprint 8's isolated purple-team range with explicit safety boundaries
+- Keep Sprints 10 and 11 deferred until their documented prerequisites justify them
+
+See [`docs/roadmap.md`](docs/roadmap.md) for the authoritative sprint status and
+acceptance criteria.
+
+The first Sprint 8 vertical slice is documented in
+[`docs/purple-range.md`](docs/purple-range.md). It provides a loopback-only,
+digest-pinned OWASP Juice Shop target and a disposable attacker profile on an
+internal Docker network.
 
 ## License
 

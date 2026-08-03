@@ -20,7 +20,7 @@ special cases.
 
 ### Controller node: `brain`
 
-`brain` runs three Compose-managed groups plus one host service:
+`brain` runs the following Compose-managed service groups plus one host service:
 
 | Group | Components | Responsibility |
 | --- | --- | --- |
@@ -48,10 +48,23 @@ isolates its immediate inputs and outputs with the protocol and payload purpose.
 The model is documentation rather than service discovery: changes are reviewed
 in Git and must not infer undocumented trust, physical, or credential flows.
 
+### Edge node: `piaware`
+
+The Ansible-managed Raspberry Pi receiver decodes ADS-B locally and exposes
+only aggregate receiver-health and host metrics to Prometheus on `brain`.
+Aircraft identities, tracks, feeder identifiers, and precise receiver location
+remain outside the monitoring contract.
+
 ### Planned nodes
 
-- ADS-B Raspberry Pi: future edge receiver, after the Ansible baseline exists
 - `atlas`: future GPU-capable node with no current workload or address
+
+### Staged purple-team range
+
+The repository contains a not-yet-deployed first range slice with Juice Shop
+and a disposable attacker profile on an internal Docker network. Its target
+port is loopback-only, and production/internet isolation must pass the runtime
+acceptance test before the range becomes part of the deployed topology.
 
 ## Data and control flows
 
@@ -102,9 +115,13 @@ share the versioned contract documented in `docs/status.md`.
 - Current HTTP endpoints rely on the trusted LAN boundary and do not yet use
   internal TLS.
 
-## Current phase
+## Current roadmap position
 
-Phases 0 through 4 are complete. Phase 5 is establishing a versioned runtime
-health contract, truthful service checks, failure semantics, and operational
-runbooks before Prometheus, hardware dashboards, logs, or additional nodes are
-introduced.
+Sprints 0 through 5, 7, and 9 are complete. Sprint 6 has delivered metrics,
+hardware dashboards, deployment annotations, logs, alerts, and the Study Deck;
+its remaining work covers outage exercises and continuous-security controls.
+Sprint 8's isolated purple-team range has not started. Current post-Sprint 9
+work focuses on notification delivery, network-inventory presentation,
+Architecture Map rollout, interview material, and threat-assessment controls.
+The authoritative status and acceptance criteria live in
+[`roadmap.md`](roadmap.md).

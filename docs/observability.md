@@ -146,7 +146,8 @@ Grafana returned all three result types on the Brain Hardware dashboard.
 Recording rules and conservative first alerts live in
 `docker/observability/rules/homelab.yml`. Operational responses and the measured
 baseline are documented in `docs/runbooks/observability-alerts.md`. Prometheus
-evaluates alerts locally; no external paging destination is configured.
+routes selected alerts through Alertmanager to the LAN-only ntfy service under
+the delivery and content boundaries documented in `docs/notifications.md`.
 
 ## Container logs
 
