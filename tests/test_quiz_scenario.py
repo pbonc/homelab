@@ -4,6 +4,7 @@ import importlib.util
 import ipaddress
 import json
 import random
+import subprocess
 import unittest
 from pathlib import Path
 
@@ -17,6 +18,14 @@ SPEC.loader.exec_module(quiz_scenario)
 
 
 class QuizScenarioTests(unittest.TestCase):
+    @staticmethod
+    def docker_result(
+        returncode: int = 0,
+        stdout: str = "",
+        stderr: str = "",
+    ) -> subprocess.CompletedProcess[str]:
+        return subprocess.CompletedProcess([], returncode, stdout, stderr)
+
     def test_same_seed_produces_same_scenario(self) -> None:
         first = quiz_scenario.generate_scenario(42)
         second = quiz_scenario.generate_scenario(42)
@@ -76,6 +85,99 @@ class QuizScenarioTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "no non-overlapping"):
             quiz_scenario.allocate_subnet(
                 random.Random(1), [ipaddress.ip_network("172.29.0.0/16")]
+            )
+
+    def test_live_docker_subnets_are_discovered(self) -> None:
+        responses = iter(
+            [
+                self.docker_result(stdout="network-a\nnetwork-b\n"),
+                self.docker_result(
+                    stdout=json.dumps(
+                        [
+                            {"IPAM": {"Config": [{"Subnet": "172.24.0.0/16"}]}},
+                            {
+                                "IPAM": {
+                                    "Config": [
+                                        {"Subnet": "172.29.4.1/24"},
+                                        {"Subnet": "fd00::/64"},
+                                    ]
+                                }
+                            },
+                        ]
+                    )
+                ),
+            ]
+        )
+
+        discovered = quiz_scenario.discover_docker_networks(
+            lambda *args, **kwargs: next(responses)
+        )
+
+        self.assertEqual(
+            [
+                ipaddress.ip_network("172.24.0.0/16"),
+                ipaddress.ip_network("172.29.4.0/24"),
+            ],
+            discovered,
+        )
+
+    def test_live_docker_discovery_fails_closed_on_list_error(self) -> None:
+        with self.assertRaisesRegex(
+            quiz_scenario.DockerNetworkDiscoveryError, "no scenario was generated"
+        ):
+            quiz_scenario.discover_docker_networks(
+                lambda *args, **kwargs: self.docker_result(
+                    returncode=1, stderr="permission denied"
+                )
+            )
+
+    def test_live_docker_discovery_fails_closed_on_partial_inspection(self) -> None:
+        responses = iter(
+            [
+                self.docker_result(stdout="network-a\nnetwork-b\n"),
+                self.docker_result(stdout=json.dumps([{"IPAM": {"Config": []}}])),
+            ]
+        )
+        with self.assertRaisesRegex(
+            quiz_scenario.DockerNetworkDiscoveryError,
+            "every requested network",
+        ):
+            quiz_scenario.discover_docker_networks(
+                lambda *args, **kwargs: next(responses)
+            )
+
+    def test_live_docker_discovery_fails_closed_if_inspection_cannot_start(self) -> None:
+        calls = 0
+
+        def run(*args, **kwargs):
+            nonlocal calls
+            calls += 1
+            if calls == 1:
+                return self.docker_result(stdout="network-a\n")
+            raise FileNotFoundError("docker disappeared")
+
+        with self.assertRaisesRegex(
+            quiz_scenario.DockerNetworkDiscoveryError,
+            "cannot inspect Docker networks",
+        ):
+            quiz_scenario.discover_docker_networks(run)
+
+    def test_live_docker_discovery_fails_closed_on_invalid_subnet(self) -> None:
+        responses = iter(
+            [
+                self.docker_result(stdout="network-a\n"),
+                self.docker_result(
+                    stdout=json.dumps(
+                        [{"IPAM": {"Config": [{"Subnet": "not-a-network"}]}}]
+                    )
+                ),
+            ]
+        )
+        with self.assertRaisesRegex(
+            quiz_scenario.DockerNetworkDiscoveryError, "invalid network subnet"
+        ):
+            quiz_scenario.discover_docker_networks(
+                lambda *args, **kwargs: next(responses)
             )
 
     def test_decoy_count_is_bounded(self) -> None:

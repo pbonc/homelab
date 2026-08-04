@@ -217,7 +217,7 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [x] Define a versioned internal scenario manifest with a deterministic seed, authorized CIDR, target answer key, decoys, and `notification_policy="never"`
 - [x] Allocate a random `/27` only from the dedicated quiz pool and reject overlap with declared LAN, production, and existing Docker networks
 - [x] Add an Alertmanager discard route for `notification_policy="never"` before any ntfy receiver and retain host-resource notifications
-- [ ] Discover live Docker networks at scenario creation and fail closed when their subnets cannot be inspected
+- [x] Discover live Docker networks at scenario creation and fail closed when their subnets cannot be inspected
 - [ ] Prove with a live synthetic alert that range lifecycle events are discarded while an equivalent production alert still reaches ntfy
 
 #### Phase B: Guided baseline and quiz catalog

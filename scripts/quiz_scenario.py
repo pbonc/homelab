@@ -6,7 +6,10 @@ import ipaddress
 import json
 import random
 import secrets
+import subprocess
 from collections.abc import Iterable
+from collections.abc import Callable
+from typing import Any
 
 
 SCHEMA_VERSION = "1.0.0"
@@ -20,6 +23,10 @@ RANGE_POOL = ipaddress.ip_network("172.29.0.0/16")
 SCENARIO_PREFIX = 27
 
 
+class DockerNetworkDiscoveryError(RuntimeError):
+    """Raised when live Docker network exclusions cannot be established safely."""
+
+
 def parse_networks(values: Iterable[str]) -> list[ipaddress.IPv4Network]:
     networks: list[ipaddress.IPv4Network] = []
     for value in values:
@@ -28,6 +35,91 @@ def parse_networks(values: Iterable[str]) -> list[ipaddress.IPv4Network]:
             raise ValueError("quiz range supports IPv4 networks only")
         networks.append(network)
     return networks
+
+
+def discover_docker_networks(
+    run: Callable[..., subprocess.CompletedProcess[str]] = subprocess.run,
+) -> list[ipaddress.IPv4Network]:
+    """Return IPv4 subnets from every live Docker network or fail closed."""
+    try:
+        listed = run(
+            ["docker", "network", "ls", "--quiet"],
+            capture_output=True,
+            check=False,
+            text=True,
+        )
+    except OSError as exc:
+        raise DockerNetworkDiscoveryError(
+            "cannot list Docker networks; no scenario was generated"
+        ) from exc
+
+    if listed.returncode != 0:
+        detail = listed.stderr.strip() or "Docker network listing failed"
+        raise DockerNetworkDiscoveryError(f"{detail}; no scenario was generated")
+
+    network_ids = [line.strip() for line in listed.stdout.splitlines() if line.strip()]
+    if not network_ids:
+        raise DockerNetworkDiscoveryError(
+            "Docker returned no networks; no scenario was generated"
+        )
+
+    try:
+        inspected = run(
+            ["docker", "network", "inspect", *network_ids],
+            capture_output=True,
+            check=False,
+            text=True,
+        )
+    except OSError as exc:
+        raise DockerNetworkDiscoveryError(
+            "cannot inspect Docker networks; no scenario was generated"
+        ) from exc
+    if inspected.returncode != 0:
+        detail = inspected.stderr.strip() or "Docker network inspection failed"
+        raise DockerNetworkDiscoveryError(f"{detail}; no scenario was generated")
+
+    try:
+        payload: Any = json.loads(inspected.stdout)
+    except json.JSONDecodeError as exc:
+        raise DockerNetworkDiscoveryError(
+            "Docker network inspection returned invalid JSON; no scenario was generated"
+        ) from exc
+
+    if not isinstance(payload, list) or len(payload) != len(network_ids):
+        raise DockerNetworkDiscoveryError(
+            "Docker did not return every requested network; no scenario was generated"
+        )
+
+    discovered: list[ipaddress.IPv4Network] = []
+    for network in payload:
+        if not isinstance(network, dict):
+            raise DockerNetworkDiscoveryError(
+                "Docker returned an invalid network record; no scenario was generated"
+            )
+        ipam = network.get("IPAM")
+        configs = ipam.get("Config") if isinstance(ipam, dict) else None
+        if not isinstance(configs, list):
+            raise DockerNetworkDiscoveryError(
+                "Docker network IPAM data is incomplete; no scenario was generated"
+            )
+        for config in configs:
+            if not isinstance(config, dict):
+                raise DockerNetworkDiscoveryError(
+                    "Docker network IPAM configuration is invalid; no scenario was generated"
+                )
+            value = config.get("Subnet")
+            if value is None:
+                continue
+            try:
+                subnet = ipaddress.ip_network(value, strict=False)
+            except (TypeError, ValueError) as exc:
+                raise DockerNetworkDiscoveryError(
+                    "Docker returned an invalid network subnet; no scenario was generated"
+                ) from exc
+            if isinstance(subnet, ipaddress.IPv4Network):
+                discovered.append(subnet)
+
+    return sorted(set(discovered), key=lambda item: (int(item.network_address), item.prefixlen))
 
 
 def allocate_subnet(
@@ -91,11 +183,15 @@ def main() -> int:
     args = parser.parse_args()
 
     seed = args.seed if args.seed is not None else secrets.randbits(63)
-    scenario = generate_scenario(
-        seed=seed,
-        excluded=parse_networks(args.exclude),
-        decoy_count=args.decoys,
-    )
+    try:
+        excluded = [*parse_networks(args.exclude), *discover_docker_networks()]
+        scenario = generate_scenario(
+            seed=seed,
+            excluded=excluded,
+            decoy_count=args.decoys,
+        )
+    except (DockerNetworkDiscoveryError, ValueError) as exc:
+        parser.error(str(exc))
     print(json.dumps(scenario, indent=2, sort_keys=True))
     return 0
 
