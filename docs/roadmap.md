@@ -15,7 +15,7 @@
 - [x] Add Glances-backed CPU, memory, and root filesystem metrics to `brain`
 - [x] Classify `brain` as active, warning, critical, or unavailable from live metrics
 - [x] Style planned and future cards as inactive inventory
-- [x] Display the dashboard semantic version (initially `0.1.0`, currently `0.10.1`)
+- [x] Display the dashboard semantic version (initially `0.1.0`, currently `0.12.0`)
 - [x] Retire the unsupported status JSON polling path
 - [x] Add UTF-8, URL, lifecycle, and version validation
 - [x] Add Glances readiness, host-header validation, and restricted CORS configuration
@@ -293,8 +293,8 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [x] Handle private/randomized MAC addresses and Wi-Fi roaming without producing repeated “new device” alerts; keep ordinary departures dashboard-only
 - [x] Publish a versioned, read-only topology API with stable node identifiers, verified status, explicit known/unknown state, and declared or evidence-backed edges
 - [x] Represent unverified clients on a shared LAN segment; do not invent switch ports, access-point associations, or physical links from ARP observations
-- [ ] Deploy a standalone Network Inventory Lab linked from Homepage, with evidence-backed topology, unidentified-device investigation, browser-local working labels, and a quiet unavailable state
-- [ ] Keep topology rendering replaceable and driven entirely by the API contract; do not couple scanner persistence to one graph library or browser layout
+- [x] Deploy a standalone Network Inventory Lab linked from Homepage, with evidence-backed topology, unidentified-device investigation, persistent operator identification, and a quiet unavailable state
+- [x] Keep topology rendering replaceable and driven entirely by the API contract; do not couple scanner persistence to one graph library or browser layout
 - [ ] Add sustained thermal or throttling alerts for `brain` and `piaware`, using measured baselines and hardware-appropriate thresholds
 - [ ] Alert when encrypted backups fail or exceed their expected freshness window, then send one recovery after the next verified backup
 - [ ] Route established weather and ADS-B stale conditions through Alertmanager without exposing readings, aircraft identities, or receiver location
@@ -309,7 +309,7 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [x] Build a LAN-only interactive explorer with flow-category filtering and component-level input/output tracing
 - [x] Show trust boundaries, protocols, endpoints, and concise responsibilities without exposing credentials or inventing undocumented flows
 - [x] Add an equal-height Architecture Map card to Homepage and bump the dashboard semantic version
-- [ ] Deploy the service on `brain`, verify its health and Homepage link, and review the rendered flows against the live system
+- [x] Deploy the service on `brain`, verify its health and Homepage link, and review the rendered flows against the live system
 - [ ] Require future service changes to update the data-flow model when they introduce or alter a meaningful flow
 
 ## Post-Sprint 9 Hotfix: Interview Talking Point Strip
