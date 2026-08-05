@@ -224,7 +224,7 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 
 - [x] Keep Juice Shop as the guided reference target with loopback-only browser access and no production or internet route
 - [x] Define a reviewed quiz-template contract with vulnerability class, safe synthetic data, success evidence, root cause, mitigation, and related Juice Shop lesson
-- [ ] Build one coherent non-Juice-Shop assessment application with a distinct theme, locally served licensed or original assets, and realistic catalog, account, search, record, review, profile, support, and administrative workflows
+- [x] Build one coherent non-Juice-Shop assessment application with a distinct theme, locally served licensed or original assets, and realistic catalog, account, search, record, review, profile, support, and administrative workflows
 - [ ] Implement secure and deliberately vulnerable variants behind reviewed feature seams; select compatible combinations from the seeded manifest instead of generating arbitrary unsafe source code
 - [ ] Randomize an unknown but bounded vulnerability count per round, include secure features and plausible dead ends, and guarantee every selected weakness is reachable and independently testable
 - [ ] Build the first three bounded templates: SQL injection, broken object-level authorization (IDOR), and stored XSS

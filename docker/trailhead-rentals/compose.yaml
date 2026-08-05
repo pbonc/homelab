@@ -1,0 +1,40 @@
+name: trailhead-rentals
+
+services:
+  trailhead-rentals:
+    build:
+      context: .
+    image: homelab/trailhead-rentals:0.1.0
+    environment:
+      TRAILHEAD_VARIANT_SET: secure-baseline
+    read_only: true
+    tmpfs:
+      - /tmp:size=8m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/api/health', timeout=3)"
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    restart: "no"
+    mem_limit: 96m
+    cpus: 0.25
+    pids_limit: 64
+    labels:
+      environment: purple_range
+      expected_vulnerable: "false"
+      notification_policy: never
+    networks:
+      - assessment-target
+
+networks:
+  assessment-target:
+    internal: true

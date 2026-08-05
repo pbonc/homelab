@@ -4,7 +4,7 @@ SHELL := /usr/bin/env bash
 # CI portability note:
 # GitHub Actions, GitLab CI, and Jenkins should call these same Make targets.
 
-.PHONY: help doctor status lint test telemetry-test telemetry-run telemetry-secrets telemetry-config security-test security-secrets security-config observability-config observability-up observability-down alertmanager-test study-test study-config study-up study-down network-inventory-test network-inventory-config network-inventory-up network-inventory-down architecture-map-test architecture-map-config architecture-map-up architecture-map-down ntfy-test ntfy-secrets ntfy-config ntfy-up ntfy-down ntfy-test-publish purple-range-test purple-range-config purple-range-up purple-range-down purple-range-shell purple-range-verify purple-range-alert-test purple-range-reset quiz-scenario quiz-app-test quiz-app-config ansible-inventory ansible-ping ansible-check ansible-bootstrap-check ansible-bootstrap ansible-piaware-observability-check ansible-piaware-observability ansible-vault-create ansible-vault-edit ansible-vault-view rebuild-syntax rebuild-check rebuild-apply rebuild-stage-validate backup-init backup-run backup-check backup-snapshots backup-restore-test backup-prune bootstrap docker-up docker-down homepage-validate homepage-deploy homepage-verify homepage-rollback
+.PHONY: help doctor status lint test telemetry-test telemetry-run telemetry-secrets telemetry-config security-test security-secrets security-config observability-config observability-up observability-down alertmanager-test study-test study-config study-up study-down network-inventory-test network-inventory-config network-inventory-up network-inventory-down architecture-map-test architecture-map-config architecture-map-up architecture-map-down ntfy-test ntfy-secrets ntfy-config ntfy-up ntfy-down ntfy-test-publish purple-range-test purple-range-config purple-range-up purple-range-down purple-range-shell purple-range-verify purple-range-alert-test purple-range-reset quiz-scenario quiz-app-test quiz-app-config trailhead-test trailhead-config ansible-inventory ansible-ping ansible-check ansible-bootstrap-check ansible-bootstrap ansible-piaware-observability-check ansible-piaware-observability ansible-vault-create ansible-vault-edit ansible-vault-view rebuild-syntax rebuild-check rebuild-apply rebuild-stage-validate backup-init backup-run backup-check backup-snapshots backup-restore-test backup-prune bootstrap docker-up docker-down homepage-validate homepage-deploy homepage-verify homepage-rollback
 
 help: ## Show available targets
 >@awk 'BEGIN {FS = ":.*##"; printf "\nAvailable targets:\n"} /^[a-zA-Z0-9_.-]+:.*##/ {printf "  %-14s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -148,6 +148,12 @@ quiz-app-test: ## Test vulnerable, fixed, and safety behavior of quiz templates
 
 quiz-app-config: ## Validate the standalone quiz-template Compose model
 >@docker compose --file docker/quiz-app/compose.yaml config --quiet
+
+trailhead-test: ## Test the secure Trailhead Rentals application shell
+>@python3 -m unittest discover -s tests -p "test_trailhead_rentals.py" -v
+
+trailhead-config: ## Validate the Trailhead Rentals Compose model
+>@docker compose --file docker/trailhead-rentals/compose.yaml config --quiet
 
 ansible-inventory: ## Show the effective production Ansible inventory
 >@ANSIBLE_CONFIG="$(CURDIR)/ansible/ansible.cfg" ansible-inventory --graph
