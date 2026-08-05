@@ -236,8 +236,8 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 
 - [ ] Build a digest-pinned attacker image with `nmap`, `curl`, and basic DNS or HTTP inspection tools; keep it disposable and off by default
 - [ ] Place one quiz target and three to eight harmless decoy deployments at seeded static addresses inside the authorized `/27`
-- [ ] Build a reviewed decoy catalog with distinct branding, titles, headers, routes, response shapes, and varied HTTP ports, including documentation, status, marketing, inventory API, login, maintenance, and secure catalog services
-- [ ] Give decoys believable synthetic content, correctly enforced authentication or authorization where shown, and enough stable behavior for meaningful enumeration without accidental vulnerabilities
+- [x] Build a reviewed decoy catalog with distinct branding, titles, headers, routes, response shapes, and varied HTTP ports, including documentation, status, marketing, inventory API, login, maintenance, and secure catalog services
+- [x] Give decoys believable synthetic content, correctly enforced authentication or authorization where shown, and enough stable behavior for meaningful enumeration without accidental vulnerabilities
 - [ ] Vary target, decoy selection, address, port, and presentation by seed while preserving deterministic replay and preventing default-server fingerprints from revealing the answer
 - [ ] Reveal only the authorized CIDR, engagement mode, time limit, and optional credentials; keep the answer key server-side
 - [ ] Provide browser access through a constrained range gateway without exposing arbitrary LAN proxying or target identity

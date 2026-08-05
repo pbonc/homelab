@@ -50,7 +50,10 @@ class QuizScenarioTests(unittest.TestCase):
     def test_target_and_decoys_stay_inside_scope_and_are_unique(self) -> None:
         scenario = quiz_scenario.generate_scenario(101, decoy_count=8)
         subnet = ipaddress.ip_network(scenario["authorized_cidr"])
-        addresses = [scenario["target"]["address"], *scenario["decoys"]]
+        addresses = [
+            scenario["target"]["address"],
+            *(item["address"] for item in scenario["decoys"]),
+        ]
         self.assertEqual(len(addresses), len(set(addresses)))
         self.assertTrue(all(ipaddress.ip_address(item) in subnet for item in addresses))
 
@@ -200,6 +203,26 @@ class QuizScenarioTests(unittest.TestCase):
         for value in (2, 9):
             with self.assertRaisesRegex(ValueError, "between 3 and 8"):
                 quiz_scenario.generate_scenario(1, decoy_count=value)
+
+    def test_decoys_are_reproducible_reviewed_deployments(self) -> None:
+        scenario = quiz_scenario.generate_scenario(42, decoy_count=8)
+        self.assertEqual(8, len(scenario["decoys"]))
+        for decoy in scenario["decoys"]:
+            profile = quiz_scenario.DECOY_PROFILES[decoy["profile_id"]]
+            self.assertIn(decoy["port"], profile["ports"])
+            self.assertEqual(list(profile["expected_routes"]), decoy["expected_routes"])
+            self.assertTrue(decoy["hostname"].startswith(profile["hostname_prefix"]))
+
+    def test_decoy_catalog_and_schema_match(self) -> None:
+        schema = json.loads(
+            (ROOT / "schemas" / "vulnerability-quiz-scenario-v1.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        enum = schema["properties"]["decoys"]["items"]["properties"][
+            "profile_id"
+        ]["enum"]
+        self.assertEqual(sorted(quiz_scenario.DECOY_PROFILES), sorted(enum))
 
 
 if __name__ == "__main__":

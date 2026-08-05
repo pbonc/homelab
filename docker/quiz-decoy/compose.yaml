@@ -1,0 +1,42 @@
+name: vulnerability-quiz-decoy
+
+services:
+  decoy:
+    build:
+      context: .
+    image: homelab/vulnerability-quiz-decoy:0.1.0
+    environment:
+      DECOY_PROFILE: documentation
+      DECOY_HOSTNAME: field-manual-01
+      DECOY_PORT: "8080"
+    read_only: true
+    tmpfs:
+      - /tmp:size=8m,mode=1777
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import os,urllib.request; urllib.request.urlopen('http://127.0.0.1:' + os.environ.get('DECOY_PORT', '8080') + '/health', timeout=3)"
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    restart: "no"
+    mem_limit: 48m
+    cpus: 0.15
+    pids_limit: 32
+    labels:
+      environment: purple_range
+      expected_vulnerable: "false"
+      notification_policy: never
+    networks:
+      - quiz-range
+
+networks:
+  quiz-range:
+    internal: true

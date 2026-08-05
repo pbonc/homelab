@@ -30,6 +30,43 @@ TRAILHEAD_VARIANT_SETS = {
 }
 RANGE_POOL = ipaddress.ip_network("172.29.0.0/16")
 SCENARIO_PREFIX = 27
+DECOY_PROFILES = {
+    "documentation": {
+        "hostname_prefix": "field-manual",
+        "ports": (8080, 8081),
+        "expected_routes": ("/", "/guides", "/health"),
+    },
+    "status": {
+        "hostname_prefix": "trail-status",
+        "ports": (8080, 8090),
+        "expected_routes": ("/", "/api/status", "/health"),
+    },
+    "marketing": {
+        "hostname_prefix": "summit-weekends",
+        "ports": (8000, 8080),
+        "expected_routes": ("/", "/cabins", "/health"),
+    },
+    "inventory_api": {
+        "hostname_prefix": "gear-stock",
+        "ports": (8080, 8888),
+        "expected_routes": ("/", "/api/inventory", "/health"),
+    },
+    "employee_login": {
+        "hostname_prefix": "crew-access",
+        "ports": (8000, 8080),
+        "expected_routes": ("/", "/login", "/health"),
+    },
+    "maintenance": {
+        "hostname_prefix": "service-bench",
+        "ports": (8080, 8090),
+        "expected_routes": ("/", "/work-orders", "/health"),
+    },
+    "secure_catalog": {
+        "hostname_prefix": "outfitter-catalog",
+        "ports": (8000, 8080, 8888),
+        "expected_routes": ("/", "/api/catalog", "/health"),
+    },
+}
 
 
 class DockerNetworkDiscoveryError(RuntimeError):
@@ -158,10 +195,27 @@ def generate_scenario(
 
     rng = random.Random(seed)
     subnet = allocate_subnet(rng, excluded)
-    hosts = list(subnet.hosts())
+    # Docker bridge networks normally reserve the first usable address as the
+    # gateway. Keep it out of the seeded service pool to prevent collisions.
+    hosts = list(subnet.hosts())[1:]
     selected = rng.sample(hosts, decoy_count + 1)
     target_address = selected[0]
-    decoys = sorted(str(address) for address in selected[1:])
+    profile_ids = list(DECOY_PROFILES)
+    rng.shuffle(profile_ids)
+    decoys = []
+    for index, address in enumerate(selected[1:]):
+        profile_id = profile_ids[index % len(profile_ids)]
+        profile = DECOY_PROFILES[profile_id]
+        decoys.append(
+            {
+                "address": str(address),
+                "profile_id": profile_id,
+                "hostname": f"{profile['hostname_prefix']}-{index + 1:02d}",
+                "port": rng.choice(profile["ports"]),
+                "expected_routes": list(profile["expected_routes"]),
+            }
+        )
+    decoys.sort(key=lambda item: ipaddress.ip_address(item["address"]))
     vulnerability_count = rng.randint(1, len(QUIZ_TYPES))
     selected_classes = set(rng.sample(QUIZ_TYPES, vulnerability_count))
     vulnerability_classes = tuple(

@@ -28,3 +28,5 @@ docker/study-deck/study.db*
 # ntfy runtime credentials and generated configuration
 docker/ntfy/.env
 docker/ntfy/secrets/
+# Private generated range manifests, answer keys, and Compose models
+.runtime/quiz-range/
