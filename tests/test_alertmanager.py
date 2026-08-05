@@ -82,6 +82,19 @@ class AlertmanagerTests(unittest.TestCase):
         self.assertIn("- name: discard", self.alertmanager)
         self.assertNotIn("webhook_configs:", self.alertmanager.split("- name: discard", 1)[1].split("- name: ntfy", 1)[0])
 
+    def test_live_routing_test_is_bounded_and_self_resolving(self) -> None:
+        script = (ROOT / "scripts" / "purple_range_alert_test.sh").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn('notification_policy":"never"', script)
+        self.assertIn('environment":"purple_range"', script)
+        self.assertIn("production-delivered-", script)
+        self.assertIn("purple-suppressed-", script)
+        self.assertIn("resolve_alerts", script)
+        self.assertIn("homelab-iphone", script)
+        self.assertNotIn("systemctl stop", script)
+        self.assertNotIn("docker stop", script)
+
 
 if __name__ == "__main__":
     unittest.main()

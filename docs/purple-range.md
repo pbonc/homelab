@@ -144,6 +144,23 @@ make quiz-scenario ARGS="--exclude 192.168.1.0/24 --exclude 172.24.0.0/16"
 The internal manifest contains the answer key and must not be served through
 Homepage, included in exercise logs, or committed as generated runtime state.
 
+### Notification isolation acceptance
+
+After deploying Alertmanager and ntfy, prove the range route is silent while
+the ordinary production route remains deliverable:
+
+```bash
+make purple-range-alert-test
+```
+
+The bounded test submits two uniquely marked synthetic alerts directly to
+Alertmanager. The Purple-Team alert carries `environment="purple_range"` and
+`notification_policy="never"`; the production control does not. After the
+immediate test route runs, the script uses ntfy's authenticated, read-only JSON
+subscription API to require the production marker and reject the range marker.
+It resolves both alerts on success, failure, or interruption. The phone should
+receive only the production firing and recovery messages.
+
 ### First quiz template: expense IDOR
 
 `docker/quiz-app/` contains the first reviewed template, **Acme Expense

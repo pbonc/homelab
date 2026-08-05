@@ -224,23 +224,34 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 
 - [x] Keep Juice Shop as the guided reference target with loopback-only browser access and no production or internet route
 - [x] Define a reviewed quiz-template contract with vulnerability class, safe synthetic data, success evidence, root cause, mitigation, and related Juice Shop lesson
+- [ ] Build one coherent non-Juice-Shop assessment application with a distinct theme, locally served licensed or original assets, and realistic catalog, account, search, record, review, profile, support, and administrative workflows
+- [ ] Implement secure and deliberately vulnerable variants behind reviewed feature seams; select compatible combinations from the seeded manifest instead of generating arbitrary unsafe source code
+- [ ] Randomize an unknown but bounded vulnerability count per round, include secure features and plausible dead ends, and guarantee every selected weakness is reachable and independently testable
 - [ ] Build the first three bounded templates: SQL injection, broken object-level authorization (IDOR), and stored XSS
 - [ ] Include secure behavior and plausible dead ends so input fields do not automatically reveal the answer
 - [ ] Add deterministic vulnerable and fixed-mode tests for every template
+- [ ] Keep unrestricted command execution, external SSRF, production credentials, real personal data, and runtime internet downloads outside the initial variant catalog
 
 #### Phase C: Discovery rounds
 
 - [ ] Build a digest-pinned attacker image with `nmap`, `curl`, and basic DNS or HTTP inspection tools; keep it disposable and off by default
-- [ ] Place one quiz target and three to eight harmless decoys at seeded random addresses inside the authorized `/27`
+- [ ] Place one quiz target and three to eight harmless decoy deployments at seeded static addresses inside the authorized `/27`
+- [ ] Build a reviewed decoy catalog with distinct branding, titles, headers, routes, response shapes, and varied HTTP ports, including documentation, status, marketing, inventory API, login, maintenance, and secure catalog services
+- [ ] Give decoys believable synthetic content, correctly enforced authentication or authorization where shown, and enough stable behavior for meaningful enumeration without accidental vulnerabilities
+- [ ] Vary target, decoy selection, address, port, and presentation by seed while preserving deterministic replay and preventing default-server fingerprints from revealing the answer
 - [ ] Reveal only the authorized CIDR, engagement mode, time limit, and optional credentials; keep the answer key server-side
 - [ ] Provide browser access through a constrained range gateway without exposing arbitrary LAN proxying or target identity
+- [ ] Verify target and every expected decoy from the attacker, validate the student-visible scan surface against the manifest, and fail a round when a deployment is missing or unexpected
 - [ ] Verify positive discovery and target access plus negative production, LAN, Docker-host, and internet connectivity on every generated round
+- [ ] Destroy target, decoys, credentials, answer key, and scenario network together; prove the next seed cannot inherit addresses, state, or discoveries from the prior round
 
 #### Phase D: Quiz experience and scoring
 
 - [ ] Add guided, gray-box, and black-box round modes with increasing information scarcity
+- [ ] Generate a student-safe engagement brief that states only authorization, scope, objective, time limit, mode, and optional credentials without target identity, address, port, vulnerability count, or answer-key leakage
 - [ ] Accept a structured finding containing vulnerability class, affected endpoint, bounded evidence, impact, and remediation
 - [ ] Reveal the expected answer, root cause, mitigation, Juice Shop cross-reference, and missed defensive evidence only after submission or surrender
+- [ ] Classify reports against decoys as valid informational observations, correctly controlled behavior, or false positives and explain the distinction during review
 - [ ] Track local progress, time-to-discovery, false positives, hints, and repeated concepts without committing personal history
 - [ ] Reset every round to clean synthetic state and prevent prior addresses, answers, or credentials from leaking into the next seed
 
@@ -251,6 +262,15 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [ ] Correlate bounded application logs, exercise timestamps, Suricata evidence, and selected Falco events in a dedicated Grafana view
 - [ ] Keep payloads, flags, answer keys, and exploit details out of Homepage, ntfy, and production security summaries
 - [ ] Produce sanitized post-round reports and comparative metrics showing discovery, detection, containment, reset, and control improvement
+
+#### Phase F: Deployment automation and acceptance
+
+- [ ] Add shared `quiz-range-validate`, `quiz-range-deploy`, `quiz-range-verify`, `quiz-range-reset`, and `quiz-range-destroy` Make targets with bounded cleanup and no production deployment-event publication
+- [ ] Add a manual `workflow_dispatch` GitHub Actions workflow on the self-hosted `brain` runner that accepts only mode and difficulty while generating the seed and answer key locally
+- [ ] Prevent seeds, selected variants, target addresses, generated credentials, and answer keys from appearing in GitHub inputs, action logs, artifacts, caches, or job summaries
+- [ ] Keep quiz deployment, reset, decoy churn, expected findings, and round destruction silent in ntfy while leaving genuine `brain` CPU, memory, disk, temperature, and availability alerts active
+- [ ] Exercise successful deployment, partial decoy failure, target failure, isolation failure, verification failure, reset, and full destruction without changing the running Juice Shop guide or production services
+- [ ] Add the range to Homepage only after live acceptance, exposing sanitized availability and launch guidance without target details, answer keys, findings, or operational controls
 
 ## Sprint 9: ADS-B Edge Node — Complete
 
