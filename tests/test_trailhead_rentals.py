@@ -55,6 +55,27 @@ class TrailheadServiceTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "unknown or unreviewed"):
             load_variant_set("mystery")
 
+    def test_idor_variant_changes_only_object_authorization(self) -> None:
+        lesson = load_variant_set("lesson-idor")
+        self.assertIsNotNone(rental_for_user("alex", 72042, lesson))
+        self.assertEqual("parameterized", lesson.search)
+        self.assertEqual("encoded", lesson.review_rendering)
+
+    def test_sql_injection_variant_changes_query_logic(self) -> None:
+        payload = "' OR 1=1 --"
+        self.assertEqual([], search_products(payload, self.variants))
+        lesson_results = search_products(payload, load_variant_set("lesson-sqli"))
+        self.assertEqual(6, len(lesson_results))
+
+    def test_reviewed_combination_changes_only_selected_seams(self) -> None:
+        combined = load_variant_set("lesson-idor-sqli-stored-xss")
+        self.assertEqual("authentication-only", combined.rental_authorization)
+        self.assertEqual("concatenated-sql", combined.search)
+        self.assertEqual("raw", combined.review_rendering)
+        self.assertEqual("allowlisted", combined.profile_updates)
+        self.assertEqual("minimal", combined.api_projection)
+        self.assertEqual("role-required", combined.admin_authorization)
+
 
 class TrailheadHttpTests(unittest.TestCase):
     @classmethod
@@ -110,7 +131,8 @@ class TrailheadHttpTests(unittest.TestCase):
         self.assertIn("frame-ancestors 'none'", headers["content-security-policy"])
         self.assertEqual(200, self.request("GET", "/static/app.css")[0])
         health = json.loads(self.request("GET", "/api/health")[2])
-        self.assertEqual("secure-baseline", health["variant_set"])
+        self.assertEqual({"status": "healthy"}, health)
+        self.assertNotIn(b"variant", self.request("GET", "/api/health")[2])
 
     def test_catalog_api_is_minimal_and_searchable(self) -> None:
         status, _, body = self.request("GET", "/api/catalog?q=bike")
@@ -144,6 +166,19 @@ class TrailheadHttpTests(unittest.TestCase):
         _, _, body = self.request("GET", "/reviews")
         self.assertNotIn(b"<script>alert(1)</script>", body)
         self.assertIn(b"&lt;script&gt;alert(1)&lt;/script&gt;", body)
+
+    def test_stored_xss_variant_emits_saved_markup(self) -> None:
+        previous = os.environ["TRAILHEAD_VARIANT_SET"]
+        os.environ["TRAILHEAD_VARIANT_SET"] = "lesson-stored-xss"
+        try:
+            SUBMITTED_REVIEWS.append(
+                Review("Alex", "tent-alpine-2", 5, "<script>document.title='field-note'</script>")
+            )
+            _, headers, body = self.request("GET", "/reviews")
+            self.assertIn(b"<script>document.title='field-note'</script>", body)
+            self.assertIn("'unsafe-inline'", headers["content-security-policy"])
+        finally:
+            os.environ["TRAILHEAD_VARIANT_SET"] = previous
 
     def test_support_submission_is_bounded_and_memory_only(self) -> None:
         status, _, body = self.request(
@@ -184,6 +219,30 @@ class TrailheadContainerPolicyTests(unittest.TestCase):
     def test_image_base_is_digest_pinned_and_process_is_unprivileged(self) -> None:
         self.assertRegex(self.dockerfile, r"FROM python@sha256:[0-9a-f]{64}")
         self.assertIn("USER trailhead", self.dockerfile)
+
+    def test_private_answer_keys_cover_three_reviewed_classes(self) -> None:
+        templates = [
+            json.loads(path.read_text(encoding="utf-8"))
+            for path in sorted((APP / "variants").glob("*.json"))
+        ]
+        self.assertEqual(3, len(templates))
+        self.assertEqual(
+            {"idor", "sql_injection", "stored_xss"},
+            {item["vulnerability_class"] for item in templates},
+        )
+        self.assertTrue(all(item["synthetic_data_only"] for item in templates))
+        self.assertTrue(
+            all(not any(item["safety"].values()) for item in templates)
+        )
+
+    def test_answer_keys_are_not_copied_into_public_static_assets(self) -> None:
+        dockerfile = self.dockerfile
+        self.assertNotIn("COPY variants", dockerfile)
+        static = "\n".join(
+            path.read_text(encoding="utf-8") for path in (APP / "static").glob("*")
+        )
+        for marker in ("lesson-idor", "lesson-sqli", "lesson-stored-xss"):
+            self.assertNotIn(marker, static)
 
 
 if __name__ == "__main__":

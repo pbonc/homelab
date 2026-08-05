@@ -82,7 +82,17 @@ class TrailheadHandler(BaseHTTPRequestHandler):
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("X-Frame-Options", "DENY")
         self.send_header("Referrer-Policy", "no-referrer")
-        self.send_header("Content-Security-Policy", "default-src 'self'; style-src 'self'; img-src 'self'; form-action 'self'; frame-ancestors 'none'")
+        script_policy = (
+            "script-src 'self' 'unsafe-inline'; "
+            if variants().review_rendering == "raw"
+            else "script-src 'self'; "
+        )
+        self.send_header(
+            "Content-Security-Policy",
+            "default-src 'self'; "
+            + script_policy
+            + "style-src 'self'; img-src 'self' data:; form-action 'self'; frame-ancestors 'none'",
+        )
         self.send_header("Cache-Control", "no-store")
 
     def send_body(self, status: HTTPStatus, body: bytes, content_type: str) -> None:
@@ -119,7 +129,7 @@ class TrailheadHandler(BaseHTTPRequestHandler):
         if path.startswith("/static/"):
             self.handle_static(path)
         elif path == "/api/health":
-            self.send_json(HTTPStatus.OK, {"status": "healthy", "variant_set": SECURE_BASELINE})
+            self.send_json(HTTPStatus.OK, {"status": "healthy"})
         elif path == "/api/catalog":
             self.handle_catalog_api(parse_qs(parsed.query).get("q", [""])[0])
         elif path.startswith("/api/rentals/"):
@@ -186,7 +196,7 @@ class TrailheadHandler(BaseHTTPRequestHandler):
             self.send_json(HTTPStatus.NOT_FOUND, {"error": "not_found"})
             return
         related = [review for review in (*REVIEWS, *SUBMITTED_REVIEWS) if review.product_id == product.product_id]
-        notes = "".join(f"<li><strong>{html.escape(item.author)}</strong> · {item.rating}/5<br>{html.escape(item.comment)}</li>" for item in related) or "<li>No field notes yet.</li>"
+        notes = "".join(self.render_review(item) for item in related) or "<li>No field notes yet.</li>"
         content = f"""<section class="hero"><div><span class="eyebrow">{html.escape(product.category)}</span><h1>{html.escape(product.name)}</h1>
 <p>{html.escape(product.summary)}</p><span class="rate">${product.rate} per day</span></div><div class="product-art {html.escape(product.accent)}" aria-hidden="true">{html.escape(product.glyph)}</div></section>
 <section class="split"><div class="panel"><h2>Included with every rental</h2><p>Fit check, safety inspection, basic accessories, and a straightforward return window.</p></div>
@@ -259,13 +269,27 @@ class TrailheadHandler(BaseHTTPRequestHandler):
     def handle_reviews(self) -> None:
         user = session_user(self.headers.get("Cookie"))
         reviews = (*REVIEWS, *SUBMITTED_REVIEWS)
-        items = "".join(f"<li><strong>{html.escape(item.author)}</strong> on {html.escape(product_by_id(item.product_id).name)} · {item.rating}/5<br>{html.escape(item.comment)}</li>" for item in reviews)
+        items = "".join(self.render_review(item, include_product=True) for item in reviews)
         form = ""
         if user:
             options = "".join(f"<option value='{html.escape(item.product_id)}'>{html.escape(item.name)}</option>" for item in PRODUCTS)
             form = f"<form class='panel stack' method='post' action='/reviews'><h2>Add a field note</h2><select name='product_id'>{options}</select><select name='rating'><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select><textarea name='comment' maxlength='400' required></textarea><button>Publish note</button></form>"
         content = f"<section class='hero'><div><span class='eyebrow'>Community notes</span><h1>Reports from the trail.</h1></div></section><section class='split'><div class='panel'><ul class='list'>{items}</ul></div>{form}</section>"
         self.send_html(HTTPStatus.OK, layout("Field notes", content, user))
+
+    def render_review(self, item: Review, include_product: bool = False) -> str:
+        current = variants()
+        if current.review_rendering not in {"encoded", "raw"}:
+            raise ValueError("unreviewed review-rendering variant")
+        author = html.escape(item.author)
+        comment = (
+            html.escape(item.comment)
+            if current.review_rendering == "encoded"
+            else item.comment
+        )
+        product = product_by_id(item.product_id)
+        context = f" on {html.escape(product.name)}" if include_product and product else ""
+        return f"<li><strong>{author}</strong>{context} · {item.rating}/5<br>{comment}</li>"
 
     def handle_review_submission(self) -> None:
         user = self.require_user()

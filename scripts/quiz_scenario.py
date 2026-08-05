@@ -19,6 +19,15 @@ QUIZ_TEMPLATES = {
     "sql_injection": "inventory-sqli",
     "stored_xss": "guestbook-stored-xss",
 }
+TRAILHEAD_VARIANT_SETS = {
+    ("idor",): "lesson-idor",
+    ("sql_injection",): "lesson-sqli",
+    ("stored_xss",): "lesson-stored-xss",
+    ("idor", "sql_injection"): "lesson-idor-sqli",
+    ("idor", "stored_xss"): "lesson-idor-stored-xss",
+    ("sql_injection", "stored_xss"): "lesson-sqli-stored-xss",
+    ("idor", "sql_injection", "stored_xss"): "lesson-idor-sqli-stored-xss",
+}
 RANGE_POOL = ipaddress.ip_network("172.29.0.0/16")
 SCENARIO_PREFIX = 27
 
@@ -153,7 +162,12 @@ def generate_scenario(
     selected = rng.sample(hosts, decoy_count + 1)
     target_address = selected[0]
     decoys = sorted(str(address) for address in selected[1:])
-    quiz_type = rng.choice(QUIZ_TYPES)
+    vulnerability_count = rng.randint(1, len(QUIZ_TYPES))
+    selected_classes = set(rng.sample(QUIZ_TYPES, vulnerability_count))
+    vulnerability_classes = tuple(
+        item for item in QUIZ_TYPES if item in selected_classes
+    )
+    quiz_type = vulnerability_classes[0]
     identity = hashlib.sha256(
         f"{SCHEMA_VERSION}:{seed}:{subnet}:{quiz_type}".encode("utf-8")
     ).hexdigest()[:12]
@@ -168,6 +182,9 @@ def generate_scenario(
             "address": str(target_address),
             "quiz_type": quiz_type,
             "template_id": QUIZ_TEMPLATES[quiz_type],
+            "vulnerability_classes": list(vulnerability_classes),
+            "template_ids": [QUIZ_TEMPLATES[item] for item in vulnerability_classes],
+            "trailhead_variant_set": TRAILHEAD_VARIANT_SETS[vulnerability_classes],
         },
         "decoys": decoys,
     }

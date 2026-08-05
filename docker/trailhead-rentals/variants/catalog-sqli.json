@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0.0",
+  "template_id": "trailhead-catalog-sqli",
+  "title": "Trailhead Catalog Search",
+  "vulnerability_class": "sql_injection",
+  "modes": ["vulnerable", "fixed"],
+  "synthetic_data_only": true,
+  "success_evidence": "A crafted search changes the synthetic catalog query's boolean logic and returns products unrelated to the literal search text.",
+  "root_cause": "The lesson variant concatenates untrusted search text into a SQLite statement.",
+  "mitigation": "Use parameterized queries and keep query structure separate from user-provided values.",
+  "juice_shop_reference": {"category": "Injection", "lesson": "Transfer SQL-injection reasoning to an unfamiliar catalog implementation."},
+  "safety": {"allows_command_execution": false, "allows_file_upload": false, "requires_outbound_network": false, "uses_production_data": false}
+}

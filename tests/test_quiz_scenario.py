@@ -81,6 +81,22 @@ class QuizScenarioTests(unittest.TestCase):
                 target["template_id"],
             )
 
+    def test_answer_key_selects_one_to_three_compatible_trailhead_variants(self) -> None:
+        observed_counts = set()
+        for seed in range(100):
+            target = quiz_scenario.generate_scenario(seed)["target"]
+            classes = tuple(target["vulnerability_classes"])
+            observed_counts.add(len(classes))
+            self.assertEqual(
+                [quiz_scenario.QUIZ_TEMPLATES[item] for item in classes],
+                target["template_ids"],
+            )
+            self.assertEqual(
+                quiz_scenario.TRAILHEAD_VARIANT_SETS[classes],
+                target["trailhead_variant_set"],
+            )
+        self.assertEqual({1, 2, 3}, observed_counts)
+
     def test_allocator_fails_closed_when_pool_is_excluded(self) -> None:
         with self.assertRaisesRegex(ValueError, "no non-overlapping"):
             quiz_scenario.allocate_subnet(

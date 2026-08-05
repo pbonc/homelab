@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0.0",
+  "template_id": "trailhead-rental-idor",
+  "title": "Trailhead Rental Record Authorization",
+  "vulnerability_class": "idor",
+  "modes": ["vulnerable", "fixed"],
+  "synthetic_data_only": true,
+  "success_evidence": "An authenticated member retrieves another synthetic member's rental record by changing the numeric identifier.",
+  "root_cause": "The lesson variant requires authentication but omits the object-owner comparison after lookup.",
+  "mitigation": "Require ownership after lookup and make unauthorized and absent records indistinguishable.",
+  "juice_shop_reference": {"category": "Broken Access Control", "lesson": "Apply Juice Shop object-authorization reasoning to a rental API."},
+  "safety": {"allows_command_execution": false, "allows_file_upload": false, "requires_outbound_network": false, "uses_production_data": false}
+}

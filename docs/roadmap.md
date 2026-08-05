@@ -226,10 +226,10 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [x] Define a reviewed quiz-template contract with vulnerability class, safe synthetic data, success evidence, root cause, mitigation, and related Juice Shop lesson
 - [x] Build one coherent non-Juice-Shop assessment application with a distinct theme, locally served licensed or original assets, and realistic catalog, account, search, record, review, profile, support, and administrative workflows
 - [ ] Implement secure and deliberately vulnerable variants behind reviewed feature seams; select compatible combinations from the seeded manifest instead of generating arbitrary unsafe source code
-- [ ] Randomize an unknown but bounded vulnerability count per round, include secure features and plausible dead ends, and guarantee every selected weakness is reachable and independently testable
-- [ ] Build the first three bounded templates: SQL injection, broken object-level authorization (IDOR), and stored XSS
+- [x] Randomize an unknown but bounded vulnerability count per round, include secure features and plausible dead ends, and guarantee every selected weakness is reachable and independently testable
+- [x] Build the first three bounded templates: SQL injection, broken object-level authorization (IDOR), and stored XSS
 - [ ] Include secure behavior and plausible dead ends so input fields do not automatically reveal the answer
-- [ ] Add deterministic vulnerable and fixed-mode tests for every template
+- [x] Add deterministic vulnerable and fixed-mode tests for every template
 - [ ] Keep unrestricted command execution, external SSRF, production credentials, real personal data, and runtime internet downloads outside the initial variant catalog
 
 #### Phase C: Discovery rounds
@@ -245,14 +245,26 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [ ] Verify positive discovery and target access plus negative production, LAN, Docker-host, and internet connectivity on every generated round
 - [ ] Destroy target, decoys, credentials, answer key, and scenario network together; prove the next seed cannot inherit addresses, state, or discoveries from the prior round
 
-#### Phase D: Quiz experience and scoring
+#### Phase D: Assessment ledger and quiz experience
 
 - [ ] Add guided, gray-box, and black-box round modes with increasing information scarcity
 - [ ] Generate a student-safe engagement brief that states only authorization, scope, objective, time limit, mode, and optional credentials without target identity, address, port, vulnerability count, or answer-key leakage
-- [ ] Accept a structured finding containing vulnerability class, affected endpoint, bounded evidence, impact, and remediation
+- [ ] Create an immutable range-run record containing scenario ID, seed, mode, difficulty, start and end times, deployment status, reset status, and a reference to the private scenario manifest
+- [ ] Persist assessment history outside disposable target and decoy containers so destroying a round cannot erase its journal, findings, validation results, or sanitized telemetry references
+- [ ] Keep the private scenario manifest, learner assessment journal, and observed telemetry timeline as separate data stores with explicit access boundaries
+- [ ] Define a versioned finding schema containing vulnerability class, affected component or endpoint, discovery notes, bounded and redacted evidence, reproduction summary, impact, severity, confidence, remediation, detection notes, hint usage, and timestamps
+- [ ] Track each finding through `suspected`, `submitted`, `partially_validated`, `validated`, `rejected`, `duplicate`, `false_positive`, `remediated`, and `regression_verified` states without rewriting its prior history
+- [ ] Add append-only attempt records for reconnaissance, hypotheses, validation attempts, hints, and notable defensive observations without requiring every request or payload to be retained
+- [ ] Accept structured findings through a local-only assessment API and provide a simple range journal that remains usable after the exercise deployment is destroyed
+- [ ] Validate findings with a deliberate combination of signed per-run proof tokens, prohibited-state assertions, telemetry correlation, bounded manual evidence, and an instructor override instead of requiring every vulnerability to expose a flag
+- [ ] Ensure proof tokens identify only their run and finding, cannot reveal other selected vulnerabilities, and cannot be forged or reused across rounds
+- [ ] Present progress according to engagement mode: guided mode may show lesson objectives, gray-box mode may show broad categories, and black-box mode must not reveal the target, vulnerability count, or remaining findings
 - [ ] Reveal the expected answer, root cause, mitigation, Juice Shop cross-reference, and missed defensive evidence only after submission or surrender
 - [ ] Classify reports against decoys as valid informational observations, correctly controlled behavior, or false positives and explain the distinction during review
-- [ ] Track local progress, time-to-discovery, false positives, hints, and repeated concepts without committing personal history
+- [ ] Track local progress, time to first useful finding, time to validation, false-positive rate, hints, repeated or missed concepts, detection coverage, remediation success, and secure regression results without committing personal history
+- [ ] Generate an end-of-round comparison of deployed, found, missed, and falsely reported concepts together with detection and remediation status
+- [ ] Export a sanitized Markdown assessment report and versioned JSON run archive; defer SARIF, JUnit, and CSV exports until the ledger contract is stable
+- [ ] Add retention, redaction, backup, and deletion rules for attempt history, evidence, session tokens, proof tokens, uploaded samples, and generated credentials
 - [ ] Reset every round to clean synthetic state and prevent prior addresses, answers, or credentials from leaking into the next seed
 
 #### Phase E: Detection and portfolio evidence
@@ -260,6 +272,9 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [ ] Label all range telemetry `environment="purple_range"`, `expected_vulnerable="true"`, and `notification_policy="never"`
 - [ ] Exclude quiz lifecycle, expected findings, resets, and container churn from ntfy while preserving genuine `brain` resource-pressure alerts
 - [ ] Correlate bounded application logs, exercise timestamps, Suricata evidence, and selected Falco events in a dedicated Grafana view
+- [ ] Correlate validated findings with the immutable attempt and telemetry timelines so a post-round review can compare attacker action, application evidence, alert timing, and control response
+- [ ] Define expected observables and at least one candidate detection for every reviewed vulnerability module before admitting it to the scenario catalog
+- [ ] Score discovery, validation, detection, remediation, and regression verification separately instead of reducing the exercise to exploit count or completion speed
 - [ ] Keep payloads, flags, answer keys, and exploit details out of Homepage, ntfy, and production security summaries
 - [ ] Produce sanitized post-round reports and comparative metrics showing discovery, detection, containment, reset, and control improvement
 
