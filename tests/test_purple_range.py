@@ -30,15 +30,14 @@ class PurpleRangePolicyTests(unittest.TestCase):
         self.assertNotIn("0.0.0.0", self.compose)
         self.assertNotIn('"192.168.1.23:3008:8080"', self.compose)
 
-    def test_homepage_lab_link_preserves_loopback_boundary(self) -> None:
+    def test_homepage_lab_link_uses_safe_launcher(self) -> None:
         card = self.homepage.split("    - Juice Shop Lab:", 1)[1].split(
             "\n    - ", 1
         )[0]
-        self.assertIn("href: http://127.0.0.1:3008", card)
+        self.assertIn("href: http://192.168.1.23:8050", card)
+        self.assertIn("siteMonitor: http://192.168.1.23:8050/api/health", card)
         self.assertIn("target: _blank", card)
-        self.assertIn("SSH tunnel required", card)
-        self.assertNotIn("siteMonitor:", card)
-        self.assertNotIn("192.168.1.23", card)
+        self.assertNotIn("href: http://127.0.0.1:3008", card)
 
     def test_range_network_is_internal_and_standalone(self) -> None:
         self.assertIn("internal: true", self.compose)

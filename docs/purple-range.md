@@ -63,11 +63,15 @@ ssh -N -L 3008:127.0.0.1:3008 dar@192.168.1.23
 ```
 
 Then open `http://127.0.0.1:3008` on the workstation. The forwarding session
-must remain open while using the target. Homepage's **Juice Shop Lab** card
-opens this workstation-local URL in a new tab; it does not open or manage the
-tunnel. Start the range and SSH forward first. The card intentionally has no
-health indicator because Homepage cannot probe the loopback listener on the
-operator's workstation without weakening the isolation boundary.
+must remain open while using the target.
+
+Homepage's **Juice Shop Lab** card opens the LAN-safe Purple-Team Range Portal
+at `http://192.168.1.23:8050`. The portal provides copyable commands, checks
+whether that browser can load the workstation-local Juice Shop image, and
+enables its target link only after the tunnel responds. It cannot start or stop
+containers and has no Docker socket, production credentials, or range-network
+connection. Its Homepage health state represents only the safe launcher—not
+the intentionally on-demand target or workstation tunnel.
 
 Launch a disposable shell with basic HTTP tooling:
 

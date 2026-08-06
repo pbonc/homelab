@@ -31,6 +31,7 @@ internet without a deliberate authenticated reverse-proxy and TLS design.
 | 8020 | Study Deck | `http://192.168.1.23:8020` | LAN-only study notes, quizzes, and local progress |
 | 8030 | Network Inventory | `http://192.168.1.23:8030` | Read-only topology API and discovery freshness |
 | 8040 | Architecture Map | `http://192.168.1.23:8040` | Interactive, repository-driven system data-flow explorer |
+| 8050 | Purple-Team Range Portal | `http://192.168.1.23:8050` | Safe launcher instructions and workstation-tunnel readiness |
 | 8093 | ntfy | `http://192.168.1.23:8093` | Authenticated LAN-only notification API and web client |
 | 9090 | Prometheus | `http://192.168.1.23:9090` | Metrics queries and administration on the trusted LAN |
 | 9093 | Alertmanager | `http://192.168.1.23:9093` | Trusted-LAN alert state, grouping, silences, and delivery status |

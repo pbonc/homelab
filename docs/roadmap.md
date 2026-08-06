@@ -15,7 +15,7 @@
 - [x] Add Glances-backed CPU, memory, and root filesystem metrics to `brain`
 - [x] Classify `brain` as active, warning, critical, or unavailable from live metrics
 - [x] Style planned and future cards as inactive inventory
-- [x] Display the dashboard semantic version (initially `0.1.0`, currently `0.12.1`)
+- [x] Display the dashboard semantic version (initially `0.1.0`, currently `0.12.2`)
 - [x] Retire the unsupported status JSON polling path
 - [x] Add UTF-8, URL, lifecycle, and version validation
 - [x] Add Glances readiness, host-header validation, and restricted CORS configuration
@@ -188,9 +188,10 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 
 ### Homepage access hotfix
 
-- [x] Replace the planned Juice Shop placeholder with an on-demand Homepage lab card that opens the workstation-side SSH tunnel without publishing the vulnerable target to the LAN
-- [x] Keep the card unmonitored and explicitly label the tunnel requirement so an absent workstation tunnel is not misreported as a production outage
-- [ ] Deploy Homepage `0.12.1` and verify the card opens Juice Shop only while the range and SSH tunnel are active
+- [x] Replace the planned Juice Shop placeholder with an on-demand Homepage lab card that opens a LAN-safe launcher without publishing the vulnerable target to the LAN
+- [x] Build an independently available range portal with copyable start and tunnel instructions plus browser-local tunnel readiness; grant it no Docker control, credentials, or target-network access
+- [x] Make Homepage monitor only the safe launcher and clearly distinguish launcher health from the on-demand target and workstation tunnel
+- [ ] Deploy the range portal and Homepage `0.12.2`, then verify the target action remains disabled without the tunnel and opens Juice Shop only while the range and tunnel are active
 
 ### 1. Safety boundary and reproducibility
 

@@ -101,9 +101,10 @@
         container: alloy
     - Juice Shop Lab:
         icon: mdi-shield-bug-outline
-        href: http://127.0.0.1:3008
+        href: http://192.168.1.23:8050
         target: _blank
-        description: "On demand | SSH tunnel required"
+        siteMonitor: http://192.168.1.23:8050/api/health
+        description: "Train | Isolated range launcher"
 
 - Planned Services:
     - Jenkins:

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Purple-Team Range Launcher</title>
+    <meta name="description" content="Safe local launcher and connection guide for the Homelab Purple-Team range.">
+    <link rel="stylesheet" href="styles.css">
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <main>
+      <header class="hero">
+        <p class="eyebrow">HOMELAB / AUTHORIZED TRAINING</p>
+        <div class="title-row">
+          <div>
+            <h1>Purple-Team Range</h1>
+            <p class="lede">Start the isolated target, create a workstation-local tunnel, then enter Juice Shop.</p>
+          </div>
+          <div id="connection-state" class="state state-checking" role="status" aria-live="polite">
+            <span class="state-dot" aria-hidden="true"></span>
+            <span id="state-text">Checking tunnel</span>
+          </div>
+        </div>
+      </header>
+
+      <section class="boundary" aria-labelledby="boundary-title">
+        <div class="boundary-icon" aria-hidden="true">!</div>
+        <div>
+          <h2 id="boundary-title">Isolation stays intact</h2>
+          <p>This page cannot start containers, access Docker, or expose the vulnerable target. Juice Shop remains bound to loopback on <strong>brain</strong> and is reachable only through your SSH session.</p>
+        </div>
+      </section>
+
+      <section class="steps" aria-label="Launch steps">
+        <article class="step-card">
+          <div class="step-heading"><span>1</span><h2>Start the target on brain</h2></div>
+          <p>Run this from an SSH session connected to the controller.</p>
+          <div class="command-row">
+            <code id="start-command">cd ~/git/homelab &amp;&amp; make purple-range-up</code>
+            <button class="copy" data-copy="start-command" type="button">Copy</button>
+          </div>
+        </article>
+
+        <article class="step-card">
+          <div class="step-heading"><span>2</span><h2>Open the local tunnel</h2></div>
+          <p>Run one command on your workstation and leave that terminal open.</p>
+          <div class="command-block">
+            <label for="powershell-command">PowerShell</label>
+            <div class="command-row">
+              <code id="powershell-command">ssh -N -L 3008:127.0.0.1:3008 -i "$env:USERPROFILE\.ssh\id_ed25519_homelab" dar@192.168.1.23</code>
+              <button class="copy" data-copy="powershell-command" type="button">Copy</button>
+            </div>
+          </div>
+          <div class="command-block">
+            <label for="wsl-command">WSL / Linux</label>
+            <div class="command-row">
+              <code id="wsl-command">ssh -N -L 3008:127.0.0.1:3008 -i ~/.ssh/id_ed25519_homelab dar@192.168.1.23</code>
+              <button class="copy" data-copy="wsl-command" type="button">Copy</button>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section class="launch-panel" aria-labelledby="launch-title">
+        <div>
+          <p class="eyebrow">LOCAL CONNECTION</p>
+          <h2 id="launch-title">Enter the training target</h2>
+          <p id="launch-help">The launch action unlocks when this browser can load Juice Shop through <code>127.0.0.1:3008</code>.</p>
+        </div>
+        <div class="launch-actions">
+          <button id="check-connection" class="secondary" type="button">Check again</button>
+          <a id="open-target" class="primary disabled" href="http://127.0.0.1:3008" target="_blank" rel="noopener noreferrer" aria-disabled="true">Open Juice Shop</a>
+        </div>
+      </section>
+
+      <footer>
+        <span>Authorized targets only</span>
+        <span>Reset when finished: <code>make purple-range-reset</code></span>
+      </footer>
+      <img id="tunnel-probe" alt="" hidden>
+    </main>
+  </body>
+</html>

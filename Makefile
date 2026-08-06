@@ -4,7 +4,7 @@ SHELL := /usr/bin/env bash
 # CI portability note:
 # GitHub Actions, GitLab CI, and Jenkins should call these same Make targets.
 
-.PHONY: help doctor status lint test telemetry-test telemetry-run telemetry-secrets telemetry-config security-test security-secrets security-config observability-config observability-up observability-down alertmanager-test study-test study-config study-up study-down network-inventory-test network-inventory-config network-inventory-up network-inventory-down architecture-map-test architecture-map-config architecture-map-up architecture-map-down ntfy-test ntfy-secrets ntfy-config ntfy-up ntfy-down ntfy-test-publish purple-range-test purple-range-config purple-range-up purple-range-down purple-range-shell purple-range-verify purple-range-alert-test purple-range-reset quiz-scenario quiz-range-render quiz-app-test quiz-app-config quiz-decoy-test quiz-decoy-config trailhead-test trailhead-config ansible-inventory ansible-ping ansible-check ansible-bootstrap-check ansible-bootstrap ansible-piaware-observability-check ansible-piaware-observability ansible-vault-create ansible-vault-edit ansible-vault-view rebuild-syntax rebuild-check rebuild-apply rebuild-stage-validate backup-init backup-run backup-check backup-snapshots backup-restore-test backup-prune bootstrap docker-up docker-down homepage-validate homepage-deploy homepage-verify homepage-rollback
+.PHONY: help doctor status lint test telemetry-test telemetry-run telemetry-secrets telemetry-config security-test security-secrets security-config observability-config observability-up observability-down alertmanager-test study-test study-config study-up study-down network-inventory-test network-inventory-config network-inventory-up network-inventory-down architecture-map-test architecture-map-config architecture-map-up architecture-map-down ntfy-test ntfy-secrets ntfy-config ntfy-up ntfy-down ntfy-test-publish purple-range-portal-test purple-range-portal-config purple-range-portal-up purple-range-portal-down purple-range-test purple-range-config purple-range-up purple-range-down purple-range-shell purple-range-verify purple-range-alert-test purple-range-reset quiz-scenario quiz-range-render quiz-app-test quiz-app-config quiz-decoy-test quiz-decoy-config trailhead-test trailhead-config ansible-inventory ansible-ping ansible-check ansible-bootstrap-check ansible-bootstrap ansible-piaware-observability-check ansible-piaware-observability ansible-vault-create ansible-vault-edit ansible-vault-view rebuild-syntax rebuild-check rebuild-apply rebuild-stage-validate backup-init backup-run backup-check backup-snapshots backup-restore-test backup-prune bootstrap docker-up docker-down homepage-validate homepage-deploy homepage-verify homepage-rollback
 
 help: ## Show available targets
 >@awk 'BEGIN {FS = ":.*##"; printf "\nAvailable targets:\n"} /^[a-zA-Z0-9_.-]+:.*##/ {printf "  %-14s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -114,6 +114,18 @@ ntfy-down: ## Stop ntfy without deleting messages or access control
 
 ntfy-test-publish: ## Send one authenticated test notification
 >@bash scripts/ntfy_test_publish.sh
+
+purple-range-portal-test: ## Validate the LAN-safe Purple-Team launcher
+>@python3 -m unittest discover -s tests -p "test_purple_range_portal.py" -v
+
+purple-range-portal-config: ## Validate the Purple-Team launcher Compose model
+>@docker compose --file docker/purple-range-portal/compose.yaml config --quiet
+
+purple-range-portal-up: ## Build and start the LAN-safe Purple-Team launcher
+>@docker compose --file docker/purple-range-portal/compose.yaml up --detach --build
+
+purple-range-portal-down: ## Stop the Purple-Team launcher
+>@docker compose --file docker/purple-range-portal/compose.yaml down
 
 purple-range-test: ## Validate the isolated range safety contract
 >@python3 -m unittest discover -s tests -p "test_purple_range.py" -v
