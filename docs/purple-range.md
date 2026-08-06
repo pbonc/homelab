@@ -63,7 +63,11 @@ ssh -N -L 3008:127.0.0.1:3008 dar@192.168.1.23
 ```
 
 Then open `http://127.0.0.1:3008` on the workstation. The forwarding session
-must remain open while using the target.
+must remain open while using the target. Homepage's **Juice Shop Lab** card
+opens this workstation-local URL in a new tab; it does not open or manage the
+tunnel. Start the range and SSH forward first. The card intentionally has no
+health indicator because Homepage cannot probe the loopback listener on the
+operator's workstation without weakening the isolation boundary.
 
 Launch a disposable shell with basic HTTP tooling:
 

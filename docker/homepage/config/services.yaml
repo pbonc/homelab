@@ -99,6 +99,11 @@
         description: "Observe | Constrained Docker log collector"
         server: brain-docker
         container: alloy
+    - Juice Shop Lab:
+        icon: mdi-shield-bug-outline
+        href: http://127.0.0.1:3008
+        target: _blank
+        description: "On demand | SSH tunnel required"
 
 - Planned Services:
     - Jenkins:
@@ -113,9 +118,6 @@
     - Uptime Kuma:
         icon: mdi-heart-pulse
         description: "Planned | Availability checks"
-    - OWASP Juice Shop:
-        icon: mdi-shield-bug-outline
-        description: "Planned | Web security practice"
     - DVWA:
         icon: mdi-shield-alert-outline
         description: "Planned | Vulnerable web app training"

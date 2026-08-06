@@ -12,6 +12,9 @@ class PurpleRangePolicyTests(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.compose = (RANGE / "compose.yaml").read_text(encoding="utf-8")
         cls.docs = (ROOT / "docs" / "purple-range.md").read_text(encoding="utf-8")
+        cls.homepage = (
+            ROOT / "docker" / "homepage" / "config" / "services.yaml"
+        ).read_text(encoding="utf-8")
         cls.verify = (ROOT / "scripts" / "purple_range_verify.sh").read_text(
             encoding="utf-8"
         )
@@ -26,6 +29,16 @@ class PurpleRangePolicyTests(unittest.TestCase):
         self.assertIn('"127.0.0.1:3008:8080"', self.compose)
         self.assertNotIn("0.0.0.0", self.compose)
         self.assertNotIn('"192.168.1.23:3008:8080"', self.compose)
+
+    def test_homepage_lab_link_preserves_loopback_boundary(self) -> None:
+        card = self.homepage.split("    - Juice Shop Lab:", 1)[1].split(
+            "\n    - ", 1
+        )[0]
+        self.assertIn("href: http://127.0.0.1:3008", card)
+        self.assertIn("target: _blank", card)
+        self.assertIn("SSH tunnel required", card)
+        self.assertNotIn("siteMonitor:", card)
+        self.assertNotIn("192.168.1.23", card)
 
     def test_range_network_is_internal_and_standalone(self) -> None:
         self.assertIn("internal: true", self.compose)
