@@ -161,6 +161,10 @@ subscription API to require the production marker and reject the range marker.
 It resolves both alerts on success, failure, or interruption. The phone should
 receive only the production firing and recovery messages.
 
+Live acceptance passed on 2026-08-06: Alertmanager discarded the marked
+Purple-Team alert, the equivalent production control reached ntfy, and both
+synthetic alerts were resolved after verification.
+
 ### First quiz template: expense IDOR
 
 `docker/quiz-app/` contains the first reviewed template, **Acme Expense
