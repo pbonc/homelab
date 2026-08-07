@@ -232,12 +232,12 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [x] Keep Juice Shop as the guided reference target with loopback-only browser access and no production or internet route
 - [x] Define a reviewed quiz-template contract with vulnerability class, safe synthetic data, success evidence, root cause, mitigation, and related Juice Shop lesson
 - [x] Build one coherent non-Juice-Shop assessment application with a distinct theme, locally served licensed or original assets, and realistic catalog, account, search, record, review, profile, support, and administrative workflows
-- [ ] Implement secure and deliberately vulnerable variants behind reviewed feature seams; select compatible combinations from the seeded manifest instead of generating arbitrary unsafe source code
+- [x] Implement secure and deliberately vulnerable variants behind reviewed feature seams; select compatible combinations from the seeded manifest instead of generating arbitrary unsafe source code
 - [x] Randomize an unknown but bounded vulnerability count per round, include secure features and plausible dead ends, and guarantee every selected weakness is reachable and independently testable
 - [x] Build the first three bounded templates: SQL injection, broken object-level authorization (IDOR), and stored XSS
-- [ ] Include secure behavior and plausible dead ends so input fields do not automatically reveal the answer
+- [x] Include secure behavior and plausible dead ends so input fields do not automatically reveal the answer
 - [x] Add deterministic vulnerable and fixed-mode tests for every template
-- [ ] Keep unrestricted command execution, external SSRF, production credentials, real personal data, and runtime internet downloads outside the initial variant catalog
+- [x] Keep unrestricted command execution, external SSRF, production credentials, real personal data, and runtime internet downloads outside the initial variant catalog
 
 #### Phase C: Discovery rounds
 
