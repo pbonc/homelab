@@ -81,7 +81,11 @@ make purple-range-shell
 
 Inside that shell, the authorized target is `http://juice-shop:3000`. Exit the
 shell when the exercise ends. This initial toolbox deliberately contains only
-`curl`; broader tooling belongs in a separately reviewed attacker image.
+`curl`; broader tooling belongs in the separately reviewed quiz attacker image.
+That image bakes in `nmap`, `curl`, `dig`, and `nslookup`, runs as the upstream
+unprivileged user with all Linux capabilities dropped, and is enabled only by
+the generated range's explicit `attacker` profile. Use TCP-connect scans such
+as `nmap -sT` because the toolbox is intentionally not granted raw sockets.
 
 Prove isolation after the target is healthy:
 

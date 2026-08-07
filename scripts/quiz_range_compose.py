@@ -10,6 +10,7 @@ from typing import Any
 
 TRAILHEAD_IMAGE = "homelab/trailhead-rentals:0.1.0"
 DECOY_IMAGE = "homelab/vulnerability-quiz-decoy:0.1.0"
+ATTACKER_IMAGE = "homelab/vulnerability-quiz-attacker:0.1.0"
 
 
 def constrained_service(image: str, address: str) -> dict[str, Any]:
@@ -65,7 +66,25 @@ def render_compose(scenario: dict[str, Any]) -> dict[str, Any]:
     )
     target_service["labels"]["expected_vulnerable"] = "true"
 
-    services: dict[str, Any] = {"trailhead-target": target_service}
+    attacker_service = constrained_service(ATTACKER_IMAGE, "")
+    attacker_service.update(
+        {
+            "profiles": ["attacker"],
+            "entrypoint": ["/bin/sh"],
+            "command": ["-c", "sleep infinity"],
+            "stdin_open": True,
+            "tty": True,
+        }
+    )
+    # Let Docker allocate the disposable toolbox address so the private
+    # manifest remains the sole source of target and decoy identities.
+    attacker_service["networks"] = ["quiz-range"]
+    attacker_service["labels"]["expected_vulnerable"] = "false"
+
+    services: dict[str, Any] = {
+        "trailhead-target": target_service,
+        "attacker": attacker_service,
+    }
     for index, decoy in enumerate(scenario["decoys"], start=1):
         service = constrained_service(DECOY_IMAGE, decoy["address"])
         service.update(

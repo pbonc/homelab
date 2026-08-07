@@ -30,7 +30,7 @@ class QuizRangeComposeTests(unittest.TestCase):
 
     def test_places_one_target_and_every_decoy_at_manifest_addresses(self) -> None:
         services = self.compose["services"]
-        self.assertEqual(6, len(services))
+        self.assertEqual(7, len(services))
         self.assertEqual(
             self.scenario["target"]["address"],
             services["trailhead-target"]["networks"]["quiz-range"]["ipv4_address"],
@@ -66,9 +66,18 @@ class QuizRangeComposeTests(unittest.TestCase):
             all(
                 service["labels"]["expected_vulnerable"] == "false"
                 for name, service in services.items()
-                if name.startswith("decoy-")
+                if name.startswith("decoy-") or name == "attacker"
             )
         )
+
+    def test_attacker_is_disposable_off_by_default_and_has_no_answer_address(self) -> None:
+        attacker = self.compose["services"]["attacker"]
+        self.assertEqual(["attacker"], attacker["profiles"])
+        self.assertEqual("no", attacker["restart"])
+        self.assertEqual(["quiz-range"], attacker["networks"])
+        self.assertNotIn("ipv4_address", attacker["networks"])
+        self.assertNotIn("environment", attacker)
+        self.assertNotIn("volumes", attacker)
 
     def test_renderer_rejects_gateway_collision(self) -> None:
         subnet = ipaddress.ip_network(self.scenario["authorized_cidr"])
