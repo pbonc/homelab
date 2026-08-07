@@ -144,6 +144,12 @@ def discover_docker_networks(
             )
         ipam = network.get("IPAM")
         configs = ipam.get("Config") if isinstance(ipam, dict) else None
+        driver = network.get("Driver")
+        # Docker's built-in host and none networks have no allocatable subnet,
+        # so their IPAM Config is legitimately null. They cannot overlap the
+        # quiz pool. Every address-allocating driver must still supply a list.
+        if configs is None and driver in {"host", "null"}:
+            continue
         if not isinstance(configs, list):
             raise DockerNetworkDiscoveryError(
                 "Docker network IPAM data is incomplete; no scenario was generated"

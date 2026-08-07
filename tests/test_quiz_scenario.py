@@ -140,6 +140,49 @@ class QuizScenarioTests(unittest.TestCase):
             discovered,
         )
 
+    def test_builtin_host_and_none_networks_need_no_ipam_subnet(self) -> None:
+        responses = iter(
+            [
+                self.docker_result(stdout="host-id\nnone-id\nbridge-id\n"),
+                self.docker_result(
+                    stdout=json.dumps(
+                        [
+                            {"Driver": "host", "IPAM": {"Config": None}},
+                            {"Driver": "null", "IPAM": {"Config": None}},
+                            {
+                                "Driver": "bridge",
+                                "IPAM": {"Config": [{"Subnet": "172.28.0.0/16"}]},
+                            },
+                        ]
+                    )
+                ),
+            ]
+        )
+
+        discovered = quiz_scenario.discover_docker_networks(
+            lambda *args, **kwargs: next(responses)
+        )
+
+        self.assertEqual([ipaddress.ip_network("172.28.0.0/16")], discovered)
+
+    def test_address_allocating_network_without_ipam_fails_closed(self) -> None:
+        responses = iter(
+            [
+                self.docker_result(stdout="bridge-id\n"),
+                self.docker_result(
+                    stdout=json.dumps(
+                        [{"Driver": "bridge", "IPAM": {"Config": None}}]
+                    )
+                ),
+            ]
+        )
+        with self.assertRaisesRegex(
+            quiz_scenario.DockerNetworkDiscoveryError, "IPAM data is incomplete"
+        ):
+            quiz_scenario.discover_docker_networks(
+                lambda *args, **kwargs: next(responses)
+            )
+
     def test_live_docker_discovery_fails_closed_on_list_error(self) -> None:
         with self.assertRaisesRegex(
             quiz_scenario.DockerNetworkDiscoveryError, "no scenario was generated"
