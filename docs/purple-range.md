@@ -87,6 +87,24 @@ unprivileged user with all Linux capabilities dropped, and is enabled only by
 the generated range's explicit `attacker` profile. Use TCP-connect scans such
 as `nmap -sT` because the toolbox is intentionally not granted raw sockets.
 
+Prepare and exercise a seeded discovery round without printing its private
+answer data:
+
+```bash
+make quiz-range-prepare ARGS="--seed 42 --exclude 192.168.1.0/24"
+make quiz-range-deploy
+make quiz-range-verify
+make quiz-range-destroy
+```
+
+Preparation discovers live Docker networks, allocates a non-overlapping `/27`,
+and writes the scenario and generated Compose model beneath the ignored
+`.runtime/quiz-range/` directory with private permissions. Verification runs
+from the disposable attacker, requires the exact target-and-decoy TCP surface,
+checks every declared HTTP route, and fails if the attacker can reach Homepage
+or a public internet address. Destruction removes the generated project before
+deleting its private manifest and Compose model.
+
 Prove isolation after the target is healthy:
 
 ```bash
