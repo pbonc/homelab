@@ -191,7 +191,7 @@ Build the first version of a generic ingestion, storage, API, and visualization 
 - [x] Replace the planned Juice Shop placeholder with an on-demand Homepage lab card that opens a LAN-safe launcher without publishing the vulnerable target to the LAN
 - [x] Build an independently available range portal with copyable start and tunnel instructions plus browser-local tunnel readiness; grant it no Docker control, credentials, or target-network access
 - [x] Make Homepage monitor only the safe launcher and clearly distinguish launcher health from the on-demand target and workstation tunnel
-- [ ] Deploy the range portal and Homepage `0.12.2`, then verify the target action remains disabled without the tunnel and opens Juice Shop only while the range and tunnel are active
+- [x] Deploy the range portal and Homepage `0.12.2`, then verify the target action remains disabled without the tunnel and opens Juice Shop only while the range and tunnel are active
 
 ### 1. Safety boundary and reproducibility
 
